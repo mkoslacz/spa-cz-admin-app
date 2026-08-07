@@ -1,7 +1,7 @@
 // Firestore rules for the prototype stakeholder comment layer.
-// Deployment patch point: replace the reserved .example alternatives in
-// hostedDomain() only after the reviewer domains have been approved. Until then,
-// they grant no real access. See docs/firebase-comments-setup.md.
+// Review access is limited to verified Szallas Group email identities. Exact
+// individual exceptions and the owner role live in the private allowed/{email}
+// collection. See docs/firebase-comments-setup.md.
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -12,9 +12,8 @@ service cloud.firestore {
     }
 
     function hostedDomain() {
-      // DEPLOYMENT PATCH POINT: replace only these escaped domain alternatives.
-      // Never use the GitHub Pages hostname here; this is the reviewer's email domain.
-      return request.auth.token.email.matches('^[^@]+@(your-company\\.example|partner\\.example)$');
+      // This is the reviewer's email domain, not the GitHub Pages hostname.
+      return request.auth.token.email.matches('^[^@]+@szallas\\.group$');
     }
 
     function explicitlyAllowed() {

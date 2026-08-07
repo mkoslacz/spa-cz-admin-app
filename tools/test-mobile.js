@@ -2,6 +2,7 @@
 'use strict';
 
 const assert = require('assert');
+const childProcess = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const { captureJobs } = require('./capture-previews.js');
@@ -9,6 +10,7 @@ const { normaliseUsecase } = require('./build-usecases.js');
 const { normalizedViewportHeight, normalizedViewportWidth } = require('./dump-dom.js');
 const { frameQueue } = require('./dump-frames.js');
 const { frameDimensions } = require('./generate-fig.js');
+const { validateRepositoryFirebaseContract } = require('./test-firebase-deploy-config.js');
 
 const root = path.resolve(__dirname, '..');
 const areas = [
@@ -126,10 +128,36 @@ assert.deepStrictEqual(
 assert(exists('comments.config.example.json'));
 assert(exists('comments.config.schema.json'));
 assert(exists('comments.rules'));
-assert(
-  !exists('comments.config.json'),
-  'live Firebase comments config must not exist before an explicit project is configured'
-);
+assert(exists('firebase.json'));
+validateRepositoryFirebaseContract(root);
+if (exists('comments.config.json')) {
+  const ignored = childProcess.spawnSync('git', ['check-ignore', '-q', 'comments.config.json'], {
+    cwd: root,
+    encoding: 'utf8',
+  });
+  assert.strictEqual(ignored.status, 0, 'configured comments.config.json must stay git-ignored');
+  const indexed = childProcess.spawnSync('git', ['ls-files', '--error-unmatch', 'comments.config.json'], {
+    cwd: root,
+    encoding: 'utf8',
+  });
+  assert.notStrictEqual(indexed.status, 0, 'comments.config.json must never enter the Git index');
+  const status = childProcess.spawnSync(
+    'git',
+    ['status', '--short', '--untracked-files=all', '--', 'comments.config.json'],
+    { cwd: root, encoding: 'utf8' }
+  );
+  assert.strictEqual(status.status, 0, 'Git status check for comments.config.json must succeed');
+  assert.strictEqual(status.stdout, '', 'comments.config.json must remain absent from Git status');
+  const validation = childProcess.spawnSync(
+    process.execPath,
+    ['tools/validate-comments-config.js', 'comments.config.json'],
+    {
+      cwd: root,
+      encoding: 'utf8',
+    }
+  );
+  assert.strictEqual(validation.status, 0, 'configured comments.config.json must pass schema validation');
+}
 const publishWorkflow = read('.github/workflows/prototype-refresh.yml');
 assert.match(publishWorkflow, /secrets\.COMMENTS_CONFIG_JSON/);
 assert.match(publishWorkflow, /validate-comments-config\.js comments\.config\.json/);

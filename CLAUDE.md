@@ -42,10 +42,14 @@ Then decode/check the `.fig`, confirm all 24 top-level frames are 390 × 844, an
 
 ## Comments and Firebase
 
-- `comments.config.json` is ignored and must never be committed. Reviewer exports, credentials and one-time auth codes are also private.
-- Use the pinned CLI in `tools/node_modules/.bin/firebase` and the one-session procedure in `docs/firebase-comments-setup.md` once that file exists.
+- `comments.config.json` may be absent (comments disabled) or locally present after explicit setup. When present, it must remain ignored, absent from the Git index/status and schema-valid; tests must inspect only those properties and never print its contents. Reviewer exports, credentials and one-time auth codes are also private.
+- Root `firebase.json` is the only Firebase CLI authority. It serves emulator tests and live rules deployment; never add a second nested Firebase config or a `.firebaserc` alias.
+- Run `node tools/test-firebase-deploy-config.js` from the repository root before emulator or deployment work. It rejects escaped, missing, non-file or symlinked rules paths, public emulator hosts and a second Firebase config.
+- Use the pinned CLI in `tools/node_modules/.bin/firebase` and the one-session procedure in `docs/firebase-comments-setup.md`. Every Firebase command must pass `--config firebase.json`; every live resource command must also pass the exact `--project`.
+- Create `(default)` explicitly in `europe-west3` and assert its exact name, `FIRESTORE_NATIVE` type, `STANDARD` edition and location from `firestore:databases:get --json` before any rules dry run or deployment. A deploy command must never become database creation.
+- The `nam5` recovery path documents the pre-activation failure that was corrected on 7 August 2026; the current `(default)` is `FIRESTORE_NATIVE`, `STANDARD`, `europe-west3` and must not be deleted. Recovery requires exact project/database/current-location guards plus manual confirmation of zero collections and no deployed rules, secret or comments; never reuse it for an active database.
 - Keep comments disabled if authentication, rules, allowlisting, secret injection or the live denial smoke test is incomplete. The product prototype must remain usable without Firebase.
 
 ## Known open boundary
 
-- Firebase comments are not active until a dedicated project is authenticated/configured, rules are deployed, `COMMENTS_CONFIG_JSON` is set in GitHub, and live authorized/unauthorized smoke tests pass.
+- Firebase comments are not active until the dedicated EU database passes the location assertion, rules are deployed, `COMMENTS_CONFIG_JSON` is set in GitHub, and live authorized/unauthorized smoke tests pass.

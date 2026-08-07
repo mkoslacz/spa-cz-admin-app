@@ -50,6 +50,12 @@ jobs:
       # leaving deploy-pages to fail after a full regeneration.
       - uses: actions/configure-pages@v5
 
+      - name: Install Java for the Firestore emulator
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -66,6 +72,7 @@ jobs:
         run: |
           npm --prefix tools test
           npm --prefix tools run lint
+          npm --prefix tools run format:check
           npm --prefix tools run test:browser
 
       - name: Regenerate derived artifacts

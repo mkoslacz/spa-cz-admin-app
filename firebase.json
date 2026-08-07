@@ -1,6 +1,18 @@
 {
+  "auth": {
+    "providers": {
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "SPA CZ Partner Mobile",
+        "supportEmail": "mateusz.koslacz@szallas.group",
+        "authorizedRedirectUris": [
+          "https://mateuszkoslacz.com",
+          "http://127.0.0.1"
+        ]
+      }
+    }
+  },
   "firestore": {
-    "rules": "../comments.rules"
+    "rules": "comments.rules"
   },
   "emulators": {
     "firestore": {

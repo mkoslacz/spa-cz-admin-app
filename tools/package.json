@@ -19,7 +19,10 @@
     "node": ">=22"
   },
   "scripts": {
-    "test": "node test-usecases-contract.js && node test-product-contract.js && node test-mobile.js",
+    "test": "npm run test:static && npm run test:comments",
+    "test:static": "node test-usecases-contract.js && node test-product-contract.js && node test-mobile.js && node test-firebase-deploy-config.js",
+    "test:comments": "node test-comments-config.js && npm run test:comments-rules",
+    "test:comments-rules": "cd .. && tools/node_modules/.bin/firebase --config firebase.json --project demo-spa-cz-comments emulators:exec --only firestore \"node tools/test-comments-rules.js\"",
     "test:browser": "node test-mobile-browser.js && node test-usecases-workshop-browser.js",
     "lint": "eslint --max-warnings=0 \"*.js\"",
     "format": "prettier --write \"*.js\" \"*.cjs\" \"*.json\"",

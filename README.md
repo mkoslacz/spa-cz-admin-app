@@ -12,7 +12,7 @@ Always use the local or published HTTP URL for review. The product screens can s
 python3 -m http.server 8000
 ```
 
-Then open `http://localhost:8000/`. The standard local workshop server for this repository uses `http://127.0.0.1:4173/`.
+Then open `http://localhost:8000/`. The authenticated local review server for this repository uses `http://127.0.0.1:4174/`.
 
 ## Mobile app map
 
@@ -134,7 +134,15 @@ The 7 August 2026 review replaced the pale blue-grey application layer with a wh
 
 ## Stakeholder comments and privacy
 
-The complete comment layer is included but disabled by default: `comments.config.json` is intentionally absent and ignored by Git. A configured deployment injects the validated JSON from the `COMMENTS_CONFIG_JSON` GitHub Actions secret. Follow the [Firebase comments setup, verification and recovery runbook](docs/firebase-comments-setup.md) to activate it in a dedicated project without committing deployment configuration or reviewer data.
+The complete comment layer is included but disabled by default while `comments.config.json` is absent. After explicit setup, that file may exist locally only while it remains ignored, absent from the Git index/status and schema-valid; the default test gate enforces this without printing its contents. A configured deployment injects the validated JSON from the `COMMENTS_CONFIG_JSON` GitHub Actions secret. Follow the [Firebase comments setup, verification and recovery runbook](docs/firebase-comments-setup.md) to activate it in a dedicated project without committing deployment configuration or reviewer data.
+
+`firebase.json` at the repository root is the single Firebase CLI authority for both the loopback-only Firestore emulator and live rules deployment. Run the credential-free deployment preflight from the repository root:
+
+```bash
+node tools/test-firebase-deploy-config.js
+```
+
+Live activation is ordered deliberately: create `(default)` in `europe-west3`, verify its exact resource name, `FIRESTORE_NATIVE` type, `STANDARD` edition and location through machine-readable CLI output, and only then run any rules command. Every Firebase command in the runbook passes `--config firebase.json`; every live command also passes the exact `--project spa-cz-partner-mobile`. A rules dry run is an external operation and must not be used to create the database.
 
 When enabled:
 
