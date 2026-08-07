@@ -112,6 +112,9 @@ assert(
   !exists('comments.config.json'),
   'live Firebase comments config must not exist before an explicit project is configured'
 );
+const publishWorkflow = read('.github/workflows/prototype-refresh.yml');
+assert.match(publishWorkflow, /secrets\.COMMENTS_CONFIG_JSON/);
+assert.match(publishWorkflow, /validate-comments-config\.js comments\.config\.json/);
 
 const runtime = read('proto-m.js');
 assert.doesNotMatch(runtime, /commissionRate|Provize 15|Commission 15/);

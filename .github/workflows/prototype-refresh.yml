@@ -74,6 +74,17 @@ jobs:
           CHROME_PATH: /usr/bin/google-chrome
         run: node tools/refresh.js --allow-package-scripts
 
+      - name: Add configured stakeholder comments
+        env:
+          COMMENTS_CONFIG_JSON: ${{ secrets.COMMENTS_CONFIG_JSON }}
+        run: |
+          if [[ -z "$COMMENTS_CONFIG_JSON" ]]; then
+            echo "COMMENTS_CONFIG_JSON is not configured; publishing the review layer in disabled mode."
+          else
+            printf '%s\n' "$COMMENTS_CONFIG_JSON" > comments.config.json
+            node tools/validate-comments-config.js comments.config.json
+          fi
+
       - name: Assemble the published package
         env:
           PACKAGE_DIR: ${{ runner.temp }}/pages-package

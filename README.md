@@ -140,7 +140,7 @@ The 7 August 2026 review replaced the pale blue-grey application layer with a wh
 
 ## Stakeholder comments and privacy
 
-The complete comment layer is included but disabled by default: `comments.config.json` is intentionally absent and ignored by Git. To enable it, copy `comments.config.example.json`, supply a dedicated Firebase web configuration, configure the Google provider and reviewer allowlist, and deploy `comments.rules` to that project.
+The complete comment layer is included but disabled by default: `comments.config.json` is intentionally absent and ignored by Git. A configured deployment injects the validated JSON from the `COMMENTS_CONFIG_JSON` GitHub Actions secret, so the live Firebase project details do not have to be committed. For local review, place the same ignored file beside `index.html`. Configure the Google provider and explicit reviewer allowlist, then deploy `comments.rules` to the dedicated project.
 
 When enabled:
 
