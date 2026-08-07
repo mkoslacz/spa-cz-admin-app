@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light">
   <title>Přehled · SPA.CZ partner app prototype</title>
-  <link rel="stylesheet" href="tokens-m.css?v=20260807e">
-  <link rel="stylesheet" href="app-m.css?v=20260807e">
-  <link rel="stylesheet" href="proto-tools.css?v=20260807e">
-  <link rel="stylesheet" href="proto-comments.css?v=20260807e">
-  <link rel="stylesheet" href="proto-m.css?v=20260807e">
+  <link rel="stylesheet" href="tokens-m.css?v=20260807g">
+  <link rel="stylesheet" href="app-m.css?v=20260807g">
+  <link rel="stylesheet" href="proto-tools.css?v=20260807g">
+  <link rel="stylesheet" href="proto-comments.css?v=20260807g">
+  <link rel="stylesheet" href="proto-m.css?v=20260807g">
 </head>
 <body data-page="dashboard" data-viewport="mobile" data-auth="in" data-access="full" data-connection="manual" data-density="dense" data-inv="many" data-hotel="active">
   <a class="skip-link" href="#main">Přejít na obsah</a>
@@ -27,7 +27,7 @@
         <small><span class="connection-pill"><span class="connection-manual">Ruční správa</span><span class="connection-chm">Channel Manager</span></span></small>
       </span>
     </button>
-    <button class="header-button" type="button" data-toast="V prototypu: centrum oznámení." aria-label="Oznámení"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M18 16v-5a6 6 0 0 0-5-5.9V4a1 1 0 0 0-2 0v1.1A6 6 0 0 0 6 11v5l-2 2h16l-2-2Zm-8 3h4a2 2 0 0 1-4 0Z"/></svg></button>
+    <button class="header-button" type="button" data-open-sheet="notification-sheet" data-outcome="sheet" aria-label="Oznámení"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M18 16v-5a6 6 0 0 0-5-5.9V4a1 1 0 0 0-2 0v1.1A6 6 0 0 0 6 11v5l-2 2h16l-2-2Zm-8 3h4a2 2 0 0 1-4 0Z"/></svg></button>
   </header>
       <main class="mobile-main" id="main">
         <div class="page-head">
@@ -38,10 +38,10 @@
   
   <div class="alert info test-alert"><strong>Testovací zařízení.</strong>&nbsp;Změny nejsou publikovány na SPA.CZ.</div>
     <div class="metrics-grid inventory-content">
-      <article class="card metric-card"><span class="metric-icon"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M5 3h2v2h10V3h2v2h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h1V3Zm15 7H4v10h16V10ZM7 12h3v3H7v-3Zm5 0h3v3h-3v-3Zm5 0h2v3h-2v-3ZM7 17h3v2H7v-2Zm5 0h3v2h-3v-2Z"/></svg></span><div class="metric-copy"><small>Dnešní příjezdy · demo</small><strong class="metric-value">4</strong></div></article>
-      <article class="card metric-card"><span class="metric-icon"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 11h5v-2h-4V6h-2v7h1Z"/></svg></span><div class="metric-copy"><small>Dnešní odjezdy · demo</small><strong class="metric-value">3</strong></div></article>
-      <article class="card metric-card"><span class="metric-icon"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M3 4h2v8h4V7h6a4 4 0 0 1 4 4v1h2v8h-2v-2H5v2H3V4Zm8 8h6v-1a2 2 0 0 0-2-2h-4v3Z"/></svg></span><div class="metric-copy"><small>Volné pokoje · demo</small><strong class="metric-value">22</strong></div></article>
-      <article class="card metric-card"><span class="metric-icon"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M5 2h14v20l-3-2-2 2-2-2-2 2-2-2-3 2V2Zm4 5h6V5H9v2Zm-1 4h8V9H8v2Zm0 4h8v-2H8v2Z"/></svg></span><div class="metric-copy"><small>Ke schválení · demo</small><strong class="metric-value">3</strong></div></article>
+      <a class="card metric-card dashboard-action" data-dashboard-action="kpi-arrivals" href="m-reservations.html?queue=arrivals" data-carry-state data-outcome="route"><span class="metric-icon"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M5 3h2v2h10V3h2v2h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h1V3Zm15 7H4v10h16V10ZM7 12h3v3H7v-3Zm5 0h3v3h-3v-3Zm5 0h2v3h-2v-3ZM7 17h3v2H7v-2Zm5 0h3v2h-3v-2Z"/></svg></span><span class="metric-copy"><small>Dnešní příjezdy · demo</small><strong class="metric-value">4</strong></span></a>
+      <a class="card metric-card dashboard-action" data-dashboard-action="kpi-departures" href="m-reservations.html?queue=departures" data-carry-state data-outcome="route"><span class="metric-icon"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 11h5v-2h-4V6h-2v7h1Z"/></svg></span><span class="metric-copy"><small>Dnešní odjezdy · demo</small><strong class="metric-value">3</strong></span></a>
+      <a class="card metric-card dashboard-action" data-dashboard-action="kpi-rooms" href="m-availability.html" data-carry-state data-outcome="route"><span class="metric-icon"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M3 4h2v8h4V7h6a4 4 0 0 1 4 4v1h2v8h-2v-2H5v2H3V4Zm8 8h6v-1a2 2 0 0 0-2-2h-4v3Z"/></svg></span><span class="metric-copy"><small>Volné pokoje · demo</small><strong class="metric-value">22</strong></span></a>
+      <a class="card metric-card dashboard-action" data-dashboard-action="kpi-approvals" href="m-billing.html?billingFilter=pending" data-carry-state data-outcome="route"><span class="metric-icon"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M5 2h14v20l-3-2-2 2-2-2-2 2-2-2-3 2V2Zm4 5h6V5H9v2Zm-1 4h8V9H8v2Zm0 4h8v-2H8v2Z"/></svg></span><span class="metric-copy"><small>Ke schválení · demo</small><strong class="metric-value">3</strong></span></a>
     </div>
     <div class="empty-state"><div class="empty-inner">
     <svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m3 12 9-9h7a2 2 0 0 1 2 2v7l-9 9L3 12Zm13-4.5A1.5 1.5 0 1 0 16 4a1.5 1.5 0 0 0 0 3.5Z"/></svg>
@@ -52,31 +52,30 @@
     <div class="section-head"><h2>Vyžaduje pozornost</h2><span class="demo-label">Ukázka</span></div>
     <section class="card flush inventory-content">
       <ul class="task-list">
-        <li class="task-item" data-inventory-rank="1"><span class="task-count">3</span><span><strong>Rezervace k rozúčtování</strong><small>Zkontrolujte cenu a provizi</small></span><a href="m-billing.html" data-carry-state aria-label="Otevřít rozúčtování"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m9 18 6-6-6-6-1.4 1.4 4.6 4.6-4.6 4.6L9 18Z"/></svg></a></li>
-        <li class="task-item" data-inventory-rank="2"><span class="task-count">2</span><span><strong>Změny čekají na schválení</strong><small>Proces čtyř očí · demo</small></span><a href="m-more.html#changes" data-carry-state aria-label="Otevřít změny"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m9 18 6-6-6-6-1.4 1.4 4.6 4.6-4.6 4.6L9 18Z"/></svg></a></li>
-        <li class="task-item" data-inventory-rank="3"><span class="task-count">7</span><span><strong>Nízká dostupnost</strong><small>Sedm nocí v ukázkovém kalendáři</small></span><a href="m-availability.html" data-carry-state aria-label="Otevřít dostupnost"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m9 18 6-6-6-6-1.4 1.4 4.6 4.6-4.6 4.6L9 18Z"/></svg></a></li>
+        <li class="task-item" data-inventory-rank="1"><a class="task-link dashboard-action" data-dashboard-action="task-billing" href="m-billing.html?billingFilter=pending" data-carry-state data-outcome="route"><span class="task-count">3</span><span><strong>Rezervace k rozúčtování</strong><small>Zkontrolujte cenu a provizi</small></span><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m9 18 6-6-6-6-1.4 1.4 4.6 4.6-4.6 4.6L9 18Z"/></svg></a></li>
+        <li class="task-item" data-inventory-rank="2"><a class="task-link dashboard-action" data-dashboard-action="task-changes" href="m-more.html?section=changes" data-carry-state data-outcome="route"><span class="task-count">2</span><span><strong>Změny čekají na schválení</strong><small>Proces čtyř očí · demo</small></span><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m9 18 6-6-6-6-1.4 1.4 4.6 4.6-4.6 4.6L9 18Z"/></svg></a></li>
+        <li class="task-item" data-inventory-rank="3"><a class="task-link dashboard-action" data-dashboard-action="task-availability" href="m-availability.html" data-carry-state data-outcome="route"><span class="task-count">7</span><span><strong>Nízká dostupnost</strong><small>Sedm nocí v ukázkovém kalendáři</small></span><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m9 18 6-6-6-6-1.4 1.4 4.6 4.6-4.6 4.6L9 18Z"/></svg></a></li>
       </ul>
     </section>
 
     <div class="section-head"><h2>Aktuální rezervace</h2><a href="m-reservations.html" data-carry-state>Zobrazit vše</a></div>
     <div class="reservation-list inventory-content">
-      <a class="reservation-card" data-inventory-rank="1" href="m-reservation-detail.html?reservation=DEMO-10482" data-carry-state>
+      <a class="reservation-card" data-inventory-rank="1" data-reservation-status="confirmed" data-reservation-queues="arrivals departures" href="m-reservation-detail.html?reservation=DEMO-10482" data-carry-state>
     <div class="card-line"><strong class="truncate">Jana Nováková</strong><span class="status success">Potvrzeno</span></div>
     <div class="card-line secondary"><span>DEMO-10482 · ukázka</span><span>Vytvořeno 8. 10.</span></div>
-    <div class="card-line financial"><span>12.–14. 10. 2026</span><strong>7 154 Kč</strong></div>
-  </a>
-      <a class="reservation-card" data-inventory-rank="2" href="m-reservation-detail.html?reservation=DEMO-10477" data-carry-state>
+    <div class="card-line financial"><span>12.–14. 10. 2026</span><strong>7 154 Kč</strong></div>
+  </a><a class="reservation-card" data-inventory-rank="2" data-reservation-status="new" data-reservation-queues="arrivals" href="m-reservation-detail.html?reservation=DEMO-10477" data-carry-state>
     <div class="card-line"><strong class="truncate">Petr Dvořák</strong><span class="status info">Nová</span></div>
     <div class="card-line secondary"><span>DEMO-10477 · ukázka</span><span>Vytvořeno 8. 10.</span></div>
-    <div class="card-line financial"><span>16.–19. 10. 2026</span><strong>6 240 Kč</strong></div>
+    <div class="card-line financial"><span>16.–19. 10. 2026</span><strong>6 240 Kč</strong></div>
   </a>
     </div>
 
-    <div class="section-head"><h2>Veřejná nabídka</h2></div>
+    <div class="section-head"><h2>Nabídka</h2><span class="demo-label">Ukázka</span></div>
     <article class="offer-card">
       <div class="offer-visual"><div><small>SPA HOTEL ČAJKOVSKIJ</small><strong>3 dny / 2 noci</strong></div></div>
-      <div class="offer-copy"><h2>Pobyt na SPA.CZ</h2><p>Veřejně ověřené parametry použité jako cenový základ prototypu.</p></div>
-      <div class="offer-price"><div><small>od</small><strong data-price="base">3 577 Kč</strong></div><a class="button primary" href="m-offer.html" data-carry-state>Nabídka</a></div>
+      <div class="offer-copy"><h2>Pobyt na SPA.CZ</h2><p>Ukázkový pobytový balíček pro kontrolu partnerského toku.</p></div>
+      <div class="offer-price"><div><small>ukázková cena od</small><strong>3 577 Kč</strong></div><a class="button primary dashboard-action" data-dashboard-action="offer-package" href="m-rate-edit.html?offer=cajkovskij-stay" data-carry-state data-outcome="route">Ceny</a></div>
     </article>
       </main>
       <nav class="mobile-bottom-nav" aria-label="Hlavní navigace">
@@ -98,14 +97,14 @@
   </nav>
     </div>
   </div>
-  <section class="signed-out-wall"><div class="wall-card"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm6-1a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM9 13c-4 0-7 2-7 5v2h14v-2c0-3-3-5-7-5Zm7 0c-.6 0-1.2.1-1.8.2 2.3 1 3.8 2.7 3.8 4.8v2h4v-2c0-3-2.6-5-6-5Z"/></svg><h1>Odhlášený ukázkový účet</h1><p>V plovoucím panelu přepněte účet zpět na „Přihlášen“. Nejsou použity žádné skutečné přihlašovací údaje.</p><button class="button primary" type="button" data-toast="Přihlášení se mění v panelu prototypu.">Otevřít ukázkový účet</button></div></section>
+  <section class="signed-out-wall"><div class="wall-card"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm6-1a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM9 13c-4 0-7 2-7 5v2h14v-2c0-3-3-5-7-5Zm7 0c-.6 0-1.2.1-1.8.2 2.3 1 3.8 2.7 3.8 4.8v2h4v-2c0-3-2.6-5-6-5Z"/></svg><h1>Odhlášený ukázkový účet</h1><p>Nejsou použity žádné skutečné přihlašovací údaje.</p><button class="button primary" type="button" data-state-key="auth" data-state-value="in">Otevřít ukázkový účet</button></div></section>
   <section class="access-wall"><div class="wall-card"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m19.4 13 .1-1-.1-1 2-1.5-2-3.4-2.4 1a8 8 0 0 0-1.7-1L15 3.5h-4l-.4 2.6a8 8 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.5-.1 1 .1 1-2 1.5 2 3.4 2.4-1a8 8 0 0 0 1.7 1l.4 2.6h4l.4-2.6a8 8 0 0 0 1.7-1l2.4 1 2-3.4-2-1.5ZM13 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z"/></svg><h1>Bez přístupu v tomto stavu</h1><p>V plovoucím panelu zvolte přístup „Pouze pro čtení“ nebo „Plný“.</p></div></section>
-  <div class="modal-backdrop" id="property-sheet" aria-hidden="true"><section class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="property-sheet-title"><div class="sheet-grabber"></div><header class="sheet-head"><h2 id="property-sheet-title">Vybrat zařízení</h2><button class="header-button" type="button" data-close-sheet aria-label="Zavřít">×</button></header><div class="sheet-body"><button class="button full primary" type="button" data-close-sheet>SPA HOTEL ČAJKOVSKIJ <span class="test-label">TEST</span></button><p class="subtle">Jediné veřejné zařízení použité v prototypu.</p></div></section></div>
+  <div class="modal-backdrop" id="property-sheet" aria-hidden="true"><section class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="property-sheet-title" tabindex="-1"><div class="sheet-grabber"></div><header class="sheet-head"><h2 id="property-sheet-title">Vybrat zařízení</h2><button class="header-button" type="button" data-close-sheet aria-label="Zavřít">×</button></header><div class="sheet-body"><p class="subtle">SPA HOTEL ČAJKOVSKIJ · ukázková konfigurace</p><div class="state-choices"><button class="button full" type="button" data-state-key="hotel" data-state-value="active">Aktivní zařízení</button><button class="button full" type="button" data-state-key="hotel" data-state-value="test">Testovací zařízení</button></div></div></section></div><div class="modal-backdrop" id="notification-sheet" aria-hidden="true"><section class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="notification-sheet-title" tabindex="-1"><div class="sheet-grabber"></div><header class="sheet-head"><h2 id="notification-sheet-title">Oznámení</h2><button class="header-button" type="button" data-close-sheet aria-label="Zavřít">×</button></header><div class="sheet-body"><nav class="notification-list"><a href="m-billing.html?billingFilter=pending" data-carry-state><strong>3 rozúčtování ke schválení</strong><small>Otevřít pracovní seznam</small></a><a href="m-more.html?section=changes" data-carry-state><strong>2 změny čekají na kontrolu</strong><small>Otevřít změny</small></a><a href="m-availability.html" data-carry-state><strong>Nízká dostupnost v 7 nocích</strong><small>Otevřít kalendář</small></a></nav></div></section></div>
   <div class="toast" role="status" aria-live="polite"></div>
   <div class="state-debug" data-state-output></div>
   <a class="screen-reader-only" href="m-dashboard-en.html" data-carry-state>English</a>
-  <script src="proto-tools.js?v=20260807e" defer></script>
-  <script src="proto-comments.js?v=20260807e" defer></script>
-  <script src="proto-m.js?v=20260807e" defer></script>
+  <script src="proto-tools.js?v=20260807g" defer></script>
+  <script src="proto-comments.js?v=20260807g" defer></script>
+  <script src="proto-m.js?v=20260807g" defer></script>
 </body>
 </html>

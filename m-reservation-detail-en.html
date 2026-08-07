@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light">
   <title>Reservation detail · SPA.CZ partner app prototype</title>
-  <link rel="stylesheet" href="tokens-m.css?v=20260807e">
-  <link rel="stylesheet" href="app-m.css?v=20260807e">
-  <link rel="stylesheet" href="proto-tools.css?v=20260807e">
-  <link rel="stylesheet" href="proto-comments.css?v=20260807e">
-  <link rel="stylesheet" href="proto-m.css?v=20260807e">
+  <link rel="stylesheet" href="tokens-m.css?v=20260807g">
+  <link rel="stylesheet" href="app-m.css?v=20260807g">
+  <link rel="stylesheet" href="proto-tools.css?v=20260807g">
+  <link rel="stylesheet" href="proto-comments.css?v=20260807g">
+  <link rel="stylesheet" href="proto-m.css?v=20260807g">
 </head>
 <body data-page="reservation-detail" data-viewport="mobile" data-auth="in" data-access="full" data-connection="manual" data-density="dense" data-inv="many" data-hotel="active">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -27,30 +27,31 @@
         <small><span class="connection-pill"><span class="connection-manual">Manual</span><span class="connection-chm">Channel Manager</span></span></small>
       </span>
     </button>
-    <button class="header-button" type="button" data-toast="In prototype: notification centre." aria-label="Notifications"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M18 16v-5a6 6 0 0 0-5-5.9V4a1 1 0 0 0-2 0v1.1A6 6 0 0 0 6 11v5l-2 2h16l-2-2Zm-8 3h4a2 2 0 0 1-4 0Z"/></svg></button>
+    <button class="header-button" type="button" data-open-sheet="notification-sheet" data-outcome="sheet" aria-label="Notifications"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M18 16v-5a6 6 0 0 0-5-5.9V4a1 1 0 0 0-2 0v1.1A6 6 0 0 0 6 11v5l-2 2h16l-2-2Zm-8 3h4a2 2 0 0 1-4 0Z"/></svg></button>
   </header>
       <main class="mobile-main" id="main">
         <a class="back-link" href="m-reservations-en.html" data-carry-state><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m15 18-6-6 6-6 1.4 1.4-4.6 4.6 4.6 4.6L15 18Z"/></svg> Reservations</a>
+    <div class="identity-found">
     <div class="page-head">
-    <div><h1>Reservation DEMO-10482</h1><p>All private data below is explicitly demo data.</p><span class="demo-label">Demo data</span></div>
+    <div><h1>Reservation <span data-reservation-field="id">DEMO-10482</span></h1><p>All private data below is explicitly demo data.</p><span class="demo-label">Demo data</span></div>
     
   </div>
     <div class="alert warning readonly-alert"><strong>Read-only access.</strong>&nbsp;Editing is disabled for this role.</div>
   
   <div class="alert info test-alert"><strong>Test property.</strong>&nbsp;Changes are not published on SPA.CZ.</div>
     <div class="summary-band">
-      <div class="summary-cell"><small>Status</small><strong><span class="status success">Confirmed</span></strong></div>
+      <div class="summary-cell"><small>Status</small><strong><span class="status success" data-reservation-field="status">Confirmed</span></strong></div>
       <div class="summary-cell"><small>Created · demo</small><strong>8. 10. 2026</strong></div>
-      <div class="summary-cell wide"><small>Stay · demo</small><strong>12.–14. 10. 2026 · 3 days / 2 nights</strong></div>
+      <div class="summary-cell wide"><small>Stay · demo</small><strong><span data-reservation-field="stay">12.–14. 10. 2026</span> · <span data-reservation-field="duration">3 days / 2 nights</span></strong></div>
       <div class="summary-cell"><small>Check-in</small><strong>14:00</strong></div>
       <div class="summary-cell"><small>Check-out</small><strong>10:00</strong></div>
     </div>
 
     <section class="card">
-      <div class="section-head"><h2>Stay</h2><span class="status info">Public baseline</span></div>
+      <div class="section-head"><h2>Stay</h2><span class="demo-label">Demo</span></div>
       <div class="definition-grid">
         <dl><dt>Property</dt><dd>SPA HOTEL ČAJKOVSKIJ</dd></dl>
-        <dl><dt>Package</dt><dd>3 days / 2 nights</dd></dl>
+        <dl><dt>Package</dt><dd data-reservation-field="duration">3 days / 2 nights</dd></dl>
         <dl><dt>Room · demo</dt><dd>Double room</dd></dl>
         <dl><dt>Guests · demo</dt><dd>2 adults</dd></dl>
       </div>
@@ -59,18 +60,18 @@
     <section class="card">
       <div class="section-head"><h2>Guest and contact</h2><span class="demo-label">Demo</span></div>
       <div class="definition-grid">
-        <dl><dt>Contact person</dt><dd>Jana Nováková</dd></dl>
+        <dl><dt>Contact person</dt><dd data-reservation-field="guest">Jana Nováková</dd></dl>
         <dl><dt>Phone</dt><dd>+420 000 000 000</dd></dl>
         <dl><dt>E-mail</dt><dd>demo@example.invalid</dd></dl>
-        <dl><dt>Additional guest</dt><dd>Pavel Novák</dd></dl>
+        <dl><dt>Additional guest</dt><dd data-reservation-field="additionalGuest">Pavel Novák</dd></dl>
       </div>
     </section>
 
     <section class="card">
       <div class="section-head"><h2>Price and commission</h2><span class="demo-label">Demo calculation</span></div>
       <div class="finance-summary">
-        <dl><dt>Public price from / person</dt><dd data-price="base">3 577 Kč</dd></dl>
-        <dl class="total"><dt>2 adults × public baseline · derived</dt><dd data-price="partyTotal">7 154 Kč</dd></dl>
+        <dl><dt>Reservation price · demo</dt><dd data-reservation-field="price">7 154 Kč</dd></dl>
+        <dl class="total"><dt>Total · demo value</dt><dd data-reservation-field="price">7 154 Kč</dd></dl>
         <dl><dt>Commission incl. VAT</dt><dd>Per partner contract</dd></dl>
       </div>
     </section>
@@ -79,10 +80,13 @@
       <div class="section-head"><h2>Cancellation and documents</h2></div>
       <ul class="detail-list">
         <li class="detail-row"><span><strong>Cancellation policy</strong><br><small class="subtle">Demo reservation condition; no production value.</small></span><span class="status warning">Demo</span></li>
-        <li class="detail-row"><span><strong>Voucher PDF</strong><br><small class="subtle">Available for a supported reservation status</small></span><button class="page-action-icon" type="button" data-toast="In prototype: open voucher PDF." aria-label="Voucher PDF"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M6 2h8l5 5v15H6V2Zm8 2.5V8h3.5L14 4.5ZM9 13h7v-2H9v2Zm0 4h7v-2H9v2Z"/></svg></button></li>
+        <li class="detail-row"><span><strong>Voucher PDF</strong><br><small class="subtle">Document for this demo reservation</small></span><button class="page-action-icon" type="button" data-open-sheet="voucher-sheet" aria-label="Voucher PDF"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M6 2h8l5 5v15H6V2Zm8 2.5V8h3.5L14 4.5ZM9 13h7v-2H9v2Zm0 4h7v-2H9v2Z"/></svg></button></li>
       </ul>
     </section>
-    <div class="sticky-action-bar"><span><small>Next step</small><strong>Reservation settlement</strong></span><a class="button primary" href="m-billing-en.html" data-carry-state>Open</a></div>
+    <div class="sticky-action-bar"><span><small>Next step</small><strong>Reservation settlement</strong></span><a class="button primary" href="m-billing-en.html?billingFilter=pending" data-carry-state>Open</a></div>
+    </div>
+    <section class="identity-missing card" hidden><h1>Reservation not found</h1><p>The requested ID is not part of the demo data.</p><a class="button primary" href="m-reservations-en.html" data-carry-state>Back to reservations</a></section>
+    <script id="reservation-fixtures" type="application/json">[{"id":"DEMO-10482","rank":1,"guest":"Jana Nováková","additionalGuest":"Pavel Novák","stay":"12.–14. 10. 2026","duration":"3 days / 2 nights","statusKey":"confirmed","status":"Confirmed","statusClass":"success","price":7154,"queues":["arrivals","departures"]},{"id":"DEMO-10477","rank":2,"guest":"Petr Dvořák","additionalGuest":"Lucie Dvořáková","stay":"16.–19. 10. 2026","duration":"4 days / 3 nights","statusKey":"new","status":"New","statusClass":"info","price":6240,"queues":["arrivals"]},{"id":"DEMO-10463","rank":3,"guest":"Klára Veselá","additionalGuest":"Tomáš Veselý","stay":"20.–23. 10. 2026","duration":"4 days / 3 nights","statusKey":"confirmed","status":"Confirmed","statusClass":"success","price":8120,"queues":["arrivals","departures"]},{"id":"DEMO-10451","rank":4,"guest":"Martin Černý","additionalGuest":"—","stay":"27.–29. 10. 2026","duration":"3 days / 2 nights","statusKey":"pending","status":"Awaiting hotel","statusClass":"warning","price":4390,"queues":["arrivals"]},{"id":"DEMO-10439","rank":5,"guest":"Eva Horáková","additionalGuest":"Jan Horák","stay":"2.–5. 11. 2026","duration":"4 days / 3 nights","statusKey":"cancelled","status":"Cancelled","statusClass":"danger","price":7030,"queues":["departures"]}]</script>
       </main>
       <nav class="mobile-bottom-nav" aria-label="Primary navigation">
     <a href="m-dashboard-en.html" data-carry-state class="" >
@@ -103,14 +107,14 @@
   </nav>
     </div>
   </div>
-  <section class="signed-out-wall"><div class="wall-card"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm6-1a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM9 13c-4 0-7 2-7 5v2h14v-2c0-3-3-5-7-5Zm7 0c-.6 0-1.2.1-1.8.2 2.3 1 3.8 2.7 3.8 4.8v2h4v-2c0-3-2.6-5-6-5Z"/></svg><h1>Signed-out demo account</h1><p>Use the floating settings panel to switch back to “Signed in”. No real credentials are used.</p><button class="button primary" type="button" data-toast="Use the prototype settings panel to sign in.">Open demo account</button></div></section>
+  <section class="signed-out-wall"><div class="wall-card"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm6-1a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM9 13c-4 0-7 2-7 5v2h14v-2c0-3-3-5-7-5Zm7 0c-.6 0-1.2.1-1.8.2 2.3 1 3.8 2.7 3.8 4.8v2h4v-2c0-3-2.6-5-6-5Z"/></svg><h1>Signed-out demo account</h1><p>No real credentials are used.</p><button class="button primary" type="button" data-state-key="auth" data-state-value="in">Open demo account</button></div></section>
   <section class="access-wall"><div class="wall-card"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m19.4 13 .1-1-.1-1 2-1.5-2-3.4-2.4 1a8 8 0 0 0-1.7-1L15 3.5h-4l-.4 2.6a8 8 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.5-.1 1 .1 1-2 1.5 2 3.4 2.4-1a8 8 0 0 0 1.7 1l.4 2.6h4l.4-2.6a8 8 0 0 0 1.7-1l2.4 1 2-3.4-2-1.5ZM13 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z"/></svg><h1>No access in this demo state</h1><p>Use the floating settings panel to select Read only or Full access.</p></div></section>
-  <div class="modal-backdrop" id="property-sheet" aria-hidden="true"><section class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="property-sheet-title"><div class="sheet-grabber"></div><header class="sheet-head"><h2 id="property-sheet-title">Select property</h2><button class="header-button" type="button" data-close-sheet aria-label="Close">×</button></header><div class="sheet-body"><button class="button full primary" type="button" data-close-sheet>SPA HOTEL ČAJKOVSKIJ <span class="test-label">TEST</span></button><p class="subtle">The only public property used in the prototype.</p></div></section></div>
+  <div class="modal-backdrop" id="property-sheet" aria-hidden="true"><section class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="property-sheet-title" tabindex="-1"><div class="sheet-grabber"></div><header class="sheet-head"><h2 id="property-sheet-title">Select property</h2><button class="header-button" type="button" data-close-sheet aria-label="Close">×</button></header><div class="sheet-body"><p class="subtle">SPA HOTEL ČAJKOVSKIJ · demo configuration</p><div class="state-choices"><button class="button full" type="button" data-state-key="hotel" data-state-value="active">Active property</button><button class="button full" type="button" data-state-key="hotel" data-state-value="test">Test property</button></div></div></section></div><div class="modal-backdrop" id="notification-sheet" aria-hidden="true"><section class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="notification-sheet-title" tabindex="-1"><div class="sheet-grabber"></div><header class="sheet-head"><h2 id="notification-sheet-title">Notifications</h2><button class="header-button" type="button" data-close-sheet aria-label="Close">×</button></header><div class="sheet-body"><nav class="notification-list"><a href="m-billing-en.html?billingFilter=pending" data-carry-state><strong>3 settlements for approval</strong><small>Open working list</small></a><a href="m-more-en.html?section=changes" data-carry-state><strong>2 changes await review</strong><small>Open changes</small></a><a href="m-availability-en.html" data-carry-state><strong>Low availability on 7 nights</strong><small>Open calendar</small></a></nav></div></section></div><div class="modal-backdrop" id="voucher-sheet" aria-hidden="true"><section class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="voucher-sheet-title" tabindex="-1"><div class="sheet-grabber"></div><header class="sheet-head"><h2 id="voucher-sheet-title">Voucher PDF</h2><button class="header-button" type="button" data-close-sheet aria-label="Close">×</button></header><div class="sheet-body"><p class="subtle"><span data-reservation-sheet-id>DEMO-10482</span> · demo document</p><button class="button full" type="button" data-terminal="voucher-pdf" data-terminal-message="Voucher PDF for the selected demo reservation is ready.">Open PDF</button></div></section></div>
   <div class="toast" role="status" aria-live="polite"></div>
   <div class="state-debug" data-state-output></div>
   <a class="screen-reader-only" href="m-reservation-detail.html" data-carry-state>Čeština</a>
-  <script src="proto-tools.js?v=20260807e" defer></script>
-  <script src="proto-comments.js?v=20260807e" defer></script>
-  <script src="proto-m.js?v=20260807e" defer></script>
+  <script src="proto-tools.js?v=20260807g" defer></script>
+  <script src="proto-comments.js?v=20260807g" defer></script>
+  <script src="proto-m.js?v=20260807g" defer></script>
 </body>
 </html>

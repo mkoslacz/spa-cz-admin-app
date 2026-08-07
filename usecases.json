@@ -84,7 +84,7 @@
       "options": {
         "active": {
           "label": "Active property",
-          "doc": "Uses the public SPA HOTEL ČAJKOVSKIJ package fixture."
+          "doc": "Uses the SPA HOTEL ČAJKOVSKIJ demo package fixture."
         },
         "test": {
           "label": "Test property",
@@ -215,9 +215,9 @@
     {
       "id": "UC-07",
       "name": "Maintain an offer and its rate",
-      "story": "A partner reviews the public package fixture, then moves to the related price configuration without losing context.",
+      "story": "A partner reviews the demo package fixture, then moves to the related price configuration without losing context.",
       "rules": [
-        "The public fixture stays consistent: SPA HOTEL ČAJKOVSKIJ, three days, two nights, from 3,577 CZK, check-in 14:00 and check-out 10:00.",
+        "The demo fixture stays consistent within the prototype: SPA HOTEL ČAJKOVSKIJ, three days, two nights, from 3,577 CZK, check-in 14:00 and check-out 10:00.",
         "Offer and rate actions respect the selected access level."
       ],
       "screens": ["m-offer.html", "m-rate-edit.html"],

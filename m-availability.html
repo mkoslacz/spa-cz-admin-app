@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light">
   <title>Dostupnost · SPA.CZ partner app prototype</title>
-  <link rel="stylesheet" href="tokens-m.css?v=20260807e">
-  <link rel="stylesheet" href="app-m.css?v=20260807e">
-  <link rel="stylesheet" href="proto-tools.css?v=20260807e">
-  <link rel="stylesheet" href="proto-comments.css?v=20260807e">
-  <link rel="stylesheet" href="proto-m.css?v=20260807e">
+  <link rel="stylesheet" href="tokens-m.css?v=20260807g">
+  <link rel="stylesheet" href="app-m.css?v=20260807g">
+  <link rel="stylesheet" href="proto-tools.css?v=20260807g">
+  <link rel="stylesheet" href="proto-comments.css?v=20260807g">
+  <link rel="stylesheet" href="proto-m.css?v=20260807g">
 </head>
 <body data-page="availability" data-viewport="mobile" data-auth="in" data-access="full" data-connection="manual" data-density="dense" data-inv="many" data-hotel="active">
   <a class="skip-link" href="#main">Přejít na obsah</a>
@@ -27,7 +27,7 @@
         <small><span class="connection-pill"><span class="connection-manual">Ruční správa</span><span class="connection-chm">Channel Manager</span></span></small>
       </span>
     </button>
-    <button class="header-button" type="button" data-toast="V prototypu: centrum oznámení." aria-label="Oznámení"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M18 16v-5a6 6 0 0 0-5-5.9V4a1 1 0 0 0-2 0v1.1A6 6 0 0 0 6 11v5l-2 2h16l-2-2Zm-8 3h4a2 2 0 0 1-4 0Z"/></svg></button>
+    <button class="header-button" type="button" data-open-sheet="notification-sheet" data-outcome="sheet" aria-label="Oznámení"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M18 16v-5a6 6 0 0 0-5-5.9V4a1 1 0 0 0-2 0v1.1A6 6 0 0 0 6 11v5l-2 2h16l-2-2Zm-8 3h4a2 2 0 0 1-4 0Z"/></svg></button>
   </header>
       <main class="mobile-main" id="main">
         <div class="page-head">
@@ -67,14 +67,14 @@
   </nav>
     </div>
   </div>
-  <section class="signed-out-wall"><div class="wall-card"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm6-1a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM9 13c-4 0-7 2-7 5v2h14v-2c0-3-3-5-7-5Zm7 0c-.6 0-1.2.1-1.8.2 2.3 1 3.8 2.7 3.8 4.8v2h4v-2c0-3-2.6-5-6-5Z"/></svg><h1>Odhlášený ukázkový účet</h1><p>V plovoucím panelu přepněte účet zpět na „Přihlášen“. Nejsou použity žádné skutečné přihlašovací údaje.</p><button class="button primary" type="button" data-toast="Přihlášení se mění v panelu prototypu.">Otevřít ukázkový účet</button></div></section>
+  <section class="signed-out-wall"><div class="wall-card"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm6-1a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM9 13c-4 0-7 2-7 5v2h14v-2c0-3-3-5-7-5Zm7 0c-.6 0-1.2.1-1.8.2 2.3 1 3.8 2.7 3.8 4.8v2h4v-2c0-3-2.6-5-6-5Z"/></svg><h1>Odhlášený ukázkový účet</h1><p>Nejsou použity žádné skutečné přihlašovací údaje.</p><button class="button primary" type="button" data-state-key="auth" data-state-value="in">Otevřít ukázkový účet</button></div></section>
   <section class="access-wall"><div class="wall-card"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m19.4 13 .1-1-.1-1 2-1.5-2-3.4-2.4 1a8 8 0 0 0-1.7-1L15 3.5h-4l-.4 2.6a8 8 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.5-.1 1 .1 1-2 1.5 2 3.4 2.4-1a8 8 0 0 0 1.7 1l.4 2.6h4l.4-2.6a8 8 0 0 0 1.7-1l2.4 1 2-3.4-2-1.5ZM13 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z"/></svg><h1>Bez přístupu v tomto stavu</h1><p>V plovoucím panelu zvolte přístup „Pouze pro čtení“ nebo „Plný“.</p></div></section>
-  <div class="modal-backdrop" id="property-sheet" aria-hidden="true"><section class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="property-sheet-title"><div class="sheet-grabber"></div><header class="sheet-head"><h2 id="property-sheet-title">Vybrat zařízení</h2><button class="header-button" type="button" data-close-sheet aria-label="Zavřít">×</button></header><div class="sheet-body"><button class="button full primary" type="button" data-close-sheet>SPA HOTEL ČAJKOVSKIJ <span class="test-label">TEST</span></button><p class="subtle">Jediné veřejné zařízení použité v prototypu.</p></div></section></div><div class="modal-backdrop" id="availability-sheet" aria-hidden="true"><section class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="availability-sheet-title"><div class="sheet-grabber"></div><header class="sheet-head"><h2 id="availability-sheet-title">Uzavřít termín</h2><button class="header-button" type="button" data-close-sheet aria-label="Zavřít">×</button></header><div class="sheet-body"><form data-prototype-form data-success="Ukázkový stop prodej byl nastaven." id="availability-form"><div class="form-two-col"><label class="field"><span>Od</span><input type="date" value="2026-10-16"></label><label class="field"><span>Do</span><input type="date" value="2026-10-17"></label></div><label class="field"><span>Pokoj</span><select><option>Všechny pokoje</option><option>Dvoulůžkový</option></select></label></form></div><div class="sheet-actions"><button class="button" type="button" data-close-sheet>Zrušit</button><button class="button primary" type="submit" form="availability-form">Nastavit</button></div></section></div>
+  <div class="modal-backdrop" id="property-sheet" aria-hidden="true"><section class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="property-sheet-title" tabindex="-1"><div class="sheet-grabber"></div><header class="sheet-head"><h2 id="property-sheet-title">Vybrat zařízení</h2><button class="header-button" type="button" data-close-sheet aria-label="Zavřít">×</button></header><div class="sheet-body"><p class="subtle">SPA HOTEL ČAJKOVSKIJ · ukázková konfigurace</p><div class="state-choices"><button class="button full" type="button" data-state-key="hotel" data-state-value="active">Aktivní zařízení</button><button class="button full" type="button" data-state-key="hotel" data-state-value="test">Testovací zařízení</button></div></div></section></div><div class="modal-backdrop" id="notification-sheet" aria-hidden="true"><section class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="notification-sheet-title" tabindex="-1"><div class="sheet-grabber"></div><header class="sheet-head"><h2 id="notification-sheet-title">Oznámení</h2><button class="header-button" type="button" data-close-sheet aria-label="Zavřít">×</button></header><div class="sheet-body"><nav class="notification-list"><a href="m-billing.html?billingFilter=pending" data-carry-state><strong>3 rozúčtování ke schválení</strong><small>Otevřít pracovní seznam</small></a><a href="m-more.html?section=changes" data-carry-state><strong>2 změny čekají na kontrolu</strong><small>Otevřít změny</small></a><a href="m-availability.html" data-carry-state><strong>Nízká dostupnost v 7 nocích</strong><small>Otevřít kalendář</small></a></nav></div></section></div><div class="modal-backdrop" id="availability-sheet" aria-hidden="true"><section class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="availability-sheet-title" tabindex="-1"><div class="sheet-grabber"></div><header class="sheet-head"><h2 id="availability-sheet-title">Uzavřít termín</h2><button class="header-button" type="button" data-close-sheet aria-label="Zavřít">×</button></header><div class="sheet-body"><form data-prototype-form data-success="Ukázkový stop prodej byl nastaven." id="availability-form"><div class="form-two-col"><label class="field"><span>Od</span><input type="date" value="2026-10-16"></label><label class="field"><span>Do</span><input type="date" value="2026-10-17"></label></div><label class="field"><span>Pokoj</span><select><option>Všechny pokoje</option><option>Dvoulůžkový</option></select></label></form></div><div class="sheet-actions"><button class="button" type="button" data-close-sheet>Zrušit</button><button class="button primary" type="submit" form="availability-form">Nastavit</button></div></section></div>
   <div class="toast" role="status" aria-live="polite"></div>
   <div class="state-debug" data-state-output></div>
   <a class="screen-reader-only" href="m-availability-en.html" data-carry-state>English</a>
-  <script src="proto-tools.js?v=20260807e" defer></script>
-  <script src="proto-comments.js?v=20260807e" defer></script>
-  <script src="proto-m.js?v=20260807e" defer></script>
+  <script src="proto-tools.js?v=20260807g" defer></script>
+  <script src="proto-comments.js?v=20260807g" defer></script>
+  <script src="proto-m.js?v=20260807g" defer></script>
 </body>
 </html>

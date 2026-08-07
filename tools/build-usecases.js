@@ -13,6 +13,7 @@
 const fs = require('fs');
 const path = require('path');
 const { pathToFileURL } = require('url');
+const usecasesContract = require('../usecases-contract.js');
 
 class ToolError extends Error {}
 
@@ -49,91 +50,32 @@ function parseArgs(argv) {
   return options;
 }
 
-function isNonEmptyString(value) {
-  return typeof value === 'string' && value.trim().length > 0;
-}
-
-function assertObject(value, label, errors) {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) {
-    errors.push(label + ' must be an object');
-    return false;
-  }
-  return true;
-}
-
 function validateMatrix(matrix, root) {
-  const errors = [];
-  const covered = new Set();
-  if (!assertObject(matrix, 'usecases.json', errors)) throw new ToolError(errors.join('; '));
-  const states = matrix.states;
-  if (!assertObject(states, 'states', errors) || Object.keys(states).length === 0) {
-    if (Object.keys(states || {}).length === 0) errors.push('states must declare at least one axis');
-  }
-
-  for (const [axis, definition] of Object.entries(states || {})) {
-    if (!assertObject(definition, 'state "' + axis + '"', errors)) continue;
-    if (!isNonEmptyString(definition.doc)) errors.push('state "' + axis + '" is missing doc');
-    if (
-      !assertObject(definition.options, 'state "' + axis + '" options', errors) ||
-      Object.keys(definition.options).length === 0
-    ) {
-      if (Object.keys(definition.options || {}).length === 0)
-        errors.push('state "' + axis + '" must declare at least one option');
-      continue;
-    }
-    for (const [option, optionDefinition] of Object.entries(definition.options)) {
-      if (!assertObject(optionDefinition, 'state "' + axis + '" option "' + option + '"', errors)) continue;
-      if (!isNonEmptyString(optionDefinition.doc))
-        errors.push('state "' + axis + '" option "' + option + '" is missing doc');
+  let allowedScreens = null;
+  const manifestFile = path.join(root, 'prototype.json');
+  if (fs.existsSync(manifestFile)) {
+    try {
+      allowedScreens = usecasesContract.screensFromManifest(JSON.parse(fs.readFileSync(manifestFile, 'utf8')));
+    } catch (error) {
+      throw new ToolError('could not parse prototype.json: ' + error.message);
     }
   }
-
-  if (!Array.isArray(matrix.usecases) || matrix.usecases.length === 0) {
-    errors.push('usecases must be a non-empty array');
-  }
-  const ids = new Set();
-  for (const [index, usecase] of (matrix.usecases || []).entries()) {
+  const result = usecasesContract.validateMatrix(matrix, {
+    allowedScreens,
+    maxUsecases: Number.MAX_SAFE_INTEGER,
+    requireCoverage: true,
+  });
+  const errors = result.errors.slice();
+  for (const [index, usecase] of (Array.isArray(matrix && matrix.usecases) ? matrix.usecases : []).entries()) {
     const label = 'use case #' + (index + 1);
-    if (!assertObject(usecase, label, errors)) continue;
-    if (!isNonEmptyString(usecase.id)) errors.push(label + ' is missing id');
-    else if (ids.has(usecase.id)) errors.push('duplicate use case id "' + usecase.id + '"');
-    else ids.add(usecase.id);
-    if (!isNonEmptyString(usecase.name)) errors.push(label + ' is missing name');
-    if (!isNonEmptyString(usecase.story)) errors.push(label + ' is missing story');
-    if (!Array.isArray(usecase.rules)) errors.push(label + ' rules must be an array');
-    if (!Array.isArray(usecase.screens) || usecase.screens.length === 0) {
-      errors.push(label + ' must name at least one screen');
-    } else {
-      for (const screen of usecase.screens) {
-        if (!isNonEmptyString(screen)) {
-          errors.push(label + ' has an invalid screen');
-          continue;
-        }
-        const screenPath = safeScreenPath(root, screen, label, errors);
-        if (screenPath && !fs.existsSync(screenPath)) errors.push(label + ' names a missing screen "' + screen + '"');
-      }
-    }
-    if (!assertObject(usecase.state, label + ' state', errors)) continue;
-    for (const [axis, option] of Object.entries(usecase.state || {})) {
-      if (!Object.prototype.hasOwnProperty.call(states || {}, axis)) {
-        errors.push(label + ' names unknown state axis "' + axis + '"');
-        continue;
-      }
-      if (!Object.prototype.hasOwnProperty.call(states[axis].options || {}, option)) {
-        errors.push(label + ' names unknown option "' + axis + '.' + option + '"');
-        continue;
-      }
-      covered.add(axis + '\0' + option);
-    }
-  }
-  for (const [axis, definition] of Object.entries(states || {})) {
-    for (const option of Object.keys((definition && definition.options) || {})) {
-      if (!covered.has(axis + '\0' + option))
-        errors.push('state "' + axis + '" option "' + option + '" is not covered by any use case');
+    for (const screen of Array.isArray(usecase && usecase.screens) ? usecase.screens : []) {
+      if (typeof screen !== 'string' || !screen.trim()) continue;
+      const screenPath = safeScreenPath(root, screen, label, errors);
+      if (screenPath && !fs.existsSync(screenPath)) errors.push(label + ' names a missing screen "' + screen + '"');
     }
   }
   if (errors.length) throw new ToolError(errors.join('; '));
-  return matrix;
+  return usecasesContract.normalizeMatrix(matrix);
 }
 
 function safeScreenPath(root, screen, label, errors) {
@@ -150,35 +92,15 @@ function safeScreenPath(root, screen, label, errors) {
 }
 
 function queryForState(state, extra) {
-  const query = new URLSearchParams();
-  for (const [key, value] of Object.entries(state || {})) query.set(key, String(value));
-  for (const [key, value] of Object.entries(extra || {})) query.set(key, String(value));
-  const text = query.toString();
-  return text ? '?' + text : '';
+  return usecasesContract.queryForState(state, extra);
 }
 
 function deepLink(screen, state) {
-  return screen + queryForState(state);
+  return usecasesContract.deepLink(screen, state);
 }
 
 function viewportFor(screen, usecase) {
-  const fallbackName = /^m-/.test(path.basename(screen)) ? 'mobile' : 'desktop';
-  if (usecase.viewport && typeof usecase.viewport === 'object' && !Array.isArray(usecase.viewport)) {
-    const name = usecase.viewport.name || fallbackName;
-    const width = Number(usecase.viewport.width);
-    const height = Number(usecase.viewport.height);
-    if (Number.isSafeInteger(width) && width > 0 && Number.isSafeInteger(height) && height > 0)
-      return { name, width, height };
-    throw new ToolError('use case "' + usecase.id + '" viewport must declare positive integer width and height');
-  }
-  if (typeof usecase.viewport === 'string') {
-    return usecase.viewport === 'mobile'
-      ? { name: 'mobile', width: 390, height: 844 }
-      : { name: usecase.viewport, width: 1440, height: 900 };
-  }
-  return fallbackName === 'mobile'
-    ? { name: 'mobile', width: 390, height: 844 }
-    : { name: 'desktop', width: 1440, height: 900 };
+  return usecasesContract.viewportFor(screen, usecase);
 }
 
 function relativeScreenLink(outFile, root, screen, state) {
@@ -188,25 +110,8 @@ function relativeScreenLink(outFile, root, screen, state) {
 }
 
 function normaliseUsecase(usecase, root) {
-  const screens = usecase.screens.map(screen => {
-    const viewport = viewportFor(screen, usecase);
-    return {
-      screen,
-      viewport: viewport.name,
-      deepLink: deepLink(screen, usecase.state),
-      width: viewport.width,
-      height: viewport.height,
-    };
-  });
-  return {
-    id: usecase.id,
-    name: usecase.name,
-    story: usecase.story,
-    rules: usecase.rules,
-    state: usecase.state,
-    deepLink: screens[0].deepLink,
-    screens,
-  };
+  void root;
+  return usecasesContract.normalizedEntry(usecase);
 }
 
 function escapeMarkdown(value) {
@@ -218,6 +123,12 @@ function markdown(matrix, entries, outFile, root, captures, captureEnabled) {
     '# Product use cases',
     '',
     'Generated from `usecases.json`. The matrix is declared rather than a full cross-product: every switch option is documented and appears in at least one product use case.',
+    '',
+    '## Local workshop',
+    '',
+    'Open [`usecases.html`](../usecases.html) over HTTP to create, edit, duplicate, delete, search, validate, preview, import and export scenarios. Drafts stay in this browser until a normalized `usecases.json` is downloaded and deliberately committed; they do not create Firebase comment anchors.',
+    '',
+    'The workshop protects local work when the published source fingerprint changes, caps imports at 1 MiB / 500 scenarios, and blocks export until every declared state option is covered. After replacing the source JSON, run `node tools/build-usecases.js` to regenerate this document, the review payload and one representative capture per scenario.',
     '',
     '## State reference',
     '',
@@ -352,7 +263,8 @@ async function captureEntries(entries, root, outFile, dependencies = {}) {
       args: ['--force-device-scale-factor=1', '--hide-scrollbars'],
     });
     for (const entry of entries) {
-      for (const screen of entry.screens) {
+      const screen = entry.screens[0];
+      if (screen) {
         const source = path.resolve(root, screen.screen);
         const target = path.join(
           captureDir,
@@ -363,8 +275,8 @@ async function captureEntries(entries, root, outFile, dependencies = {}) {
         try {
           await page.setViewport({ width: screen.width, height: screen.height, deviceScaleFactor: 1 });
           const url = pathToFileURL(source);
-          for (const [key, value] of new URLSearchParams(queryForState(entry.state, { nopanel: 1 })))
-            url.searchParams.set(key, value);
+          for (const [key, value] of Object.entries(entry.state || {})) url.searchParams.set(key, String(value));
+          url.searchParams.set('nopanel', '1');
           await timeout(
             page.goto(url.toString(), { waitUntil: 'networkidle0', timeout: 60000 }),
             captureTimeout,
@@ -400,6 +312,13 @@ async function captureEntries(entries, root, outFile, dependencies = {}) {
   } finally {
     if (browser) await browser.close();
   }
+  if (dependencies.pruneStale !== false && typeof fileSystem.readdirSync === 'function') {
+    const expected = new Set(Array.from(captures.values()).map(file => path.resolve(file)));
+    for (const name of fileSystem.readdirSync(captureDir)) {
+      const candidate = path.resolve(captureDir, name);
+      if (/\.png$/i.test(name) && !expected.has(candidate)) fileSystem.unlinkSync(candidate);
+    }
+  }
   return captures;
 }
 
@@ -424,7 +343,9 @@ async function build(options, cwd = process.cwd()) {
   const entries = source.map(usecase => normaliseUsecase(usecase, root));
   const markdownOutput = path.resolve(root, options.out);
   const jsonOutput = path.resolve(root, options.json);
-  const captures = options.capture ? await captureEntries(entries, root, markdownOutput) : new Map();
+  const captures = options.capture
+    ? await captureEntries(entries, root, markdownOutput, { pruneStale: !options.only })
+    : new Map();
   const panel = {
     generatedAt: new Date().toISOString(),
     states: matrix.states,

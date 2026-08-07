@@ -19,8 +19,8 @@
     "node": ">=22"
   },
   "scripts": {
-    "test": "node test-mobile.js",
-    "test:browser": "node test-mobile-browser.js",
+    "test": "node test-usecases-contract.js && node test-product-contract.js && node test-mobile.js",
+    "test:browser": "node test-mobile-browser.js && node test-usecases-workshop-browser.js",
     "lint": "eslint --max-warnings=0 \"*.js\"",
     "format": "prettier --write \"*.js\" \"*.cjs\" \"*.json\"",
     "format:check": "prettier --check \"*.js\" \"*.cjs\" \"*.json\""

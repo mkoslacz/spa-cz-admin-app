@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light">
   <title>Offer · SPA.CZ partner app prototype</title>
-  <link rel="stylesheet" href="tokens-m.css?v=20260807e">
-  <link rel="stylesheet" href="app-m.css?v=20260807e">
-  <link rel="stylesheet" href="proto-tools.css?v=20260807e">
-  <link rel="stylesheet" href="proto-comments.css?v=20260807e">
-  <link rel="stylesheet" href="proto-m.css?v=20260807e">
+  <link rel="stylesheet" href="tokens-m.css?v=20260807g">
+  <link rel="stylesheet" href="app-m.css?v=20260807g">
+  <link rel="stylesheet" href="proto-tools.css?v=20260807g">
+  <link rel="stylesheet" href="proto-comments.css?v=20260807g">
+  <link rel="stylesheet" href="proto-m.css?v=20260807g">
 </head>
 <body data-page="offer" data-viewport="mobile" data-auth="in" data-access="full" data-connection="manual" data-density="dense" data-inv="many" data-hotel="active">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -27,40 +27,43 @@
         <small><span class="connection-pill"><span class="connection-manual">Manual</span><span class="connection-chm">Channel Manager</span></span></small>
       </span>
     </button>
-    <button class="header-button" type="button" data-toast="In prototype: notification centre." aria-label="Notifications"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M18 16v-5a6 6 0 0 0-5-5.9V4a1 1 0 0 0-2 0v1.1A6 6 0 0 0 6 11v5l-2 2h16l-2-2Zm-8 3h4a2 2 0 0 1-4 0Z"/></svg></button>
+    <button class="header-button" type="button" data-open-sheet="notification-sheet" data-outcome="sheet" aria-label="Notifications"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M18 16v-5a6 6 0 0 0-5-5.9V4a1 1 0 0 0-2 0v1.1A6 6 0 0 0 6 11v5l-2 2h16l-2-2Zm-8 3h4a2 2 0 0 1-4 0Z"/></svg></button>
   </header>
       <main class="mobile-main" id="main">
         <div class="page-head">
     <div><h1>Offer</h1><p>Stay packages, publication status and pricing readiness.</p></div>
-    <button class="page-action-icon" type="button" data-toast="In prototype: create package." aria-label="New package"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M4 17.3V21h3.7L18.8 9.9l-3.7-3.7L4 17.3ZM21.7 7a1 1 0 0 0 0-1.4l-3.3-3.3a1 1 0 0 0-1.4 0l-1.8 1.8 3.7 3.7L21.7 7Z"/></svg></button>
+    <button class="page-action-icon" type="button" data-open-sheet="new-package-sheet" aria-label="New package"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M4 17.3V21h3.7L18.8 9.9l-3.7-3.7L4 17.3ZM21.7 7a1 1 0 0 0 0-1.4l-3.3-3.3a1 1 0 0 0-1.4 0l-1.8 1.8 3.7 3.7L21.7 7Z"/></svg></button>
   </div>
     <div class="alert warning readonly-alert"><strong>Read-only access.</strong>&nbsp;Editing is disabled for this role.</div>
   
   <div class="alert info test-alert"><strong>Test property.</strong>&nbsp;Changes are not published on SPA.CZ.</div>
-    <div class="alert info"><strong>Verified pricing baseline.</strong>&nbsp;SPA HOTEL ČAJKOVSKIJ · 3 days / 2 nights · from CZK 3,577.</div>
-    <div class="filter-scroll"><button class="chip active" type="button" data-filter-chip>All</button><button class="chip" type="button" data-filter-chip>Active</button><button class="chip" type="button" data-filter-chip>SPA.CZ</button><button class="chip" type="button" data-filter-chip>Missing rates</button></div>
+    <div class="alert info"><strong>Demo data.</strong>&nbsp;Packages and prices are provided only to review the workflow.</div>
+    <div class="filter-scroll"><button class="chip" type="button" data-offer-filter="all" aria-pressed="false">All <span data-offer-filter-count="all">4</span></button><button class="chip" type="button" data-offer-filter="active" aria-pressed="false">Active <span data-offer-filter-count="active">3</span></button><button class="chip" type="button" data-offer-filter="spa" aria-pressed="false">SPA.CZ <span data-offer-filter-count="spa">2</span></button><button class="chip" type="button" data-offer-filter="missing" aria-pressed="false">Missing rates <span data-offer-filter-count="missing">1</span></button></div>
+    <div class="section-head"><h2><span data-offer-count>4</span> demo packages</h2></div>
     <div class="offer-list inventory-content">
-      <article class="offer-card featured" data-inventory-rank="1">
+      <article class="offer-card featured" data-inventory-rank="1" data-offer-id="cajkovskij-stay" data-offer-active="true" data-offer-spa="true" data-offer-has-rates="true">
     <div class="offer-visual"><div><small>SPA HOTEL ČAJKOVSKIJ</small><strong>3 days / 2 nights</strong></div></div>
-    <div class="offer-copy"><div class="card-line"><h2>SPA HOTEL ČAJKOVSKIJ stay</h2><span class="status info">Public fact</span></div><p>Publicly verified offer facts</p><div class="offer-meta"><span class="status success">Active</span><span class="status info">SPA.CZ</span></div></div>
-    <div class="offer-price"><div><small>from</small><strong data-price="base">3 577 Kč</strong></div><a class="button primary" href="m-rate-edit-en.html" data-carry-state>Rates</a></div>
-  </article>
-      <article class="offer-card compact" data-inventory-rank="2">
+    <div class="offer-copy"><div class="card-line"><h2>SPA HOTEL ČAJKOVSKIJ stay</h2><span class="demo-label">Demo</span></div><p>Demo stay package</p><div class="offer-meta"><span class="status success">Active</span><span class="status info">SPA.CZ</span></div></div>
+    <div class="offer-price"><div><small>demo price from</small><strong>3 577 Kč</strong></div><a class="button primary" href="m-rate-edit-en.html?offer=cajkovskij-stay" data-carry-state>Rates</a></div>
+  </article><article class="offer-card compact" data-inventory-rank="2" data-offer-id="wellness-weekend" data-offer-active="true" data-offer-spa="true" data-offer-has-rates="true">
     <div class="offer-visual"><div><small>DEMO OFFER</small><strong>3 days / 2 nights</strong></div></div>
     <div class="offer-copy"><div class="card-line"><h2>Wellness weekend · demo</h2><span class="demo-label">Demo</span></div><p>Breakfast · demo value</p><div class="offer-meta"><span class="status success">Active</span><span class="status info">SPA.CZ</span></div></div>
-    <div class="offer-price"><div><small>from</small><strong>4 890 Kč</strong></div><a class="button primary" href="m-rate-edit-en.html" data-carry-state>Rates</a></div>
-  </article>
-      <article class="offer-card compact" data-inventory-rank="3">
+    <div class="offer-price"><div><small>demo price from</small><strong>4 890 Kč</strong></div><a class="button primary" href="m-rate-edit-en.html?offer=wellness-weekend" data-carry-state>Rates</a></div>
+  </article><article class="offer-card compact" data-inventory-rank="3" data-offer-id="spa-week" data-offer-active="true" data-offer-spa="false" data-offer-has-rates="true">
     <div class="offer-visual"><div><small>DEMO OFFER</small><strong>8 days / 7 nights</strong></div></div>
-    <div class="offer-copy"><div class="card-line"><h2>Spa week · demo</h2><span class="demo-label">Demo</span></div><p>Half board · demo value</p><div class="offer-meta"><span class="status success">Active</span><span class="status info">SPA.CZ</span></div></div>
-    <div class="offer-price"><div><small>from</small><strong>14 200 Kč</strong></div><a class="button primary" href="m-rate-edit-en.html" data-carry-state>Rates</a></div>
-  </article>
-      <article class="offer-card compact" data-inventory-rank="4">
+    <div class="offer-copy"><div class="card-line"><h2>Spa week · demo</h2><span class="demo-label">Demo</span></div><p>Half board · demo value</p><div class="offer-meta"><span class="status success">Active</span></div></div>
+    <div class="offer-price"><div><small>demo price from</small><strong>14 200 Kč</strong></div><a class="button primary" href="m-rate-edit-en.html?offer=spa-week" data-carry-state>Rates</a></div>
+  </article><article class="offer-card compact" data-inventory-rank="4" data-offer-id="break-for-two" data-offer-active="false" data-offer-spa="false" data-offer-has-rates="false">
     <div class="offer-visual"><div><small>DEMO OFFER</small><strong>4 days / 3 nights</strong></div></div>
-    <div class="offer-copy"><div class="card-line"><h2>Break for two · demo</h2><span class="demo-label">Demo</span></div><p>Breakfast · demo value</p><div class="offer-meta"><span class="status success">Active</span><span class="status info">SPA.CZ</span></div></div>
-    <div class="offer-price"><div><small>from</small><strong>7 460 Kč</strong></div><a class="button primary" href="m-rate-edit-en.html" data-carry-state>Rates</a></div>
+    <div class="offer-copy"><div class="card-line"><h2>Break for two · demo</h2><span class="demo-label">Demo</span></div><p>Breakfast · demo value</p><div class="offer-meta"><span class="status warning">Draft</span></div></div>
+    <div class="offer-price"><div><small>missing rates</small><strong>—</strong></div><a class="button primary" href="m-rate-edit-en.html?offer=break-for-two" data-carry-state>Rates</a></div>
   </article>
     </div>
+    <div class="filter-empty" data-offer-empty hidden><div class="empty-state"><div class="empty-inner">
+    <svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m3 12 9-9h7a2 2 0 0 1 2 2v7l-9 9L3 12Zm13-4.5A1.5 1.5 0 1 0 16 4a1.5 1.5 0 0 0 0 3.5Z"/></svg>
+    <h2>No packages</h2>
+    <p>No demo package matches this filter.</p>
+  </div></div></div>
     <div class="empty-state"><div class="empty-inner">
     <svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m3 12 9-9h7a2 2 0 0 1 2 2v7l-9 9L3 12Zm13-4.5A1.5 1.5 0 1 0 16 4a1.5 1.5 0 0 0 0 3.5Z"/></svg>
     <h2>No packages</h2>
@@ -86,14 +89,14 @@
   </nav>
     </div>
   </div>
-  <section class="signed-out-wall"><div class="wall-card"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm6-1a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM9 13c-4 0-7 2-7 5v2h14v-2c0-3-3-5-7-5Zm7 0c-.6 0-1.2.1-1.8.2 2.3 1 3.8 2.7 3.8 4.8v2h4v-2c0-3-2.6-5-6-5Z"/></svg><h1>Signed-out demo account</h1><p>Use the floating settings panel to switch back to “Signed in”. No real credentials are used.</p><button class="button primary" type="button" data-toast="Use the prototype settings panel to sign in.">Open demo account</button></div></section>
+  <section class="signed-out-wall"><div class="wall-card"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm6-1a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM9 13c-4 0-7 2-7 5v2h14v-2c0-3-3-5-7-5Zm7 0c-.6 0-1.2.1-1.8.2 2.3 1 3.8 2.7 3.8 4.8v2h4v-2c0-3-2.6-5-6-5Z"/></svg><h1>Signed-out demo account</h1><p>No real credentials are used.</p><button class="button primary" type="button" data-state-key="auth" data-state-value="in">Open demo account</button></div></section>
   <section class="access-wall"><div class="wall-card"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m19.4 13 .1-1-.1-1 2-1.5-2-3.4-2.4 1a8 8 0 0 0-1.7-1L15 3.5h-4l-.4 2.6a8 8 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.5-.1 1 .1 1-2 1.5 2 3.4 2.4-1a8 8 0 0 0 1.7 1l.4 2.6h4l.4-2.6a8 8 0 0 0 1.7-1l2.4 1 2-3.4-2-1.5ZM13 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z"/></svg><h1>No access in this demo state</h1><p>Use the floating settings panel to select Read only or Full access.</p></div></section>
-  <div class="modal-backdrop" id="property-sheet" aria-hidden="true"><section class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="property-sheet-title"><div class="sheet-grabber"></div><header class="sheet-head"><h2 id="property-sheet-title">Select property</h2><button class="header-button" type="button" data-close-sheet aria-label="Close">×</button></header><div class="sheet-body"><button class="button full primary" type="button" data-close-sheet>SPA HOTEL ČAJKOVSKIJ <span class="test-label">TEST</span></button><p class="subtle">The only public property used in the prototype.</p></div></section></div>
+  <div class="modal-backdrop" id="property-sheet" aria-hidden="true"><section class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="property-sheet-title" tabindex="-1"><div class="sheet-grabber"></div><header class="sheet-head"><h2 id="property-sheet-title">Select property</h2><button class="header-button" type="button" data-close-sheet aria-label="Close">×</button></header><div class="sheet-body"><p class="subtle">SPA HOTEL ČAJKOVSKIJ · demo configuration</p><div class="state-choices"><button class="button full" type="button" data-state-key="hotel" data-state-value="active">Active property</button><button class="button full" type="button" data-state-key="hotel" data-state-value="test">Test property</button></div></div></section></div><div class="modal-backdrop" id="notification-sheet" aria-hidden="true"><section class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="notification-sheet-title" tabindex="-1"><div class="sheet-grabber"></div><header class="sheet-head"><h2 id="notification-sheet-title">Notifications</h2><button class="header-button" type="button" data-close-sheet aria-label="Close">×</button></header><div class="sheet-body"><nav class="notification-list"><a href="m-billing-en.html?billingFilter=pending" data-carry-state><strong>3 settlements for approval</strong><small>Open working list</small></a><a href="m-more-en.html?section=changes" data-carry-state><strong>2 changes await review</strong><small>Open changes</small></a><a href="m-availability-en.html" data-carry-state><strong>Low availability on 7 nights</strong><small>Open calendar</small></a></nav></div></section></div><div class="modal-backdrop" id="new-package-sheet" aria-hidden="true"><section class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="new-package-sheet-title" tabindex="-1"><div class="sheet-grabber"></div><header class="sheet-head"><h2 id="new-package-sheet-title">New package</h2><button class="header-button" type="button" data-close-sheet aria-label="Close">×</button></header><div class="sheet-body"><form data-prototype-form data-success="A new demo package was created as a draft." id="new-package-sheet-form"><label class="field"><span>Name</span><input value="New demo package" required></label><label class="field"><span>Number of nights</span><input type="number" min="1" value="2" required></label></form></div><div class="sheet-actions"><button class="button" type="button" data-close-sheet>Cancel</button><button class="button primary" type="submit" form="new-package-sheet-form" data-write-action>Create</button></div></section></div>
   <div class="toast" role="status" aria-live="polite"></div>
   <div class="state-debug" data-state-output></div>
   <a class="screen-reader-only" href="m-offer.html" data-carry-state>Čeština</a>
-  <script src="proto-tools.js?v=20260807e" defer></script>
-  <script src="proto-comments.js?v=20260807e" defer></script>
-  <script src="proto-m.js?v=20260807e" defer></script>
+  <script src="proto-tools.js?v=20260807g" defer></script>
+  <script src="proto-comments.js?v=20260807g" defer></script>
+  <script src="proto-m.js?v=20260807g" defer></script>
 </body>
 </html>

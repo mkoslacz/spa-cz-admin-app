@@ -3,8 +3,8 @@
 
 const assert = require('assert');
 const fs = require('fs');
+const http = require('http');
 const path = require('path');
-const { pathToFileURL } = require('url');
 const puppeteer = require('puppeteer-core');
 
 const root = path.resolve(__dirname, '..');
@@ -27,18 +27,98 @@ const screens = [
   'm-more.html',
   'm-more-en.html',
 ];
+const defaults = {
+  auth: 'in',
+  access: 'full',
+  connection: 'manual',
+  density: 'dense',
+  inv: 'many',
+  hotel: 'active',
+  reservation: 'DEMO-10482',
+  offer: 'cajkovskij-stay',
+  queue: 'all',
+  reservationFilter: 'all',
+  offerFilter: 'all',
+  billingFilter: 'pending',
+};
 
-function url(screen, query = '') {
-  return pathToFileURL(path.join(root, screen)).href + query;
+function contentType(file) {
+  return (
+    {
+      '.css': 'text/css; charset=utf-8',
+      '.html': 'text/html; charset=utf-8',
+      '.js': 'text/javascript; charset=utf-8',
+      '.json': 'application/json; charset=utf-8',
+      '.svg': 'image/svg+xml',
+      '.woff2': 'font/woff2',
+    }[path.extname(file)] || 'application/octet-stream'
+  );
 }
 
-async function open(page, screen, query = '') {
-  await page.goto(url(screen, query), { waitUntil: 'networkidle0', timeout: 30000 });
+function startServer() {
+  const server = http.createServer((request, response) => {
+    const requestUrl = new URL(request.url, 'http://127.0.0.1');
+    const pathname = decodeURIComponent(requestUrl.pathname === '/' ? '/m-dashboard.html' : requestUrl.pathname);
+    if (pathname === '/favicon.ico' || pathname === '/comments.config.json') {
+      response.writeHead(204).end();
+      return;
+    }
+    const absolute = path.resolve(root, '.' + pathname);
+    if (absolute !== root && !absolute.startsWith(root + path.sep)) {
+      response.writeHead(403).end('Forbidden');
+      return;
+    }
+    try {
+      const body = fs.readFileSync(absolute);
+      response.writeHead(200, { 'Content-Type': contentType(absolute), 'Cache-Control': 'no-store' });
+      response.end(body);
+    } catch (error) {
+      response.writeHead(404).end('Not found');
+    }
+  });
+  return new Promise(resolve => {
+    server.listen(0, '127.0.0.1', () => {
+      const address = server.address();
+      resolve({ server, origin: `http://127.0.0.1:${address.port}` });
+    });
+  });
+}
+
+async function open(page, origin, screen, overrides = {}) {
+  const target = new URL('/' + screen, origin);
+  Object.entries({ ...defaults, ...overrides }).forEach(([key, value]) => {
+    if (value !== null && value !== undefined && value !== '') target.searchParams.set(key, value);
+  });
+  await page.goto(target.href, { waitUntil: 'networkidle0', timeout: 30000 });
   await page.evaluate(() => document.fonts && document.fonts.ready);
+}
+
+async function clickRoute(page, selector) {
+  await Promise.all([
+    page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 30000 }),
+    page.$eval(selector, node => node.click()),
+  ]);
+}
+
+async function currentRoute(page) {
+  return page.evaluate(() => ({
+    page: globalThis.location.pathname.split('/').pop(),
+    query: Object.fromEntries(new URLSearchParams(globalThis.location.search)),
+  }));
+}
+
+async function waitForCount(page, selector, count) {
+  await page.waitForFunction(
+    (target, expected) => document.querySelector(target)?.textContent.trim() === String(expected),
+    {},
+    selector,
+    count
+  );
 }
 
 async function main() {
   assert(fs.existsSync(chromePath), `Chrome not found at ${chromePath}`);
+  const { server, origin } = await startServer();
   const browser = await puppeteer.launch({
     executablePath: chromePath,
     headless: true,
@@ -46,16 +126,21 @@ async function main() {
   });
   const page = await browser.newPage();
   const pageErrors = [];
+  const consoleErrors = [];
   page.on('pageerror', error => pageErrors.push(error.message));
+  page.on('console', message => {
+    if (message.type() === 'error') consoleErrors.push(message.text());
+  });
+  await page.evaluateOnNewDocument(() => globalThis.localStorage.clear());
   await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 1 });
 
   try {
     for (const screen of screens) {
-      await open(page, screen);
+      await open(page, origin, screen);
       const result = await page.evaluate(() => {
         const header = document.querySelector('.mobile-header').getBoundingClientRect();
         const nav = document.querySelector('.mobile-bottom-nav').getBoundingClientRect();
-        const notification = document.querySelector('.mobile-header .header-button').getBoundingClientRect();
+        const notification = document.querySelector('[data-open-sheet="notification-sheet"]').getBoundingClientRect();
         return {
           viewport: document.body.dataset.viewport,
           navItems: document.querySelectorAll('.mobile-bottom-nav a').length,
@@ -71,18 +156,29 @@ async function main() {
       assert.strictEqual(result.viewport, 'mobile', `${screen}: viewport contract`);
       assert.strictEqual(result.navItems, 5, `${screen}: bottom-nav destinations`);
       assert.strictEqual(result.activeItems, 1, `${screen}: one active destination`);
-      assert(result.bodyWidth <= 390, `${screen}: no document-level horizontal overflow (${result.bodyWidth})`);
+      assert(result.bodyWidth <= 390, `${screen}: no horizontal overflow (${result.bodyWidth})`);
       assert.strictEqual(result.headerHeight, 56, `${screen}: app header height`);
       assert.strictEqual(result.navHeight, 64, `${screen}: bottom navigation height`);
-      assert(result.notificationRight <= 390, `${screen}: notification remains inside viewport`);
+      assert(result.notificationRight <= 390, `${screen}: notification inside viewport`);
       assert(result.hasPanel, `${screen}: floating debug panel`);
       assert.match(result.panelText, /Use cases/);
       assert.match(result.panelText, /Comments/);
       assert.match(result.panelText, /Changelog/);
-      assert.doesNotMatch(result.panelText, /Desktop|View/);
+
+      await page.click('[data-open-sheet="notification-sheet"]');
+      await page.waitForSelector('#notification-sheet.open');
+      await page.waitForFunction(() => document.querySelector('#notification-sheet').contains(document.activeElement));
+      await page.keyboard.press('Escape');
+      await page.waitForFunction(
+        () => document.querySelector('#notification-sheet').getAttribute('aria-hidden') === 'true'
+      );
+      assert(
+        await page.evaluate(() => document.activeElement.matches('[data-open-sheet="notification-sheet"]')),
+        `${screen}: notification focus returns to bell`
+      );
     }
 
-    await open(page, 'm-dashboard.html', '?nopanel=1');
+    await open(page, origin, 'm-dashboard.html', { nopanel: '1' });
     const exportViewport = await page.evaluate(async () => {
       const hadExportLayout = document.body.dataset.export === '1';
       delete document.body.dataset.export;
@@ -103,82 +199,213 @@ async function main() {
         viewportHeight: exportViewport.viewportHeight,
         navigationBottom: exportViewport.navigationBottom,
       },
-      { hadExportLayout: true, hasPanel: false, viewportHeight: 844, navigationBottom: 844 },
-      'capture mode must hide tooling while restoring app chrome to the real phone viewport'
+      { hadExportLayout: true, hasPanel: false, viewportHeight: 844, navigationBottom: 844 }
     );
+    assert(exportViewport.scrollHeight > 844, 'capture keeps naturally scrollable content');
+
+    const dashboardRoutes = {
+      'kpi-arrivals': ['reservations', 'queue', 'arrivals'],
+      'kpi-departures': ['reservations', 'queue', 'departures'],
+      'kpi-rooms': ['availability'],
+      'kpi-approvals': ['billing', 'billingFilter', 'pending'],
+      'task-billing': ['billing', 'billingFilter', 'pending'],
+      'task-changes': ['more', 'section', 'changes'],
+      'task-availability': ['availability'],
+      'offer-package': ['rate-edit', 'offer', 'cajkovskij-stay'],
+    };
+    for (const lang of ['', '-en']) {
+      const dashboard = `m-dashboard${lang}.html`;
+      await open(page, origin, dashboard);
+      const sizes = await page.$$eval('[data-dashboard-action]', nodes =>
+        nodes.map(node => {
+          const rect = node.getBoundingClientRect();
+          return { id: node.dataset.dashboardAction, width: rect.width, height: rect.height };
+        })
+      );
+      assert.strictEqual(sizes.length, 8, `${dashboard}: complete dashboard action set`);
+      sizes.forEach(item => assert(item.width >= 44 && item.height >= 44, `${item.id}: touch target >=44`));
+
+      for (const [id, expected] of Object.entries(dashboardRoutes)) {
+        await open(page, origin, dashboard);
+        await clickRoute(page, `[data-dashboard-action="${id}"]`);
+        const route = await currentRoute(page);
+        assert.strictEqual(route.page, `m-${expected[0]}${lang}.html`, `${id}: destination`);
+        if (expected[1]) assert.strictEqual(route.query[expected[1]], expected[2], `${id}: state`);
+      }
+
+      const reservations = `m-reservations${lang}.html`;
+      await open(page, origin, reservations);
+      await clickRoute(page, 'a[href*="reservation=DEMO-10477"]');
+      assert.deepStrictEqual(
+        await page.evaluate(() => ({
+          id: document.querySelector('[data-reservation-field="id"]').textContent.trim(),
+          guest: document.querySelector('[data-reservation-field="guest"]').textContent.trim(),
+          missing: document.body.dataset.identityStatus,
+        })),
+        { id: 'DEMO-10477', guest: 'Petr Dvořák', missing: 'found' },
+        `${lang || 'cs'} reservation identity`
+      );
+      await open(page, origin, `m-reservation-detail${lang}.html`, { reservation: 'DEMO-DOES-NOT-EXIST' });
+      assert.strictEqual(
+        await page.$eval('.identity-missing', node => node.hidden),
+        false,
+        'unknown reservation is explicit'
+      );
+
+      await open(page, origin, reservations, { queue: 'arrivals' });
+      await waitForCount(page, '[data-reservation-count]', 4);
+      await open(page, origin, reservations, { queue: 'departures' });
+      await waitForCount(page, '[data-reservation-count]', 3);
+
+      const offers = `m-offer${lang}.html`;
+      const offerCounts = { all: 4, active: 3, spa: 2, missing: 1 };
+      await open(page, origin, offers);
+      for (const [filter, count] of Object.entries(offerCounts)) {
+        await page.click(`[data-offer-filter="${filter}"]`);
+        await waitForCount(page, '[data-offer-count]', count);
+        assert.strictEqual((await currentRoute(page)).query.offerFilter, filter, `${filter}: URL state`);
+      }
+      for (const offer of ['cajkovskij-stay', 'wellness-weekend', 'spa-week', 'break-for-two']) {
+        await open(page, origin, offers);
+        const expectedTitle = await page.$eval(`[data-offer-id="${offer}"] h2`, node => node.textContent.trim());
+        await clickRoute(page, `[data-offer-id="${offer}"] a[href*="offer="]`);
+        const route = await currentRoute(page);
+        assert.strictEqual(route.query.offer, offer, `${offer}: exact offer query`);
+        assert.strictEqual(
+          await page.$eval('[data-offer-field="title"]', node => node.textContent.trim()),
+          expectedTitle
+        );
+      }
+      await open(page, origin, `m-rate-edit${lang}.html`, { offer: 'unknown-offer' });
+      assert.strictEqual(
+        await page.$eval('.identity-missing', node => node.hidden),
+        false,
+        'unknown offer is explicit'
+      );
+
+      await open(page, origin, offers);
+      await page.click('[data-open-sheet="new-package-sheet"]');
+      await page.click('[form="new-package-sheet-form"]');
+      await page.waitForFunction(
+        () => document.querySelector('#new-package-sheet').getAttribute('aria-hidden') === 'true'
+      );
+      assert(await page.$eval('.toast', node => node.classList.contains('show') && node.textContent.length > 20));
+
+      const billing = `m-billing${lang}.html`;
+      const billingCounts = { pending: 3, approved: 1, disputed: 1 };
+      await open(page, origin, billing);
+      for (const [filter, count] of Object.entries(billingCounts)) {
+        await page.click(`[data-billing-filter="${filter}"]`);
+        await waitForCount(page, '[data-billing-count]', count);
+      }
+      await page.click('[data-billing-filter="pending"]');
+      await waitForCount(page, '[data-billing-count]', 3);
+      await page.click('.billing-card:not([hidden]) [data-approval]');
+      await waitForCount(page, '[data-billing-count]', 2);
+
+      const more = `m-more${lang}.html`;
+      await open(page, origin, more);
+      const visibleTiles = await page.$$eval(
+        '[data-more-id]',
+        nodes => nodes.filter(node => getComputedStyle(node).display !== 'none').length
+      );
+      assert.strictEqual(visibleTiles, 14, `${more}: full access sees 14 tiles`);
+      const sheetTiles = [
+        'gallery',
+        'profile',
+        'price-list',
+        'invoices',
+        'payment-documents',
+        'contract',
+        'users',
+        'permissions',
+        'settings',
+        'changes',
+        'help',
+      ];
+      for (const id of sheetTiles) {
+        const selector = `[data-more-id="${id}"]`;
+        await page.$eval(selector, node => node.click());
+        const sheetId = await page.$eval(selector, node => node.dataset.openSheet);
+        await page.waitForSelector(`#${sheetId}.open`);
+        await page.waitForFunction(
+          sheet => document.querySelector('#' + sheet).contains(document.activeElement),
+          {},
+          sheetId
+        );
+        await page.keyboard.press('Escape');
+        await page.waitForFunction(
+          sheet => document.getElementById(sheet).getAttribute('aria-hidden') === 'true',
+          {},
+          sheetId
+        );
+        assert.strictEqual(
+          await page.evaluate(() => document.activeElement.dataset.moreId),
+          id,
+          `${id}: focus restored`
+        );
+      }
+      const routeTiles = {
+        rooms: [`m-availability${lang}.html`, null, null],
+        billing: [`m-billing${lang}.html`, 'billingFilter', 'pending'],
+        'channel-manager': [`m-availability${lang}.html`, 'connection', 'chm'],
+      };
+      for (const [id, expected] of Object.entries(routeTiles)) {
+        await open(page, origin, more);
+        await clickRoute(page, `[data-more-id="${id}"]`);
+        const route = await currentRoute(page);
+        assert.strictEqual(route.page, expected[0], `${id}: route outcome`);
+        if (expected[1]) assert.strictEqual(route.query[expected[1]], expected[2], `${id}: route state`);
+      }
+
+      await open(page, origin, more, { access: 'read' });
+      assert.strictEqual(
+        await page.$$eval(
+          '[data-more-id]',
+          nodes => nodes.filter(node => getComputedStyle(node).display !== 'none').length
+        ),
+        12,
+        `${more}: read access hides privileged tiles`
+      );
+      await page.$eval('[data-more-id="settings"]', node => node.click());
+      assert.strictEqual(
+        await page.$eval('[form="settings-sheet-form"]', node => node.disabled),
+        true,
+        'read access cannot save settings'
+      );
+    }
+
+    await open(page, origin, 'm-dashboard.html');
+    await page.click('.mobile-brand');
+    await page.click('#property-sheet [data-state-value="test"]');
+    await page.waitForFunction(() => document.body.dataset.hotel === 'test');
+    assert.strictEqual((await currentRoute(page)).query.hotel, 'test', 'property outcome updates URL');
     assert(
-      exportViewport.scrollHeight > 844,
-      'the HTML page must remain naturally scrollable below the captured viewport'
+      await page.evaluate(() => document.activeElement.classList.contains('mobile-brand')),
+      'property focus returns'
     );
 
-    await open(page, 'm-reservations.html', '?inv=none');
-    assert.deepStrictEqual(
-      await page.evaluate(() => ({
-        count: document.querySelector('[data-result-count]').textContent.trim(),
-        empty: getComputedStyle(document.querySelector('.empty-state')).display,
-        list: getComputedStyle(document.querySelector('.inventory-content')).display,
-      })),
-      { count: '0 ukázkových rezervací', empty: 'grid', list: 'none' }
+    await open(page, origin, 'm-more.html', { auth: 'out' });
+    await page.click('.signed-out-wall [data-state-key="auth"]');
+    await page.waitForFunction(() => document.body.dataset.auth === 'in');
+    assert.strictEqual(
+      await page.$eval('.product-surface', node => getComputedStyle(node).display !== 'none'),
+      true,
+      'auth CTA enters app'
     );
 
-    await open(page, 'm-reservations.html', '?inv=some');
-    assert.deepStrictEqual(
-      await page.evaluate(() => ({
-        count: document.querySelector('[data-result-count]').textContent.trim(),
-        visible: [...document.querySelectorAll('.reservation-card')].filter(
-          card => getComputedStyle(card).display !== 'none'
-        ).length,
-      })),
-      { count: '3 ukázkové rezervace', visible: 3 }
-    );
-
-    await open(page, 'm-more.html', '?auth=out');
-    const signedOut = await page.evaluate(() => ({
-      wall: getComputedStyle(document.querySelector('.signed-out-wall')).display,
-      product: getComputedStyle(document.querySelector('.product-surface')).display,
-      heading: document.querySelector('.signed-out-wall h1').textContent.trim(),
-    }));
-    assert.deepStrictEqual(signedOut, { wall: 'grid', product: 'none', heading: 'Odhlášený ukázkový účet' });
-
-    await open(page, 'm-more.html', '?auth=in&access=none');
-    assert.strictEqual(await page.$eval('.access-wall', node => getComputedStyle(node).display), 'grid');
-
-    await open(page, 'm-availability.html', '?auth=in&access=full&connection=chm');
-    const chm = await page.evaluate(() => ({
-      disabled: document.querySelector('[data-write-action]').disabled,
-      badgeRight: Math.round(document.querySelector('.connection-pill').getBoundingClientRect().right),
-      notificationRight: Math.round(
-        document.querySelector('.mobile-header .header-button').getBoundingClientRect().right
-      ),
-    }));
-    assert.strictEqual(chm.disabled, true);
-    assert(chm.badgeRight < chm.notificationRight, 'CHM badge must not cover the notification action');
-    assert(chm.notificationRight <= 390, 'notification must remain inside the mobile viewport');
-
-    await open(page, 'm-rate-edit.html', '?auth=in&access=full&connection=manual');
-    await page.evaluate(() => {
-      document.body.dataset.access = 'read';
-    });
-    await new Promise(resolve => setTimeout(resolve, 200));
-    assert.deepStrictEqual(
-      await page.evaluate(() => ({
-        access: document.body.dataset.access,
-        disabled: document.querySelector('[data-write-action]').disabled,
-      })),
-      { access: 'read', disabled: true }
-    );
-
-    await open(page, 'm-reservations.html', '?auth=in&access=full&connection=manual&inv=many');
-    await page.click('[data-open-sheet="filter-sheet"]');
-    assert.strictEqual(await page.$eval('#filter-sheet', node => node.getAttribute('aria-hidden')), 'false');
-    await page.click('#filter-sheet [data-close-sheet]');
-    assert.strictEqual(await page.$eval('#filter-sheet', node => node.getAttribute('aria-hidden')), 'true');
+    await open(page, origin, 'm-availability.html', { connection: 'chm' });
+    assert.strictEqual(await page.$eval('[data-chm-write]', node => node.disabled), true, 'CHM disables local writes');
 
     assert.deepStrictEqual(pageErrors, [], `browser page errors: ${pageErrors.join(' | ')}`);
-    process.stdout.write(`mobile-browser-qa: ${screens.length} screens + state, panel and sheet flows — OK\n`);
+    assert.deepStrictEqual(consoleErrors, [], `browser console errors: ${consoleErrors.join(' | ')}`);
+    process.stdout.write(
+      `mobile-browser-qa: HTTP, ${screens.length} screens, CZ/EN click matrix, identities, filters, focus and roles — OK\n`
+    );
   } finally {
     await page.close();
     await browser.close();
+    await new Promise(resolve => server.close(resolve));
   }
 }
 

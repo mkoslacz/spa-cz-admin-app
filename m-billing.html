@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light">
   <title>Rozúčtování · SPA.CZ partner app prototype</title>
-  <link rel="stylesheet" href="tokens-m.css?v=20260807e">
-  <link rel="stylesheet" href="app-m.css?v=20260807e">
-  <link rel="stylesheet" href="proto-tools.css?v=20260807e">
-  <link rel="stylesheet" href="proto-comments.css?v=20260807e">
-  <link rel="stylesheet" href="proto-m.css?v=20260807e">
+  <link rel="stylesheet" href="tokens-m.css?v=20260807g">
+  <link rel="stylesheet" href="app-m.css?v=20260807g">
+  <link rel="stylesheet" href="proto-tools.css?v=20260807g">
+  <link rel="stylesheet" href="proto-comments.css?v=20260807g">
+  <link rel="stylesheet" href="proto-m.css?v=20260807g">
 </head>
 <body data-page="billing" data-viewport="mobile" data-auth="in" data-access="full" data-connection="manual" data-density="dense" data-inv="many" data-hotel="active">
   <a class="skip-link" href="#main">Přejít na obsah</a>
@@ -27,7 +27,7 @@
         <small><span class="connection-pill"><span class="connection-manual">Ruční správa</span><span class="connection-chm">Channel Manager</span></span></small>
       </span>
     </button>
-    <button class="header-button" type="button" data-toast="V prototypu: centrum oznámení." aria-label="Oznámení"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M18 16v-5a6 6 0 0 0-5-5.9V4a1 1 0 0 0-2 0v1.1A6 6 0 0 0 6 11v5l-2 2h16l-2-2Zm-8 3h4a2 2 0 0 1-4 0Z"/></svg></button>
+    <button class="header-button" type="button" data-open-sheet="notification-sheet" data-outcome="sheet" aria-label="Oznámení"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M18 16v-5a6 6 0 0 0-5-5.9V4a1 1 0 0 0-2 0v1.1A6 6 0 0 0 6 11v5l-2 2h16l-2-2Zm-8 3h4a2 2 0 0 1-4 0Z"/></svg></button>
   </header>
       <main class="mobile-main" id="main">
         <div class="page-head">
@@ -38,39 +38,45 @@
   
   <div class="alert info test-alert"><strong>Testovací zařízení.</strong>&nbsp;Změny nejsou publikovány na SPA.CZ.</div>
     <div class="alert warning"><strong>Ukázková finanční data.</strong>&nbsp;Částky a stavy níže nepocházejí z reálného účtu.</div>
-    <div class="filter-scroll"><button class="chip active" type="button" data-filter-chip>Ke schválení 3</button><button class="chip" type="button" data-filter-chip>Schválené</button><button class="chip" type="button" data-filter-chip>Rozporované</button></div>
+    <div class="filter-scroll"><button class="chip" type="button" data-billing-filter="pending" aria-pressed="false">Ke schválení 3</button><button class="chip" type="button" data-billing-filter="approved" aria-pressed="false">Schválené 1</button><button class="chip" type="button" data-billing-filter="disputed" aria-pressed="false">Rozporované 1</button></div>
+    <div class="section-head"><h2><span data-billing-count>3</span> ukázkové položky</h2></div>
     <div class="billing-list inventory-content">
-      <article class="billing-card" data-inventory-rank="1">
+      <article class="billing-card" data-inventory-rank="1" data-billing-status="pending">
     <div class="card-line"><strong>DEMO-10482</strong><span class="status warning">Ke schválení</span></div>
     <div class="card-line secondary"><span>12.–14. 10. 2026</span><span>Ukázková rezervace</span></div>
     <div class="card-line financial"><span><small>Cena · demo</small><br><strong>7 154 Kč</strong></span><span><small>Provize vč. DPH</small><br><b>Dle smlouvy</b></span></div>
-    <div class="inline-actions"><button class="button" type="button" data-open-sheet="dispute-sheet" data-write-action>Rozporovat</button><button class="button primary" type="button" data-approval data-toast="Ukázkové rozúčtování bylo schváleno." data-write-action>Schválit</button></div>
+    <div class="inline-actions"><button class="button" type="button" data-open-sheet="dispute-sheet" data-write-action>Rozporovat</button><button class="button primary" type="button" data-approval data-success="Rozúčtování DEMO-10482 bylo schváleno v ukázkovém stavu." data-write-action>Schválit</button></div>
   </article>
-      <article class="billing-card" data-inventory-rank="2">
+      <article class="billing-card" data-inventory-rank="2" data-billing-status="pending">
     <div class="card-line"><strong>DEMO-10477</strong><span class="status warning">Ke schválení</span></div>
     <div class="card-line secondary"><span>16.–19. 10. 2026</span><span>Ukázková rezervace</span></div>
     <div class="card-line financial"><span><small>Cena · demo</small><br><strong>6 240 Kč</strong></span><span><small>Provize vč. DPH</small><br><b>Dle smlouvy</b></span></div>
-    <div class="inline-actions"><button class="button" type="button" data-open-sheet="dispute-sheet" data-write-action>Rozporovat</button><button class="button primary" type="button" data-approval data-toast="Ukázkové rozúčtování bylo schváleno." data-write-action>Schválit</button></div>
+    <div class="inline-actions"><button class="button" type="button" data-open-sheet="dispute-sheet" data-write-action>Rozporovat</button><button class="button primary" type="button" data-approval data-success="Rozúčtování DEMO-10477 bylo schváleno v ukázkovém stavu." data-write-action>Schválit</button></div>
   </article>
-      <article class="billing-card" data-inventory-rank="3">
+      <article class="billing-card" data-inventory-rank="3" data-billing-status="pending">
     <div class="card-line"><strong>DEMO-10463</strong><span class="status warning">Ke schválení</span></div>
     <div class="card-line secondary"><span>20.–23. 10. 2026</span><span>Ukázková rezervace</span></div>
     <div class="card-line financial"><span><small>Cena · demo</small><br><strong>8 120 Kč</strong></span><span><small>Provize vč. DPH</small><br><b>Dle smlouvy</b></span></div>
-    <div class="inline-actions"><button class="button" type="button" data-open-sheet="dispute-sheet" data-write-action>Rozporovat</button><button class="button primary" type="button" data-approval data-toast="Ukázkové rozúčtování bylo schváleno." data-write-action>Schválit</button></div>
+    <div class="inline-actions"><button class="button" type="button" data-open-sheet="dispute-sheet" data-write-action>Rozporovat</button><button class="button primary" type="button" data-approval data-success="Rozúčtování DEMO-10463 bylo schváleno v ukázkovém stavu." data-write-action>Schválit</button></div>
   </article>
-      <article class="billing-card" data-inventory-rank="4">
+      <article class="billing-card" data-inventory-rank="4" data-billing-status="approved">
     <div class="card-line"><strong>DEMO-10411</strong><span class="status success">Schváleno</span></div>
     <div class="card-line secondary"><span>27.–29. 10. 2026</span><span>Ukázková rezervace</span></div>
     <div class="card-line financial"><span><small>Cena · demo</small><br><strong>4 800 Kč</strong></span><span><small>Provize vč. DPH</small><br><b>Dle smlouvy</b></span></div>
-    <div class="inline-actions"><button class="button" type="button" data-open-sheet="dispute-sheet" data-write-action>Rozporovat</button><button class="button primary" type="button" data-approval data-toast="Ukázkové rozúčtování bylo schváleno." data-write-action>Schválit</button></div>
+    <div class="inline-actions"><button class="button" type="button" data-open-sheet="dispute-sheet" data-write-action>Rozporovat</button><button class="button primary" type="button" data-approval data-success="Rozúčtování DEMO-10411 bylo schváleno v ukázkovém stavu." data-write-action>Schválit</button></div>
   </article>
-      <article class="billing-card" data-inventory-rank="5">
+      <article class="billing-card" data-inventory-rank="5" data-billing-status="disputed">
     <div class="card-line"><strong>DEMO-10398</strong><span class="status danger">Rozporováno</span></div>
     <div class="card-line secondary"><span>2.–5. 11. 2026</span><span>Ukázková rezervace</span></div>
     <div class="card-line financial"><span><small>Cena · demo</small><br><strong>5 100 Kč</strong></span><span><small>Provize vč. DPH</small><br><b>Dle smlouvy</b></span></div>
-    <div class="inline-actions"><button class="button" type="button" data-open-sheet="dispute-sheet" data-write-action>Rozporovat</button><button class="button primary" type="button" data-approval data-toast="Ukázkové rozúčtování bylo schváleno." data-write-action>Schválit</button></div>
+    <div class="inline-actions"><button class="button" type="button" data-open-sheet="dispute-sheet" data-write-action>Rozporovat</button><button class="button primary" type="button" data-approval data-success="Rozúčtování DEMO-10398 bylo schváleno v ukázkovém stavu." data-write-action>Schválit</button></div>
   </article>
     </div>
+    <div class="filter-empty" data-billing-empty hidden><div class="empty-state"><div class="empty-inner">
+    <svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m3 12 9-9h7a2 2 0 0 1 2 2v7l-9 9L3 12Zm13-4.5A1.5 1.5 0 1 0 16 4a1.5 1.5 0 0 0 0 3.5Z"/></svg>
+    <h2>Nic k rozúčtování</h2>
+    <p>Tomuto filtru neodpovídá žádná položka.</p>
+  </div></div></div>
     <div class="empty-state"><div class="empty-inner">
     <svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m3 12 9-9h7a2 2 0 0 1 2 2v7l-9 9L3 12Zm13-4.5A1.5 1.5 0 1 0 16 4a1.5 1.5 0 0 0 0 3.5Z"/></svg>
     <h2>Nic k rozúčtování</h2>
@@ -96,14 +102,14 @@
   </nav>
     </div>
   </div>
-  <section class="signed-out-wall"><div class="wall-card"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm6-1a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM9 13c-4 0-7 2-7 5v2h14v-2c0-3-3-5-7-5Zm7 0c-.6 0-1.2.1-1.8.2 2.3 1 3.8 2.7 3.8 4.8v2h4v-2c0-3-2.6-5-6-5Z"/></svg><h1>Odhlášený ukázkový účet</h1><p>V plovoucím panelu přepněte účet zpět na „Přihlášen“. Nejsou použity žádné skutečné přihlašovací údaje.</p><button class="button primary" type="button" data-toast="Přihlášení se mění v panelu prototypu.">Otevřít ukázkový účet</button></div></section>
+  <section class="signed-out-wall"><div class="wall-card"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm6-1a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM9 13c-4 0-7 2-7 5v2h14v-2c0-3-3-5-7-5Zm7 0c-.6 0-1.2.1-1.8.2 2.3 1 3.8 2.7 3.8 4.8v2h4v-2c0-3-2.6-5-6-5Z"/></svg><h1>Odhlášený ukázkový účet</h1><p>Nejsou použity žádné skutečné přihlašovací údaje.</p><button class="button primary" type="button" data-state-key="auth" data-state-value="in">Otevřít ukázkový účet</button></div></section>
   <section class="access-wall"><div class="wall-card"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m19.4 13 .1-1-.1-1 2-1.5-2-3.4-2.4 1a8 8 0 0 0-1.7-1L15 3.5h-4l-.4 2.6a8 8 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.5-.1 1 .1 1-2 1.5 2 3.4 2.4-1a8 8 0 0 0 1.7 1l.4 2.6h4l.4-2.6a8 8 0 0 0 1.7-1l2.4 1 2-3.4-2-1.5ZM13 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z"/></svg><h1>Bez přístupu v tomto stavu</h1><p>V plovoucím panelu zvolte přístup „Pouze pro čtení“ nebo „Plný“.</p></div></section>
-  <div class="modal-backdrop" id="property-sheet" aria-hidden="true"><section class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="property-sheet-title"><div class="sheet-grabber"></div><header class="sheet-head"><h2 id="property-sheet-title">Vybrat zařízení</h2><button class="header-button" type="button" data-close-sheet aria-label="Zavřít">×</button></header><div class="sheet-body"><button class="button full primary" type="button" data-close-sheet>SPA HOTEL ČAJKOVSKIJ <span class="test-label">TEST</span></button><p class="subtle">Jediné veřejné zařízení použité v prototypu.</p></div></section></div><div class="modal-backdrop" id="dispute-sheet" aria-hidden="true"><section class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="dispute-sheet-title"><div class="sheet-grabber"></div><header class="sheet-head"><h2 id="dispute-sheet-title">Rozporovat rozúčtování</h2><button class="header-button" type="button" data-close-sheet aria-label="Zavřít">×</button></header><div class="sheet-body"><form data-prototype-form data-success="Ukázkový rozpor byl odeslán." id="dispute-form"><div class="alert warning">Všechna pole jsou ukázková.</div><label class="field"><span>Důvod</span><textarea required>Ukázkový důvod rozporu</textarea></label><label class="field"><span>Navržená cena</span><input type="number" min="1" value="3400" required></label></form></div><div class="sheet-actions"><button class="button" type="button" data-close-sheet>Zrušit</button><button class="button primary" type="submit" form="dispute-form">Odeslat</button></div></section></div>
+  <div class="modal-backdrop" id="property-sheet" aria-hidden="true"><section class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="property-sheet-title" tabindex="-1"><div class="sheet-grabber"></div><header class="sheet-head"><h2 id="property-sheet-title">Vybrat zařízení</h2><button class="header-button" type="button" data-close-sheet aria-label="Zavřít">×</button></header><div class="sheet-body"><p class="subtle">SPA HOTEL ČAJKOVSKIJ · ukázková konfigurace</p><div class="state-choices"><button class="button full" type="button" data-state-key="hotel" data-state-value="active">Aktivní zařízení</button><button class="button full" type="button" data-state-key="hotel" data-state-value="test">Testovací zařízení</button></div></div></section></div><div class="modal-backdrop" id="notification-sheet" aria-hidden="true"><section class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="notification-sheet-title" tabindex="-1"><div class="sheet-grabber"></div><header class="sheet-head"><h2 id="notification-sheet-title">Oznámení</h2><button class="header-button" type="button" data-close-sheet aria-label="Zavřít">×</button></header><div class="sheet-body"><nav class="notification-list"><a href="m-billing.html?billingFilter=pending" data-carry-state><strong>3 rozúčtování ke schválení</strong><small>Otevřít pracovní seznam</small></a><a href="m-more.html?section=changes" data-carry-state><strong>2 změny čekají na kontrolu</strong><small>Otevřít změny</small></a><a href="m-availability.html" data-carry-state><strong>Nízká dostupnost v 7 nocích</strong><small>Otevřít kalendář</small></a></nav></div></section></div><div class="modal-backdrop" id="dispute-sheet" aria-hidden="true"><section class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="dispute-sheet-title" tabindex="-1"><div class="sheet-grabber"></div><header class="sheet-head"><h2 id="dispute-sheet-title">Rozporovat rozúčtování</h2><button class="header-button" type="button" data-close-sheet aria-label="Zavřít">×</button></header><div class="sheet-body"><form data-prototype-form data-success="Ukázkový rozpor byl odeslán." id="dispute-form"><div class="alert warning">Všechna pole jsou ukázková.</div><label class="field"><span>Důvod</span><textarea required>Ukázkový důvod rozporu</textarea></label><label class="field"><span>Navržená cena</span><input type="number" min="1" value="3400" required></label></form></div><div class="sheet-actions"><button class="button" type="button" data-close-sheet>Zrušit</button><button class="button primary" type="submit" form="dispute-form">Odeslat</button></div></section></div>
   <div class="toast" role="status" aria-live="polite"></div>
   <div class="state-debug" data-state-output></div>
   <a class="screen-reader-only" href="m-billing-en.html" data-carry-state>English</a>
-  <script src="proto-tools.js?v=20260807e" defer></script>
-  <script src="proto-comments.js?v=20260807e" defer></script>
-  <script src="proto-m.js?v=20260807e" defer></script>
+  <script src="proto-tools.js?v=20260807g" defer></script>
+  <script src="proto-comments.js?v=20260807g" defer></script>
+  <script src="proto-m.js?v=20260807g" defer></script>
 </body>
 </html>

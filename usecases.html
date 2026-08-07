@@ -23,6 +23,7 @@
 <title>Use cases — SPA.cz partner mobile prototype</title>
 <link rel="stylesheet" href="proto-review.css?v=20260807d">
 <link rel="stylesheet" href="proto-discussion.css">
+<link rel="stylesheet" href="usecases-workshop.css?v=20260807a">
 <script>if (location.protocol === 'file:') document.documentElement.dataset.origin = 'file';</script>
 <style>
   /* Page-local additions the shared shell does not carry. Kept out of
@@ -93,6 +94,72 @@
   </p>
 
   <main class="rp-main rp-needs-url">
+    <section class="rp-section ucw" id="uc-workshop" aria-labelledby="ucw-title">
+      <div class="ucw-heading">
+        <div>
+          <h2 id="ucw-title">Local workshop</h2>
+          <p class="rp-sub">Draft scenarios in this browser, validate them, preview every screen and export a publishable <code>usecases.json</code>.</p>
+        </div>
+        <span class="ucw-local-badge">Local only</span>
+      </div>
+
+      <p class="ucw-status" id="ucw-status" role="status">Loading workshop data…</p>
+      <div class="ucw-conflict" id="ucw-conflict" hidden>
+        <div>
+          <strong>Published source changed</strong>
+          <p id="ucw-conflict-copy">Your local draft has not been overwritten. Choose how to resolve it.</p>
+        </div>
+        <div class="ucw-actions">
+          <button class="rp-btn" id="ucw-keep-local" type="button">Keep local</button>
+          <button class="rp-btn" id="ucw-download-local" type="button">Download local</button>
+          <button class="rp-btn" id="ucw-reset-conflict" type="button">Reset to published</button>
+        </div>
+      </div>
+
+      <div class="ucw-toolbar" id="ucw-toolbar">
+        <label class="ucw-search">
+          <span>Search drafts</span>
+          <input id="ucw-search" type="search" autocomplete="off" placeholder="ID, name, story or screen">
+        </label>
+        <div class="ucw-actions ucw-primary-actions">
+          <button class="rp-btn" id="ucw-create" type="button">Create scenario</button>
+          <button class="rp-btn" id="ucw-import" type="button">Import JSON</button>
+          <button class="rp-btn" id="ucw-export" type="button">Export JSON</button>
+          <button class="rp-btn" id="ucw-reset" type="button">Reset</button>
+          <input id="ucw-import-file" type="file" accept="application/json,.json" hidden>
+        </div>
+      </div>
+
+      <div class="ucw-validation" id="ucw-validation" role="alert" hidden></div>
+
+      <div class="ucw-layout">
+        <div>
+          <p class="ucw-count" id="ucw-draft-count"></p>
+          <div class="ucw-list" id="ucw-list"></div>
+        </div>
+
+        <aside class="ucw-editor" id="ucw-editor" aria-labelledby="ucw-editor-title" hidden>
+          <div class="ucw-editor-head">
+            <h3 id="ucw-editor-title">Scenario</h3>
+            <button class="ucw-close" id="ucw-cancel" type="button" aria-label="Close editor">×</button>
+          </div>
+          <form id="ucw-form" novalidate>
+            <label class="ucw-field"><span>ID</span><input id="ucw-id" name="id" readonly></label>
+            <label class="ucw-field"><span>Name</span><input id="ucw-name" name="name" maxlength="160" required></label>
+            <label class="ucw-field"><span>Story</span><textarea id="ucw-story" name="story" maxlength="1600" rows="4" required></textarea></label>
+            <label class="ucw-field"><span>Engineering rules <small>one per line</small></span><textarea id="ucw-rules" name="rules" maxlength="4000" rows="4"></textarea></label>
+            <fieldset class="ucw-fieldset" id="ucw-state-fields"><legend>Prototype state</legend></fieldset>
+            <fieldset class="ucw-fieldset" id="ucw-screen-fields"><legend>Screens</legend></fieldset>
+            <div class="ucw-form-errors" id="ucw-form-errors" role="alert" hidden></div>
+            <div class="ucw-actions">
+              <button class="rp-btn" type="submit">Save scenario</button>
+              <button class="rp-btn" id="ucw-cancel-bottom" type="button">Cancel</button>
+            </div>
+          </form>
+        </aside>
+      </div>
+    </section>
+
     <section class="rp-section">
       <h2>Situations <span class="rp-sub" id="uc-count"></span></h2>
       <div id="uc-list" class="rp-scroll"><p class="rp-msg">Loading…</p></div>
@@ -108,6 +175,8 @@
 
 <script src="proto-comments.js"></script>
 <script src="proto-discussion.js"></script>
+<script src="usecases-contract.js"></script>
+<script src="usecases-workshop.js"></script>
 <script>
 (function () {
   'use strict';

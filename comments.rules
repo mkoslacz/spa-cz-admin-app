@@ -1,6 +1,7 @@
 // Firestore rules for the prototype stakeholder comment layer.
-// Replace the example hosted domains before deploying. An empty domain list and
-// no allowed/{email} document deny everybody; there is deliberately no open mode.
+// Deployment patch point: replace the reserved .example alternatives in
+// hostedDomain() only after the reviewer domains have been approved. Until then,
+// they grant no real access. See docs/firebase-comments-setup.md.
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -11,7 +12,8 @@ service cloud.firestore {
     }
 
     function hostedDomain() {
-      // Add real, escaped domains here when deploying; these example domains are not access.
+      // DEPLOYMENT PATCH POINT: replace only these escaped domain alternatives.
+      // Never use the GitHub Pages hostname here; this is the reviewer's email domain.
       return request.auth.token.email.matches('^[^@]+@(your-company\\.example|partner\\.example)$');
     }
 

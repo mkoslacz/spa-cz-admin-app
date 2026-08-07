@@ -117,6 +117,8 @@ jobs:
             preview-*.png
             comments.config*.json
             changelog.json
+            prototype.json
+            usecases.json
             usecases.built.json
             docs/usecases.md
             docs/usecases

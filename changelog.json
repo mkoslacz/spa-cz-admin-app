@@ -1,9 +1,29 @@
 {
-  "generatedAt": "2026-08-07T18:43:46.455Z",
+  "generatedAt": "2026-08-07T19:51:20.372Z",
   "repository": "https://github.com/mkoslacz/spa-cz-admin-app",
   "limited": true,
   "limit": 50,
   "entries": [
+    {
+      "sha": "e140167dfb091b4bedc681abb3c014128ea7dd31",
+      "short": "e140167",
+      "date": "2026-08-07",
+      "subject": "docs: plan SPA.CZ prototype interaction round",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/e140167dfb091b4bedc681abb3c014128ea7dd31"
+    },
+    {
+      "sha": "67d3ab9296ca4b59af08ada3c891f965f5634daa",
+      "short": "67d3ab9",
+      "date": "2026-08-07",
+      "subject": "docs: capture SPA.CZ prototype interaction findings",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/67d3ab9296ca4b59af08ada3c891f965f5634daa"
+    },
     {
       "sha": "b16ed04cb602c5537af8a0846d0db98e41b95369",
       "short": "b16ed04",

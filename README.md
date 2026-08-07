@@ -2,7 +2,7 @@
 
 This repository contains a clickable, mobile-only prototype of the SPA.cz partner experience. The existing `spa/spacz_web` extranet is the source of functionality and business rules; it is not redesigned here and there is no desktop web proposal in this artifact.
 
-The proposal covers eight app areas in Czech and English, a shared state engine, review pages, reproducible captures and an editable Figma export. Product screens are plain HTML/CSS/JS and open without a build step.
+The proposal covers the app areas listed below in Czech and English, a shared state engine, review pages, reproducible captures and an editable Figma export. Product screens are plain HTML/CSS/JS and open without a build step.
 
 ## Open the prototype
 
@@ -44,7 +44,7 @@ The floating panel is review scaffolding, not proposed app UI. Each selection is
 
 Language is also switchable in the panel. There is no View/Desktop row because this project proposes only the mobile app.
 
-`usecases.json` declares eight meaningful product situations and covers every option above. Generate the reviewer payload and engineering reference with:
+`usecases.json` is the source of truth for the current set of meaningful product situations. Generate the reviewer payload and engineering reference with:
 
 ```bash
 node tools/build-usecases.js --no-capture
@@ -73,13 +73,7 @@ The full evidence map is in `research/fact-base.md`.
 
 The app uses deterministic static fixtures. No production database dump is required, and the supplied `User` row is not imported or copied into the prototype.
 
-The public commercial fixture was verified on 7 August 2026 at [Wellness pobyt dle Vašeho výběru — SPA HOTEL ČAJKOVSKIJ](https://www.spa.cz/lazne-karlovy-vary/spa-hotel-cajkovskij/wellness-pobyt-dle-vaseho-vyberu/):
-
-- SPA HOTEL ČAJKOVSKIJ
-- 3 days / 2 nights
-- from 3,577 CZK
-- check-in 14:00
-- check-out 10:00
+Product examples are deterministic workshop fixtures, not claims about a currently published commercial offer. Their provenance and any time-sensitive evidence remain isolated in `research/fact-base.md`.
 
 ## Visual source of truth
 
@@ -140,13 +134,13 @@ The 7 August 2026 review replaced the pale blue-grey application layer with a wh
 
 ## Stakeholder comments and privacy
 
-The complete comment layer is included but disabled by default: `comments.config.json` is intentionally absent and ignored by Git. A configured deployment injects the validated JSON from the `COMMENTS_CONFIG_JSON` GitHub Actions secret, so the live Firebase project details do not have to be committed. For local review, place the same ignored file beside `index.html`. Configure the Google provider and explicit reviewer allowlist, then deploy `comments.rules` to the dedicated project.
+The complete comment layer is included but disabled by default: `comments.config.json` is intentionally absent and ignored by Git. A configured deployment injects the validated JSON from the `COMMENTS_CONFIG_JSON` GitHub Actions secret. Follow the [Firebase comments setup, verification and recovery runbook](docs/firebase-comments-setup.md) to activate it in a dedicated project without committing deployment configuration or reviewer data.
 
 When enabled:
 
 - Google-signed-in comments use the configured third-party Firebase service.
 - Threads are stored in that Firebase project, not in these static HTML files.
-- Reviewer access must be restricted by email domain and Firebase rules.
+- Reviewer access must be restricted by the approved email-domain rule; the exact owner must also have an `allowed/{email}` document.
 - Comment exports contain names and email addresses. Keep them private and never commit or publish them.
 
 The GitHub Pages workflow publishes the review hub, review pages, `m-*.html` app screens and their required static assets. It deliberately does not package any non-mobile product HTML.

@@ -2,6 +2,12 @@
 
 Generated from `usecases.json`. The matrix is declared rather than a full cross-product: every switch option is documented and appears in at least one product use case.
 
+## Local workshop
+
+Open [`usecases.html`](../usecases.html) over HTTP to create, edit, duplicate, delete, search, validate, preview, import and export scenarios. Drafts stay in this browser until a normalized `usecases.json` is downloaded and deliberately committed; they do not create Firebase comment anchors.
+
+The workshop protects local work when the published source fingerprint changes, caps imports at 1 MiB / 500 scenarios, and blocks export until every declared state option is covered. After replacing the source JSON, run `node tools/build-usecases.js` to regenerate this document, the review payload and one representative capture per scenario.
+
 ## State reference
 
 ### Session (`auth`)
@@ -57,7 +63,7 @@ Selects an active property or a test property used for demonstration and trainin
 
 | Option | Meaning |
 | --- | --- |
-| `active` — Active property | Uses the public SPA HOTEL ČAJKOVSKIJ package fixture. |
+| `active` — Active property | Uses the SPA HOTEL ČAJKOVSKIJ demo package fixture. |
 | `test` — Test property | Clearly labels a non-live property so prototype actions cannot be mistaken for live operations. |
 
 ## UC-01 — Start the operational day
@@ -73,12 +79,12 @@ A fully authorized hotel partner opens the dashboard, reviews the current worklo
 | Inventory connection (`connection`) | `manual` — Manual | Allows availability to be edited in the partner app when permissions permit it. |
 | Information density (`density`) | `dense` — Dense | Shows more operational detail at once for routine partner work. |
 | Demo inventory (`inv`) | `many` — Many records | Shows a populated operational day with several items to review. |
-| Property mode (`hotel`) | `active` — Active property | Uses the public SPA HOTEL ČAJKOVSKIJ package fixture. |
+| Property mode (`hotel`) | `active` — Active property | Uses the SPA HOTEL ČAJKOVSKIJ demo package fixture. |
 
 ### Screens and deep links
 
 - **mobile · 390×844** — [m-dashboard.html](../m-dashboard.html?auth=in&access=full&connection=manual&density=dense&inv=many&hotel=active) · [capture](usecases/UC-01-m-dashboard.png)
-- **mobile · 390×844** — [m-reservations.html](../m-reservations.html?auth=in&access=full&connection=manual&density=dense&inv=many&hotel=active) · [capture](usecases/UC-01-m-reservations.png)
+- **mobile · 390×844** — [m-reservations.html](../m-reservations.html?auth=in&access=full&connection=manual&density=dense&inv=many&hotel=active)
 
 ### Engineering rules
 
@@ -98,12 +104,12 @@ A partner switches to the compact presentation while working through a smaller s
 | Inventory connection (`connection`) | `manual` — Manual | Allows availability to be edited in the partner app when permissions permit it. |
 | Information density (`density`) | `compact` — Compact | Uses a calmer summary layout for quick scanning. |
 | Demo inventory (`inv`) | `some` — Some records | Shows a shorter queue while preserving normal navigation and actions. |
-| Property mode (`hotel`) | `active` — Active property | Uses the public SPA HOTEL ČAJKOVSKIJ package fixture. |
+| Property mode (`hotel`) | `active` — Active property | Uses the SPA HOTEL ČAJKOVSKIJ demo package fixture. |
 
 ### Screens and deep links
 
 - **mobile · 390×844** — [m-reservations.html](../m-reservations.html?auth=in&access=full&connection=manual&density=compact&inv=some&hotel=active) · [capture](usecases/UC-02-m-reservations.png)
-- **mobile · 390×844** — [m-reservation-detail.html](../m-reservation-detail.html?auth=in&access=full&connection=manual&density=compact&inv=some&hotel=active) · [capture](usecases/UC-02-m-reservation-detail.png)
+- **mobile · 390×844** — [m-reservation-detail.html](../m-reservation-detail.html?auth=in&access=full&connection=manual&density=compact&inv=some&hotel=active)
 
 ### Engineering rules
 
@@ -123,7 +129,7 @@ A partner opens reservations for a period with no matching records and gets a pu
 | Inventory connection (`connection`) | `manual` — Manual | Allows availability to be edited in the partner app when permissions permit it. |
 | Information density (`density`) | `dense` — Dense | Shows more operational detail at once for routine partner work. |
 | Demo inventory (`inv`) | `none` — No records | Shows the explicit empty state instead of placeholder rows. |
-| Property mode (`hotel`) | `active` — Active property | Uses the public SPA HOTEL ČAJKOVSKIJ package fixture. |
+| Property mode (`hotel`) | `active` — Active property | Uses the SPA HOTEL ČAJKOVSKIJ demo package fixture. |
 
 ### Screens and deep links
 
@@ -147,13 +153,13 @@ A read-only user reviews reservations, rates and billing while every operation t
 | Inventory connection (`connection`) | `manual` — Manual | Allows availability to be edited in the partner app when permissions permit it. |
 | Information density (`density`) | `compact` — Compact | Uses a calmer summary layout for quick scanning. |
 | Demo inventory (`inv`) | `many` — Many records | Shows a populated operational day with several items to review. |
-| Property mode (`hotel`) | `active` — Active property | Uses the public SPA HOTEL ČAJKOVSKIJ package fixture. |
+| Property mode (`hotel`) | `active` — Active property | Uses the SPA HOTEL ČAJKOVSKIJ demo package fixture. |
 
 ### Screens and deep links
 
 - **mobile · 390×844** — [m-reservation-detail.html](../m-reservation-detail.html?auth=in&access=read&connection=manual&density=compact&inv=many&hotel=active) · [capture](usecases/UC-04-m-reservation-detail.png)
-- **mobile · 390×844** — [m-rate-edit.html](../m-rate-edit.html?auth=in&access=read&connection=manual&density=compact&inv=many&hotel=active) · [capture](usecases/UC-04-m-rate-edit.png)
-- **mobile · 390×844** — [m-billing.html](../m-billing.html?auth=in&access=read&connection=manual&density=compact&inv=many&hotel=active) · [capture](usecases/UC-04-m-billing.png)
+- **mobile · 390×844** — [m-rate-edit.html](../m-rate-edit.html?auth=in&access=read&connection=manual&density=compact&inv=many&hotel=active)
+- **mobile · 390×844** — [m-billing.html](../m-billing.html?auth=in&access=read&connection=manual&density=compact&inv=many&hotel=active)
 
 ### Engineering rules
 
@@ -197,7 +203,7 @@ A hotel connected to a channel manager reviews room availability while the partn
 | Inventory connection (`connection`) | `chm` — Channel manager | Makes availability read-only in the app because the active channel manager is the inventory source. |
 | Information density (`density`) | `dense` — Dense | Shows more operational detail at once for routine partner work. |
 | Demo inventory (`inv`) | `many` — Many records | Shows a populated operational day with several items to review. |
-| Property mode (`hotel`) | `active` — Active property | Uses the public SPA HOTEL ČAJKOVSKIJ package fixture. |
+| Property mode (`hotel`) | `active` — Active property | Uses the SPA HOTEL ČAJKOVSKIJ demo package fixture. |
 
 ### Screens and deep links
 
@@ -210,7 +216,7 @@ A hotel connected to a channel manager reviews room availability while the partn
 
 ## UC-07 — Maintain an offer and its rate
 
-A partner reviews the public package fixture, then moves to the related price configuration without losing context.
+A partner reviews the demo package fixture, then moves to the related price configuration without losing context.
 
 ### State
 
@@ -221,16 +227,16 @@ A partner reviews the public package fixture, then moves to the related price co
 | Inventory connection (`connection`) | `manual` — Manual | Allows availability to be edited in the partner app when permissions permit it. |
 | Information density (`density`) | `dense` — Dense | Shows more operational detail at once for routine partner work. |
 | Demo inventory (`inv`) | `some` — Some records | Shows a shorter queue while preserving normal navigation and actions. |
-| Property mode (`hotel`) | `active` — Active property | Uses the public SPA HOTEL ČAJKOVSKIJ package fixture. |
+| Property mode (`hotel`) | `active` — Active property | Uses the SPA HOTEL ČAJKOVSKIJ demo package fixture. |
 
 ### Screens and deep links
 
 - **mobile · 390×844** — [m-offer.html](../m-offer.html?auth=in&access=full&connection=manual&density=dense&inv=some&hotel=active) · [capture](usecases/UC-07-m-offer.png)
-- **mobile · 390×844** — [m-rate-edit.html](../m-rate-edit.html?auth=in&access=full&connection=manual&density=dense&inv=some&hotel=active) · [capture](usecases/UC-07-m-rate-edit.png)
+- **mobile · 390×844** — [m-rate-edit.html](../m-rate-edit.html?auth=in&access=full&connection=manual&density=dense&inv=some&hotel=active)
 
 ### Engineering rules
 
-- The public fixture stays consistent: SPA HOTEL ČAJKOVSKIJ, three days, two nights, from 3,577 CZK, check-in 14:00 and check-out 10:00.
+- The demo fixture stays consistent within the prototype: SPA HOTEL ČAJKOVSKIJ, three days, two nights, from 3,577 CZK, check-in 14:00 and check-out 10:00.
 - Offer and rate actions respect the selected access level.
 
 ## UC-08 — Approve or dispute a billing line
@@ -251,7 +257,7 @@ An authorized account reviews a confirmed reservation and chooses either approva
 ### Screens and deep links
 
 - **mobile · 390×844** — [m-billing.html](../m-billing.html?auth=in&access=full&connection=manual&density=dense&inv=many&hotel=test) · [capture](usecases/UC-08-m-billing.png)
-- **mobile · 390×844** — [m-reservation-detail.html](../m-reservation-detail.html?auth=in&access=full&connection=manual&density=dense&inv=many&hotel=test) · [capture](usecases/UC-08-m-reservation-detail.png)
+- **mobile · 390×844** — [m-reservation-detail.html](../m-reservation-detail.html?auth=in&access=full&connection=manual&density=dense&inv=many&hotel=test)
 
 ### Engineering rules
 

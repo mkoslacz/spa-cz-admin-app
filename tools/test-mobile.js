@@ -93,7 +93,13 @@ assert.strictEqual(normalizedViewportWidth(390), 390);
 assert.strictEqual(normalizedViewportHeight(844), 844);
 
 const usecases = JSON.parse(read('usecases.json'));
-assert.strictEqual(usecases.usecases.length, 8, 'the reviewer handoff must contain eight use cases');
+const builtUsecases = JSON.parse(read('usecases.built.json'));
+assert(usecases.usecases.length > 0, 'the reviewer handoff must contain declared use cases');
+assert.strictEqual(
+  builtUsecases.usecases.length,
+  usecases.usecases.length,
+  'published source and built use-case counts must agree'
+);
 assert(
   usecases.usecases.every(
     usecase =>
@@ -103,6 +109,18 @@ assert(
       normaliseUsecase(usecase, root).screens.every(screen => screen.width === 390 && screen.height === 844)
   ),
   'every use case must remain mobile-only'
+);
+const usecaseCaptures = fs
+  .readdirSync(path.join(root, 'docs/usecases'))
+  .filter(name => /\.png$/i.test(name))
+  .sort();
+const expectedUsecaseCaptures = usecases.usecases
+  .map(usecase => `${usecase.id}-${path.basename(usecase.screens[0], path.extname(usecase.screens[0]))}.png`)
+  .sort();
+assert.deepStrictEqual(
+  usecaseCaptures,
+  expectedUsecaseCaptures,
+  'the published package must keep exactly one representative capture per use case'
 );
 
 assert(exists('comments.config.example.json'));
@@ -115,10 +133,13 @@ assert(
 const publishWorkflow = read('.github/workflows/prototype-refresh.yml');
 assert.match(publishWorkflow, /secrets\.COMMENTS_CONFIG_JSON/);
 assert.match(publishWorkflow, /validate-comments-config\.js comments\.config\.json/);
+assert.match(publishWorkflow, /^\s+prototype\.json$/m);
+assert.match(publishWorkflow, /^\s+usecases\.json$/m);
 
 const runtime = read('proto-m.js');
 assert.doesNotMatch(runtime, /commissionRate|Provize 15|Commission 15/);
-assert.match(runtime, /partyTotal: base \* 2/);
+assert.match(runtime, /entry\.id === state\.reservation/);
+assert.match(runtime, /entry\.id === state\.offer/);
 assert.match(read('tokens-m.css'), /--brand-500: #1174bb/);
 assert.match(read('tokens-m.css'), /--accent-400: #89c02c/);
 assert.match(read('tokens-m.css'), /--accent-500: #76b82a/);
