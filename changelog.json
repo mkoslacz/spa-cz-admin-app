@@ -1,9 +1,41 @@
 {
-  "generatedAt": "2026-08-07T18:33:43.240Z",
+  "generatedAt": "2026-08-07T18:36:38.582Z",
   "repository": "https://github.com/mkoslacz/spa-cz-admin-app",
   "limited": true,
   "limit": 50,
   "entries": [
+    {
+      "sha": "683f433f215f93fa9d5c89f9b3b1412fce797b02",
+      "short": "683f433",
+      "date": "2026-08-07",
+      "subject": "fix: improve mobile prototype readability",
+      "body": "",
+      "screens": [
+        "changelog.html",
+        "comments.html",
+        "index.html",
+        "m-availability-en.html",
+        "m-availability.html",
+        "m-billing-en.html",
+        "m-billing.html",
+        "m-dashboard-en.html",
+        "m-dashboard.html",
+        "m-more-en.html",
+        "m-more.html",
+        "m-offer-en.html",
+        "m-offer.html",
+        "m-rate-edit-en.html",
+        "m-rate-edit.html",
+        "m-reservation-detail-en.html",
+        "m-reservation-detail.html",
+        "m-reservations-en.html",
+        "m-reservations.html",
+        "specs.html",
+        "usecases.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/683f433f215f93fa9d5c89f9b3b1412fce797b02"
+    },
     {
       "sha": "b29c71cd4a4d33aa9b20ce81b393d3306c48e2bc",
       "short": "b29c71c",
