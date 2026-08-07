@@ -156,6 +156,18 @@ jobs:
             echo "index.html did not reach the package; refusing to publish." >&2
             exit 1
           fi
+          # The runtime config is optional, but source and package must agree in
+          # both directions. Check the exact file so example/schema companions
+          # cannot make an unconfigured deployment look configured.
+          if [[ -f comments.config.json ]]; then
+            if [[ ! -f "$PACKAGE_DIR/comments.config.json" ]]; then
+              echo "Validated comments config did not reach the package; refusing to publish." >&2
+              exit 1
+            fi
+          elif [[ -e "$PACKAGE_DIR/comments.config.json" ]]; then
+            echo "Comments config reached the package without a source config; refusing to publish." >&2
+            exit 1
+          fi
 
       - uses: actions/upload-pages-artifact@v3
         with:

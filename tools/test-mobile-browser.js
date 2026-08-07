@@ -116,6 +116,86 @@ async function waitForCount(page, selector, count) {
   );
 }
 
+async function assertReviewPagesLayout(page, origin, viewport) {
+  await page.setViewport({ ...viewport, deviceScaleFactor: 1 });
+  await open(page, origin, 'm-dashboard.html');
+  await page.keyboard.press('Tab');
+
+  const metrics = await page.evaluate(() => {
+    const panel = document.querySelector('.proto-tools');
+    if (panel.classList.contains('mini')) panel.querySelector('.pt-min').click();
+    const pages = panel.querySelector('.pt-pages');
+    pages.scrollIntoView({ block: 'nearest' });
+    const links = [...pages.querySelectorAll(':scope > a.pt-b')];
+    const ordinarySwitch = panel.querySelector('.pt-sw');
+    const ordinaryButtons = [...ordinarySwitch.querySelectorAll(':scope > .pt-b')];
+    const panelRect = panel.getBoundingClientRect();
+    const pagesRect = pages.getBoundingClientRect();
+
+    return {
+      labels: links.map(link => link.textContent.trim()),
+      layout: links.map(link => {
+        link.focus();
+        const rect = link.getBoundingClientRect();
+        const style = getComputedStyle(link);
+        return {
+          top: rect.top,
+          bottom: rect.bottom,
+          width: rect.width,
+          height: rect.height,
+          clientWidth: link.clientWidth,
+          scrollWidth: link.scrollWidth,
+          clientHeight: link.clientHeight,
+          scrollHeight: link.scrollHeight,
+          fullWidth: Math.abs(rect.width - pagesRect.width) <= 1,
+          active: document.activeElement === link,
+          focusVisible: link.matches(':focus-visible'),
+          outlineStyle: style.outlineStyle,
+          outlineWidth: parseFloat(style.outlineWidth),
+        };
+      }),
+      pagesDisplay: getComputedStyle(pages).display,
+      panelInsideViewport: panelRect.left >= 0 && panelRect.right <= window.innerWidth,
+      panelOverflow: panel.scrollWidth - panel.clientWidth,
+      documentOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      ordinaryDisplay: getComputedStyle(ordinarySwitch).display,
+      ordinaryDirection: getComputedStyle(ordinarySwitch).flexDirection,
+      ordinaryTops: ordinaryButtons.map(button => button.getBoundingClientRect().top),
+      ordinaryUsable: ordinaryButtons.every(button => {
+        const rect = button.getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0;
+      }),
+    };
+  });
+
+  const label = `${viewport.width}x${viewport.height} review pages`;
+  assert.deepStrictEqual(metrics.labels, ['Changelog', 'Use cases', 'Comments'], `${label}: destinations`);
+  assert.strictEqual(metrics.layout.length, 3, `${label}: three independent links`);
+  metrics.layout.forEach((link, index) => {
+    assert(link.width > 0 && link.height >= 44, `${label}: link ${index + 1} readable touch dimensions`);
+    assert(link.clientWidth >= link.scrollWidth, `${label}: link ${index + 1} no text overflow`);
+    assert(link.clientHeight >= link.scrollHeight, `${label}: link ${index + 1} no vertical text overflow`);
+    assert(link.fullWidth, `${label}: link ${index + 1} fills its row`);
+    assert(link.active && link.focusVisible, `${label}: link ${index + 1} keyboard focusable`);
+    assert(link.outlineStyle !== 'none' && link.outlineWidth >= 2, `${label}: link ${index + 1} visible focus outline`);
+    if (index > 0) {
+      assert(link.top > metrics.layout[index - 1].top, `${label}: strictly increasing link tops`);
+      assert(link.top >= metrics.layout[index - 1].bottom, `${label}: links do not overlap`);
+    }
+  });
+  assert(metrics.panelInsideViewport, `${label}: panel stays inside viewport`);
+  assert(metrics.panelOverflow <= 0, `${label}: panel has no horizontal overflow`);
+  assert(metrics.documentOverflow <= 0, `${label}: document has no horizontal overflow`);
+  assert.strictEqual(metrics.pagesDisplay, 'grid', `${label}: dedicated vertical layout`);
+  assert.strictEqual(metrics.ordinaryDisplay, 'inline-flex', `${label}: ordinary switch keeps segmented layout`);
+  assert.strictEqual(metrics.ordinaryDirection, 'row', `${label}: ordinary switch stays horizontal`);
+  assert(metrics.ordinaryUsable, `${label}: ordinary switch controls remain usable`);
+  assert(
+    metrics.ordinaryTops.every(top => Math.abs(top - metrics.ordinaryTops[0]) <= 1),
+    `${label}: ordinary switch remains one row`
+  );
+}
+
 async function main() {
   assert(fs.existsSync(chromePath), `Chrome not found at ${chromePath}`);
   const { server, origin } = await startServer();
@@ -135,6 +215,14 @@ async function main() {
   await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 1 });
 
   try {
+    for (const viewport of [
+      { width: 1280, height: 844 },
+      { width: 390, height: 844 },
+    ]) {
+      await assertReviewPagesLayout(page, origin, viewport);
+    }
+    await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 1 });
+
     for (const screen of screens) {
       await open(page, origin, screen);
       const result = await page.evaluate(() => {

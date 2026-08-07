@@ -228,7 +228,7 @@
   <section class="section" aria-labelledby="privacy-title">
     <div class="section-head"><div><h2 id="privacy-title">Comment privacy</h2></div></div>
     <div class="note privacy">
-      <p>The comment layer is included but currently disabled because <code>comments.config.json</code> is intentionally absent. When configured, Google-signed-in comments use the selected third-party Firebase project and threads are stored there, not in these static files. Reviewer allowlists are required. Comment dumps contain reviewer names and email addresses; keep them private and never commit or publish them.</p>
+      <p>The comment layer activates only when a validated <code>comments.config.json</code> is packaged with the deployment; when the file is absent, the review layer remains disabled. When configured, Google-signed-in comments use the selected third-party Firebase project and threads are stored there, not in these static files. Reviewer allowlists are required. Comment dumps contain reviewer names and email addresses; keep them private and never commit or publish them.</p>
     </div>
   </section>
 

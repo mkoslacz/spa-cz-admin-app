@@ -130,6 +130,17 @@ assert(exists('comments.config.schema.json'));
 assert(exists('comments.rules'));
 assert(exists('firebase.json'));
 validateRepositoryFirebaseContract(root);
+const hub = read('index.html');
+assert.doesNotMatch(
+  hub,
+  /currently disabled because[\s\S]{0,160}intentionally absent/i,
+  'the hub must not hard-code the current comments deployment state'
+);
+assert.match(
+  hub,
+  /comment layer activates only when a validated <code>comments\.config\.json<\/code> is packaged with the deployment; when the file is absent, the review layer remains disabled/i,
+  'the hub must describe both configured and unconfigured comment modes'
+);
 if (exists('comments.config.json')) {
   const ignored = childProcess.spawnSync('git', ['check-ignore', '-q', 'comments.config.json'], {
     cwd: root,
@@ -161,8 +172,37 @@ if (exists('comments.config.json')) {
 const publishWorkflow = read('.github/workflows/prototype-refresh.yml');
 assert.match(publishWorkflow, /secrets\.COMMENTS_CONFIG_JSON/);
 assert.match(publishWorkflow, /validate-comments-config\.js comments\.config\.json/);
+assert.match(publishWorkflow, /^\s+comments\.config\*\.json$/m);
 assert.match(publishWorkflow, /^\s+prototype\.json$/m);
 assert.match(publishWorkflow, /^\s+usecases\.json$/m);
+const packageCopyIndex = publishWorkflow.indexOf('cp -R "$match" "$destination/"');
+const sourceConfigGuardIndex = publishWorkflow.indexOf('if [[ -f comments.config.json ]]');
+const packageConfigRequiredIndex = publishWorkflow.indexOf('if [[ ! -f "$PACKAGE_DIR/comments.config.json" ]]');
+const packageConfigForbiddenIndex = publishWorkflow.indexOf('elif [[ -e "$PACKAGE_DIR/comments.config.json" ]]');
+const uploadIndex = publishWorkflow.indexOf('actions/upload-pages-artifact@v3');
+assert(packageCopyIndex >= 0, 'the package workflow must assemble files before checking parity');
+assert(
+  sourceConfigGuardIndex > packageCopyIndex,
+  'the exact comments config parity guard must run after package assembly'
+);
+assert(
+  packageConfigRequiredIndex > sourceConfigGuardIndex,
+  'a source comments config must require the exact packaged file'
+);
+assert(
+  packageConfigForbiddenIndex > packageConfigRequiredIndex,
+  'an absent source comments config must forbid the exact packaged file'
+);
+assert(uploadIndex > packageConfigForbiddenIndex, 'comments config parity must be checked before artifact upload');
+const unsafeConfigOutputLines = publishWorkflow.split('\n').filter(line => {
+  if (!/\$(?:\{)?COMMENTS_CONFIG_JSON\b/.test(line) || !/\b(?:echo|printf)\b/.test(line)) return false;
+  return !/^\s*printf '%s\\n' "\$COMMENTS_CONFIG_JSON" > comments\.config\.json\s*$/.test(line);
+});
+assert.deepStrictEqual(
+  unsafeConfigOutputLines,
+  [],
+  'the workflow may write the comments configuration only to its exact private source file'
+);
 
 const runtime = read('proto-m.js');
 assert.doesNotMatch(runtime, /commissionRate|Provize 15|Commission 15/);

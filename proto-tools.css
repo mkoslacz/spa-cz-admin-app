@@ -28,6 +28,17 @@
 }
 .proto-tools .pt-b + .pt-b { border-left: 1px solid #D8D8D8; }
 .proto-tools .pt-b.on { background: #1F1F1F; color: #fff; }
+.proto-tools .pt-pages {
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; width: 100%;
+  border: 0; border-radius: 0; overflow: visible;
+}
+.proto-tools .pt-pages .pt-b {
+  box-sizing: border-box; width: 100%; min-width: 0; min-height: 44px; height: auto;
+  justify-content: flex-start; padding: 8px 10px; border: 1px solid #D8D8D8; border-radius: 8px;
+  line-height: 1.2; text-align: left; white-space: normal;
+}
+.proto-tools .pt-pages .pt-b + .pt-b { border-left: 1px solid #D8D8D8; }
+.proto-tools .pt-pages .pt-b:focus-visible { outline: 3px solid #245A86; outline-offset: 2px; }
 .proto-tools .pt-sheet-row { gap: 6px; }
 .proto-tools .pt-sheet-toggle {
   width: 100%; min-height: 28px; padding: 0 9px; border: 1px dashed #A7A7A7; border-radius: 7px;
