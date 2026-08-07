@@ -1,0 +1,24 @@
+{
+  "firestore": {
+    "rules": "../comments.rules"
+  },
+  "emulators": {
+    "firestore": {
+      "host": "127.0.0.1",
+      "port": 8187,
+      "websocketPort": 8188
+    },
+    "hub": {
+      "host": "127.0.0.1",
+      "port": 8189
+    },
+    "logging": {
+      "host": "127.0.0.1",
+      "port": 8190
+    },
+    "singleProjectMode": true,
+    "ui": {
+      "enabled": false
+    }
+  }
+}

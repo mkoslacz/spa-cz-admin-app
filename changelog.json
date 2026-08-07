@@ -1,0 +1,27 @@
+{
+  "generatedAt": "2026-08-07T00:00:00.000Z",
+  "repository": null,
+  "limited": false,
+  "limit": 50,
+  "entries": [
+    {
+      "sha": "proposal-a",
+      "short": "snapshot",
+      "date": "2026-08-07",
+      "subject": "Create the mobile-only SPA.cz partner app proposal",
+      "body": "Established the eight-area Czech and English app flow from the existing SPA.cz partner-panel functionality, mapped it to the supplied Szallas design system and SPA.cz brand, and added reproducible review, state, comment and Figma-export tooling. This bootstrap entry is replaced by commit-derived history when the repository workflow runs.",
+      "screens": [
+        "m-dashboard.html",
+        "m-reservations.html",
+        "m-reservation-detail.html",
+        "m-availability.html",
+        "m-offer.html",
+        "m-rate-edit.html",
+        "m-billing.html",
+        "m-more.html"
+      ],
+      "round": "Proposal A",
+      "url": null
+    }
+  ]
+}

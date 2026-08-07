@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=390, initial-scale=1, maximum-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Billing · SPA.CZ partner app prototype</title>
+  <link rel="stylesheet" href="tokens-m.css?v=20260807c">
+  <link rel="stylesheet" href="app-m.css?v=20260807c">
+  <link rel="stylesheet" href="proto-tools.css?v=20260807c">
+  <link rel="stylesheet" href="proto-comments.css?v=20260807c">
+  <link rel="stylesheet" href="proto-m.css?v=20260807c">
+</head>
+<body data-page="billing" data-viewport="mobile" data-auth="in" data-access="full" data-connection="manual" data-density="dense" data-inv="many" data-hotel="active">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="prototype-hint">Interactive prototype · public package facts + clearly labelled demo account data</div>
+  <nav class="langswitch" aria-label="Language">
+    <a href="m-billing.html" data-carry-state data-lang="cs" class="">CZ</a>
+    <a href="m-billing-en.html" data-carry-state data-lang="en" class="on">EN</a>
+  </nav>
+  <div class="product-surface">
+    <div class="mobile-app">
+      <header class="mobile-header">
+    <button class="mobile-brand" type="button" data-open-sheet="property-sheet" aria-label="Select property">
+      <img src="assets/logo.svg" alt="SPA.CZ">
+      <span class="hotel-summary">
+        <strong>SPA HOTEL ČAJKOVSKIJ</strong>
+        <small><span class="connection-pill"><span class="connection-manual">Manual</span><span class="connection-chm">Channel Manager</span></span></small>
+      </span>
+    </button>
+    <button class="header-button" type="button" data-toast="In prototype: notification centre." aria-label="Notifications"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M18 16v-5a6 6 0 0 0-5-5.9V4a1 1 0 0 0-2 0v1.1A6 6 0 0 0 6 11v5l-2 2h16l-2-2Zm-8 3h4a2 2 0 0 1-4 0Z"/></svg></button>
+  </header>
+      <main class="mobile-main" id="main">
+        <div class="page-head">
+    <div><h1>Billing</h1><p>Price, commission rate, commission incl. VAT and documents in one working list.</p><span class="demo-label">Demo data</span></div>
+    
+  </div>
+    <div class="alert warning readonly-alert"><strong>Read-only access.</strong>&nbsp;Editing is disabled for this role.</div>
+  
+  <div class="alert info test-alert"><strong>Test property.</strong>&nbsp;Changes are not published on SPA.CZ.</div>
+    <div class="alert warning"><strong>Demo financial data.</strong>&nbsp;The amounts and statuses below do not come from a live account.</div>
+    <div class="filter-scroll"><button class="chip active" type="button" data-filter-chip>For approval 3</button><button class="chip" type="button" data-filter-chip>Approved</button><button class="chip" type="button" data-filter-chip>Disputed</button></div>
+    <div class="billing-list inventory-content">
+      <article class="billing-card" data-inventory-rank="1">
+    <div class="card-line"><strong>DEMO-10482</strong><span class="status warning">For approval</span></div>
+    <div class="card-line secondary"><span>12.–14. 10. 2026</span><span>Demo reservation</span></div>
+    <div class="card-line financial"><span><small>Price · demo</small><br><strong>7 154 Kč</strong></span><span><small>Commission incl. VAT</small><br><b>Per contract</b></span></div>
+    <div class="inline-actions"><button class="button" type="button" data-open-sheet="dispute-sheet" data-write-action>Dispute</button><button class="button primary" type="button" data-approval data-toast="Demo settlement approved." data-write-action>Approve</button></div>
+  </article>
+      <article class="billing-card" data-inventory-rank="2">
+    <div class="card-line"><strong>DEMO-10477</strong><span class="status warning">For approval</span></div>
+    <div class="card-line secondary"><span>16.–19. 10. 2026</span><span>Demo reservation</span></div>
+    <div class="card-line financial"><span><small>Price · demo</small><br><strong>6 240 Kč</strong></span><span><small>Commission incl. VAT</small><br><b>Per contract</b></span></div>
+    <div class="inline-actions"><button class="button" type="button" data-open-sheet="dispute-sheet" data-write-action>Dispute</button><button class="button primary" type="button" data-approval data-toast="Demo settlement approved." data-write-action>Approve</button></div>
+  </article>
+      <article class="billing-card" data-inventory-rank="3">
+    <div class="card-line"><strong>DEMO-10463</strong><span class="status warning">For approval</span></div>
+    <div class="card-line secondary"><span>20.–23. 10. 2026</span><span>Demo reservation</span></div>
+    <div class="card-line financial"><span><small>Price · demo</small><br><strong>8 120 Kč</strong></span><span><small>Commission incl. VAT</small><br><b>Per contract</b></span></div>
+    <div class="inline-actions"><button class="button" type="button" data-open-sheet="dispute-sheet" data-write-action>Dispute</button><button class="button primary" type="button" data-approval data-toast="Demo settlement approved." data-write-action>Approve</button></div>
+  </article>
+      <article class="billing-card" data-inventory-rank="4">
+    <div class="card-line"><strong>DEMO-10411</strong><span class="status success">Approved</span></div>
+    <div class="card-line secondary"><span>27.–29. 10. 2026</span><span>Demo reservation</span></div>
+    <div class="card-line financial"><span><small>Price · demo</small><br><strong>4 800 Kč</strong></span><span><small>Commission incl. VAT</small><br><b>Per contract</b></span></div>
+    <div class="inline-actions"><button class="button" type="button" data-open-sheet="dispute-sheet" data-write-action>Dispute</button><button class="button primary" type="button" data-approval data-toast="Demo settlement approved." data-write-action>Approve</button></div>
+  </article>
+      <article class="billing-card" data-inventory-rank="5">
+    <div class="card-line"><strong>DEMO-10398</strong><span class="status danger">Disputed</span></div>
+    <div class="card-line secondary"><span>2.–5. 11. 2026</span><span>Demo reservation</span></div>
+    <div class="card-line financial"><span><small>Price · demo</small><br><strong>5 100 Kč</strong></span><span><small>Commission incl. VAT</small><br><b>Per contract</b></span></div>
+    <div class="inline-actions"><button class="button" type="button" data-open-sheet="dispute-sheet" data-write-action>Dispute</button><button class="button primary" type="button" data-approval data-toast="Demo settlement approved." data-write-action>Approve</button></div>
+  </article>
+    </div>
+    <div class="empty-state"><div class="empty-inner">
+    <svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m3 12 9-9h7a2 2 0 0 1 2 2v7l-9 9L3 12Zm13-4.5A1.5 1.5 0 1 0 16 4a1.5 1.5 0 0 0 0 3.5Z"/></svg>
+    <h2>Nothing to settle</h2>
+    <p>There are no items for this demo state.</p>
+  </div></div>
+      </main>
+      <nav class="mobile-bottom-nav" aria-label="Primary navigation">
+    <a href="m-dashboard-en.html" data-carry-state class="" >
+    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M4 13h6V4H4v9Zm0 7h6v-5H4v5Zm10 0h6v-9h-6v9Zm0-16v5h6V4h-6Z"/></svg><span>Overview</span>
+  </a>
+    <a href="m-reservations-en.html" data-carry-state class="" >
+    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M6 3h12a2 2 0 0 1 2 2v15l-3-2-3 2-3-2-3 2-3-2-3 2V5a2 2 0 0 1 2-2h2Zm2 5h8V6H8v2Zm0 4h8v-2H8v2Zm0 4h5v-2H8v2Z"/></svg><span class="nav-badge" data-kind="reservation">5</span><span>Reservations</span>
+  </a>
+    <a href="m-availability-en.html" data-carry-state class="" >
+    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M5 3h2v2h10V3h2v2h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h1V3Zm15 7H4v10h16V10ZM7 12h3v3H7v-3Zm5 0h3v3h-3v-3Zm5 0h2v3h-2v-3ZM7 17h3v2H7v-2Zm5 0h3v2h-3v-2Z"/></svg><span>Availability</span>
+  </a>
+    <a href="m-offer-en.html" data-carry-state class="" >
+    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m3 12 9-9h7a2 2 0 0 1 2 2v7l-9 9L3 12Zm13-4.5A1.5 1.5 0 1 0 16 4a1.5 1.5 0 0 0 0 3.5Z"/></svg><span>Offer</span>
+  </a>
+    <a href="m-more-en.html" data-carry-state class="active" aria-current="page">
+    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M5 10a2 2 0 1 1 0 4 2 2 0 0 1 0-4Zm7 0a2 2 0 1 1 0 4 2 2 0 0 1 0-4Zm7 0a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z"/></svg><span class="nav-badge" data-kind="changes">2</span><span>More</span>
+  </a>
+  </nav>
+    </div>
+  </div>
+  <section class="signed-out-wall"><div class="wall-card"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm6-1a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM9 13c-4 0-7 2-7 5v2h14v-2c0-3-3-5-7-5Zm7 0c-.6 0-1.2.1-1.8.2 2.3 1 3.8 2.7 3.8 4.8v2h4v-2c0-3-2.6-5-6-5Z"/></svg><h1>Signed-out demo account</h1><p>Use the floating settings panel to switch back to “Signed in”. No real credentials are used.</p><button class="button primary" type="button" data-toast="Use the prototype settings panel to sign in.">Open demo account</button></div></section>
+  <section class="access-wall"><div class="wall-card"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m19.4 13 .1-1-.1-1 2-1.5-2-3.4-2.4 1a8 8 0 0 0-1.7-1L15 3.5h-4l-.4 2.6a8 8 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.5-.1 1 .1 1-2 1.5 2 3.4 2.4-1a8 8 0 0 0 1.7 1l.4 2.6h4l.4-2.6a8 8 0 0 0 1.7-1l2.4 1 2-3.4-2-1.5ZM13 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z"/></svg><h1>No access in this demo state</h1><p>Use the floating settings panel to select Read only or Full access.</p></div></section>
+  <div class="modal-backdrop" id="property-sheet" aria-hidden="true"><section class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="property-sheet-title"><div class="sheet-grabber"></div><header class="sheet-head"><h2 id="property-sheet-title">Select property</h2><button class="header-button" type="button" data-close-sheet aria-label="Close">×</button></header><div class="sheet-body"><button class="button full primary" type="button" data-close-sheet>SPA HOTEL ČAJKOVSKIJ <span class="test-label">TEST</span></button><p class="subtle">The only public property used in the prototype.</p></div></section></div><div class="modal-backdrop" id="dispute-sheet" aria-hidden="true"><section class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="dispute-sheet-title"><div class="sheet-grabber"></div><header class="sheet-head"><h2 id="dispute-sheet-title">Dispute settlement</h2><button class="header-button" type="button" data-close-sheet aria-label="Close">×</button></header><div class="sheet-body"><form data-prototype-form data-success="Demo dispute submitted." id="dispute-form"><div class="alert warning">All fields contain demo data.</div><label class="field"><span>Reason</span><textarea required>Demo dispute reason</textarea></label><label class="field"><span>Suggested price</span><input type="number" min="1" value="3400" required></label></form></div><div class="sheet-actions"><button class="button" type="button" data-close-sheet>Cancel</button><button class="button primary" type="submit" form="dispute-form">Submit</button></div></section></div>
+  <div class="toast" role="status" aria-live="polite"></div>
+  <div class="state-debug" data-state-output></div>
+  <a class="screen-reader-only" href="m-billing.html" data-carry-state>Čeština</a>
+  <script src="proto-tools.js?v=20260807c" defer></script>
+  <script src="proto-comments.js?v=20260807c" defer></script>
+  <script src="proto-m.js?v=20260807c" defer></script>
+</body>
+</html>

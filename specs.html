@@ -1,0 +1,988 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SPA.CZ Partner App — Mobile Component Specification</title>
+  <link rel="stylesheet" href="tokens-m.css">
+  <link rel="stylesheet" href="app-m.css">
+  <style>
+    /*
+      Standalone documentation fallback. Every product-facing value below is
+      traced to the design-system frames or SPA.CZ partner source listed in the
+      page. tokens-m.css and app-m.css remain the expected implementation sources.
+    */
+    .spec-page,
+    .spec-page * {
+      box-sizing: border-box;
+    }
+
+    .spec-page {
+      --spec-white: #FFFFFF;
+      --spec-neutral-100: #FAFAFA;
+      --spec-neutral-200: #F7F5F3;
+      --spec-neutral-300: #EFEDED;
+      --spec-neutral-400: #E1DEDE;
+      --spec-neutral-500: #B8B8B8;
+      --spec-neutral-600: #747679;
+      --spec-neutral-700: #57585A;
+      --spec-neutral-800: #323334;
+      --spec-neutral-900: #1E1E1E;
+      --spec-spa-bg: #EEF3F5;
+      --spec-spa-stroke: #E1EAEF;
+      --spec-spa-ink: #1C1F21;
+      --spec-spa-blue: #1174BB;
+      --spec-spa-blue-dark: #0F5180;
+      --spec-spa-blue-light: #3EB3FF;
+      --spec-spa-blue-50: #E7F1F8;
+      --spec-spa-blue-100: #D2E5F3;
+      --spec-spa-green: #89C02C;
+      --spec-spa-green-action: #76B82A;
+      --spec-spa-green-hover: #5FA013;
+      --spec-spa-red: #DD1111;
+      --spec-focus-soft: #1174BB33;
+      --spec-focus-hard: #1174BBCC;
+      margin: 0;
+      background: var(--spec-spa-bg);
+      color: var(--spec-spa-ink);
+      font: 500 14px/20px "DM Sans", sans-serif;
+    }
+
+    .spec-page button,
+    .spec-page input {
+      font: inherit;
+    }
+
+    .spec-page a {
+      color: var(--spec-spa-blue);
+    }
+
+    .spec-hero {
+      padding: 28px 16px;
+      background: var(--spec-spa-blue-dark);
+      color: var(--spec-white);
+    }
+
+    .spec-hero h1 {
+      margin: 0;
+      font: 700 32px/36px "Outfit", sans-serif;
+      letter-spacing: -0.01em;
+    }
+
+    .spec-hero p {
+      max-width: 80ch;
+      margin: 8px 0 0;
+      font: 500 16px/22px "DM Sans", sans-serif;
+    }
+
+    .spec-main {
+      display: grid;
+      gap: 16px;
+      width: 100%;
+      padding: 16px;
+    }
+
+    .spec-section {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid var(--spec-spa-stroke);
+      border-radius: 12px;
+      background: var(--spec-white);
+    }
+
+    .spec-section h2 {
+      margin: 0;
+      font: 600 24px/28px "Outfit", sans-serif;
+    }
+
+    .spec-section h3 {
+      margin: 16px 0 8px;
+      font: 600 18px/22px "Outfit", sans-serif;
+    }
+
+    .spec-section p {
+      margin: 8px 0 0;
+    }
+
+    .spec-scope {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .spec-pill,
+    .spec-trace {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border-radius: 9999px;
+      font: 600 12px/16px "DM Sans", sans-serif;
+    }
+
+    .spec-pill {
+      padding: 4px 8px;
+      background: var(--spec-white);
+      color: var(--spec-spa-blue-dark);
+    }
+
+    .spec-trace {
+      margin-top: 12px;
+      padding: 4px 8px;
+      border: 1px solid var(--spec-spa-stroke);
+      background: var(--spec-neutral-200);
+      color: var(--spec-neutral-700);
+    }
+
+    .spec-note {
+      padding: 12px;
+      border-left: 4px solid var(--spec-spa-green);
+      border-radius: 8px;
+      background: var(--spec-spa-blue-50);
+    }
+
+    .spec-table-wrap {
+      max-width: 100%;
+      margin-top: 12px;
+      overflow-x: auto;
+      border: 1px solid var(--spec-neutral-400);
+      border-radius: 8px;
+    }
+
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .spec-table th,
+    .spec-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--spec-neutral-400);
+      vertical-align: top;
+      white-space: nowrap;
+    }
+
+    .spec-table th {
+      background: var(--spec-neutral-200);
+      font-weight: 700;
+    }
+
+    .spec-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .spec-code {
+      font-family: "DM Mono", monospace;
+      font-size: 12px;
+      line-height: 16px;
+    }
+
+    .spec-swatch-grid,
+    .spec-component-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(336px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .spec-swatch,
+    .spec-demo-card {
+      overflow: hidden;
+      border: 1px solid var(--spec-neutral-400);
+      border-radius: 8px;
+      background: var(--spec-white);
+    }
+
+    .spec-swatch-color {
+      height: 56px;
+    }
+
+    .spec-swatch-copy,
+    .spec-demo-copy {
+      padding: 12px;
+    }
+
+    .spec-swatch-copy strong,
+    .spec-swatch-copy code {
+      display: block;
+    }
+
+    .spec-mobile-frame {
+      width: min(390px, 100%);
+      margin-top: 12px;
+      overflow: hidden;
+      border: 1px solid var(--spec-neutral-600);
+      border-radius: 24px;
+      background: var(--spec-spa-bg);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, .16);
+    }
+
+    .spec-app-header {
+      display: flex;
+      height: 56px;
+      align-items: center;
+      gap: 8px;
+      padding: 0 12px;
+      background: var(--spec-spa-blue);
+      color: var(--spec-white);
+    }
+
+    .spec-icon-target {
+      display: grid;
+      width: 48px;
+      height: 48px;
+      flex: 0 0 48px;
+      place-items: center;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: inherit;
+    }
+
+    .spec-icon-shape {
+      display: grid;
+      width: 24px;
+      height: 24px;
+      place-items: center;
+      font: 700 16px/22px "DM Sans", sans-serif;
+    }
+
+    .spec-app-title {
+      flex: 1;
+      font: 700 16px/22px "DM Sans", sans-serif;
+    }
+
+    .spec-mobile-content {
+      display: grid;
+      gap: 8px;
+      padding: 12px;
+    }
+
+    .spec-mobile-card {
+      display: grid;
+      gap: 8px;
+      padding: 12px;
+      border: 1px solid var(--spec-spa-stroke);
+      border-radius: 12px;
+      background: var(--spec-white);
+    }
+
+    .spec-mobile-card strong {
+      font: 600 18px/22px "Outfit", sans-serif;
+    }
+
+    .spec-bottom-nav {
+      display: grid;
+      height: 64px;
+      grid-template-columns: repeat(4, 1fr);
+      border-top: 1px solid var(--spec-neutral-400);
+      background: var(--spec-white);
+    }
+
+    .spec-nav-item {
+      display: grid;
+      min-width: 0;
+      place-content: center;
+      justify-items: center;
+      gap: 2px;
+      color: var(--spec-neutral-700);
+      font: 600 10px/12px "DM Sans", sans-serif;
+    }
+
+    .spec-nav-item.is-active {
+      color: var(--spec-spa-blue);
+    }
+
+    .spec-nav-icon {
+      width: 20px;
+      height: 20px;
+      border: 2px solid currentColor;
+      border-radius: 4px;
+    }
+
+    .spec-button-stack,
+    .spec-form-stack,
+    .spec-list-group {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .spec-button-row {
+      display: grid;
+      grid-template-columns: 64px minmax(0, 1fr);
+      align-items: center;
+      gap: 12px;
+    }
+
+    .spec-button {
+      display: inline-flex;
+      width: 100%;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0 12px;
+      border: 0;
+      border-radius: 8px;
+      font: 700 16px/22px "DM Sans", sans-serif;
+    }
+
+    .spec-button.primary {
+      background: var(--spec-spa-blue);
+      color: var(--spec-white);
+    }
+
+    .spec-button.positive {
+      background: var(--spec-spa-green-action);
+      color: var(--spec-white);
+    }
+
+    .spec-button.secondary {
+      border: 1px solid var(--spec-spa-stroke);
+      background: var(--spec-white);
+      color: var(--spec-spa-blue);
+    }
+
+    .spec-button.xl { height: 64px; }
+    .spec-button.l { height: 48px; }
+    .spec-button.m { height: 40px; }
+    .spec-button.s { height: 32px; }
+
+    .spec-touch-guard {
+      display: grid;
+      min-height: 44px;
+      align-items: center;
+    }
+
+    .spec-field {
+      display: grid;
+      gap: 4px;
+    }
+
+    .spec-field label {
+      color: var(--spec-neutral-700);
+      font: 500 14px/20px "DM Sans", sans-serif;
+    }
+
+    .spec-input {
+      width: 100%;
+      height: 48px;
+      padding: 0 12px;
+      border: 1px solid var(--spec-neutral-600);
+      border-radius: 8px;
+      background: var(--spec-white);
+      color: var(--spec-spa-ink);
+      font: 600 16px/22px "DM Sans", sans-serif;
+    }
+
+    .spec-field.focus .spec-input {
+      border-color: var(--spec-focus-hard);
+      outline: 0;
+      box-shadow: 0 0 0 4px var(--spec-focus-soft);
+    }
+
+    .spec-field.error .spec-input {
+      border-color: var(--spec-spa-red);
+      outline: 0;
+      box-shadow: 0 0 0 4px #DD11111A;
+    }
+
+    .spec-helper {
+      color: var(--spec-neutral-700);
+      font: 500 12px/16px "DM Sans", sans-serif;
+    }
+
+    .spec-field.error .spec-helper {
+      color: var(--spec-spa-red);
+    }
+
+    .spec-chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .spec-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 4px 8px;
+      border-radius: 8px;
+      background: var(--spec-neutral-200);
+      color: var(--spec-neutral-800);
+      font: 600 12px/16px "DM Sans", sans-serif;
+    }
+
+    .spec-chip.info {
+      background: var(--spec-spa-blue-100);
+      color: var(--spec-spa-blue-dark);
+    }
+
+    .spec-badge {
+      display: inline-grid;
+      min-width: 16px;
+      height: 16px;
+      padding: 0 4px;
+      place-items: center;
+      border-radius: 9999px;
+      background: var(--spec-spa-blue);
+      color: var(--spec-white);
+      font: 700 10px/12px "DM Sans", sans-serif;
+    }
+
+    .spec-badge.two { width: 23px; }
+
+    .spec-badge.dot {
+      width: 8px;
+      min-width: 8px;
+      height: 8px;
+      padding: 0;
+    }
+
+    .spec-list-group {
+      overflow: hidden;
+      gap: 0;
+      border: 1px solid var(--spec-neutral-400);
+      border-radius: 12px;
+      background: var(--spec-white);
+    }
+
+    .spec-list-row {
+      display: grid;
+      min-height: 56px;
+      grid-template-columns: 24px minmax(0, 1fr) 24px;
+      align-items: center;
+      gap: 8px;
+      padding: 0 12px;
+      border-bottom: 1px solid var(--spec-neutral-400);
+    }
+
+    .spec-list-row:last-child {
+      border-bottom: 0;
+    }
+
+    .spec-list-row strong {
+      display: block;
+      font-weight: 600;
+    }
+
+    .spec-list-row small {
+      display: block;
+      color: var(--spec-neutral-700);
+      font: 500 12px/16px "DM Sans", sans-serif;
+    }
+
+    .spec-matrix-viewport {
+      width: min(390px, 100%);
+      margin-top: 12px;
+      overflow: auto;
+      border: 1px solid var(--spec-neutral-400);
+      border-radius: 8px;
+      background: var(--spec-white);
+    }
+
+    .spec-matrix {
+      width: max-content;
+      border-collapse: separate;
+      border-spacing: 0;
+      table-layout: fixed;
+    }
+
+    .spec-matrix th,
+    .spec-matrix td {
+      padding: 4px;
+      border-right: 1px solid var(--spec-neutral-400);
+      border-bottom: 1px solid var(--spec-neutral-400);
+      text-align: center;
+    }
+
+    .spec-matrix tr:last-child td,
+    .spec-matrix tr:last-child th {
+      border-bottom: 0;
+    }
+
+    .spec-matrix th:last-child,
+    .spec-matrix td:last-child {
+      border-right: 0;
+    }
+
+    .spec-matrix .label-cell {
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      width: 132px;
+      min-width: 132px;
+      max-width: 132px;
+      background: var(--spec-white);
+      text-align: left;
+      font-weight: 700;
+    }
+
+    .spec-matrix thead th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: var(--spec-spa-blue-50);
+      color: var(--spec-spa-blue-dark);
+      font: 600 12px/16px "DM Sans", sans-serif;
+    }
+
+    .spec-matrix thead .label-cell {
+      z-index: 3;
+      background: var(--spec-spa-blue-50);
+    }
+
+    .spec-matrix.availability th,
+    .spec-matrix.availability td {
+      height: 52px;
+      min-height: 52px;
+    }
+
+    .spec-matrix.availability .day-cell {
+      width: 52px;
+      min-width: 52px;
+      max-width: 52px;
+    }
+
+    .spec-matrix.rates th,
+    .spec-matrix.rates td {
+      height: 56px;
+      min-height: 56px;
+    }
+
+    .spec-matrix.rates .day-cell {
+      width: 82px;
+      min-width: 82px;
+      max-width: 82px;
+    }
+
+    .spec-matrix-value {
+      display: grid;
+      height: 48px;
+      place-items: center;
+      border: 1px solid var(--spec-spa-stroke);
+      border-radius: 8px;
+      background: var(--spec-white);
+      color: var(--spec-spa-ink);
+      font: 600 14px/20px "DM Sans", sans-serif;
+    }
+
+    .spec-sheet-stage {
+      display: flex;
+      width: min(390px, 100%);
+      margin-top: 12px;
+      padding-top: 56px;
+      align-items: end;
+      border-radius: 24px;
+      background: rgba(0, 0, 0, .4);
+    }
+
+    .spec-sheet {
+      width: 100%;
+      overflow: hidden;
+      border-radius: 24px 24px 0 0;
+      background: var(--spec-white);
+      box-shadow: 0 -2px 12px rgba(0, 0, 0, .16);
+    }
+
+    .spec-sheet-handle {
+      width: 32px;
+      height: 4px;
+      margin: 8px auto;
+      border-radius: 9999px;
+      background: var(--spec-neutral-500);
+    }
+
+    .spec-sheet-title {
+      padding: 8px 12px 12px;
+      font: 600 20px/24px "Outfit", sans-serif;
+    }
+
+    .spec-choice-row {
+      display: grid;
+      height: 56px;
+      grid-template-columns: minmax(0, 1fr) 20px;
+      align-items: center;
+      gap: 8px;
+      padding: 0 12px;
+      border-top: 1px solid var(--spec-neutral-400);
+    }
+
+    .spec-radio {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--spec-spa-blue);
+      border-radius: 9999px;
+      box-shadow: inset 0 0 0 4px var(--spec-white);
+      background: var(--spec-spa-blue);
+    }
+
+    .spec-measure-list {
+      margin: 12px 0 0;
+      padding-left: 20px;
+    }
+
+    .spec-measure-list li + li {
+      margin-top: 4px;
+    }
+
+    .spec-footer {
+      padding: 16px;
+      background: var(--spec-spa-ink);
+      color: var(--spec-white);
+      font: 500 12px/16px "DM Sans", sans-serif;
+    }
+
+    @media (max-width: 720px) {
+      .spec-main,
+      .spec-section {
+        padding: 12px;
+      }
+
+      .spec-swatch-grid,
+      .spec-component-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .spec-table th,
+      .spec-table td {
+        padding: 8px;
+      }
+    }
+  </style>
+</head>
+<body class="spec-page">
+  <header class="spec-hero">
+    <h1>SPA.CZ Partner App — mobile component specification</h1>
+    <p>
+      Developer-facing measurements for the clickable mobile application
+      prototype. Product scope is fixed to a 390 px review viewport.
+    </p>
+    <div class="spec-scope" aria-label="Specification scope">
+      <span class="spec-pill">Mobile app only</span>
+      <span class="spec-pill">390 px viewport</span>
+      <span class="spec-pill">SPA.CZ colour skin</span>
+      <span class="spec-pill">0.70 spacing density</span>
+    </div>
+  </header>
+
+  <main class="spec-main">
+    <section class="spec-section" id="scope">
+      <h2>Scope and source authority</h2>
+      <div class="spec-note">
+        Desktop web navigation, sidebars, desktop content widths and desktop
+        product screens are out of scope. The 375 px Figma screens are source
+        references; the delivered app is reviewed at 390 px.
+      </div>
+      <p>
+        This page links the expected implementation stylesheets
+        <span class="spec-code">tokens-m.css</span> and
+        <span class="spec-code">app-m.css</span>. The inline styles make the
+        reference readable when either file is not yet present.
+      </p>
+      <div class="spec-table-wrap">
+        <table class="spec-table">
+          <thead>
+            <tr><th>Authority</th><th>Path</th><th>What is borrowed</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Design system</td>
+              <td class="spec-code">/Users/mkoslacz/Workspaces/claude/szallas-apps-master/design-system/Szallas Design System.fig</td>
+              <td>Typography, spacing, radius, elevation and component anatomy</td>
+            </tr>
+            <tr>
+              <td>Approved mobile work</td>
+              <td class="spec-code">/Users/mkoslacz/Workspaces/claude/szallas-apps-master/design-system/Web &amp; App Redesign.fig</td>
+              <td>Real mobile composition and component geometry</td>
+            </tr>
+            <tr>
+              <td>SPA.CZ partner source</td>
+              <td class="spec-code">/Users/mkoslacz/Workspaces/claude/szallas-apps-master/spa/spacz_web/www/extranetspacz/</td>
+              <td>Brand colours, semantic states and matrix behaviour</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <span class="spec-trace">Trace record: research/design-system.md</span>
+    </section>
+
+    <section class="spec-section" id="brand">
+      <h2>Applied foundations</h2>
+      <h3>SPA.CZ semantic skin</h3>
+      <div class="spec-swatch-grid">
+        <div class="spec-swatch">
+          <div class="spec-swatch-color" style="background:#1174BB"></div>
+          <div class="spec-swatch-copy"><strong>Primary action / active</strong><code>#1174BB</code></div>
+        </div>
+        <div class="spec-swatch">
+          <div class="spec-swatch-color" style="background:#0F5180"></div>
+          <div class="spec-swatch-copy"><strong>Primary hover / pressed</strong><code>#0F5180</code></div>
+        </div>
+        <div class="spec-swatch">
+          <div class="spec-swatch-color" style="background:#89C02C"></div>
+          <div class="spec-swatch-copy"><strong>Brand / positive green</strong><code>#89C02C</code></div>
+        </div>
+        <div class="spec-swatch">
+          <div class="spec-swatch-color" style="background:#EEF3F5"></div>
+          <div class="spec-swatch-copy"><strong>Application background</strong><code>#EEF3F5</code></div>
+        </div>
+        <div class="spec-swatch">
+          <div class="spec-swatch-color" style="background:#E1EAEF"></div>
+          <div class="spec-swatch-copy"><strong>SPA.CZ base stroke</strong><code>#E1EAEF</code></div>
+        </div>
+        <div class="spec-swatch">
+          <div class="spec-swatch-color" style="background:#1C1F21"></div>
+          <div class="spec-swatch-copy"><strong>Primary ink</strong><code>#1C1F21</code></div>
+        </div>
+      </div>
+      <h3>Typography</h3>
+      <ul class="spec-measure-list">
+        <li><strong>Headings:</strong> Outfit; H1 36/40, H2 32/36, H3 24/28, H4 22/26, H5 20/24, H6 18/22.</li>
+        <li><strong>Body and controls:</strong> DM Sans; 16/22, 14/20, 12/16 and 10/12.</li>
+        <li>Typography is not reduced by the density override.</li>
+      </ul>
+      <span class="spec-trace">Frames 8778:30914 · 8778:31203 · 8922:35914 · 8778:32941 · SPA source variables.less:9–35 · logo.svg:5–9</span>
+    </section>
+
+    <section class="spec-section" id="density">
+      <h2>Global density rule</h2>
+      <p>
+        Multiply layout spacing, gaps, padding and section rhythm by 0.70. Use
+        the rounded values below everywhere; do not tune individual screens.
+      </p>
+      <div class="spec-table-wrap">
+        <table class="spec-table">
+          <thead><tr><th>Original px</th><th>0</th><th>2</th><th>4</th><th>8</th><th>12</th><th>16</th><th>20</th><th>24</th><th>28</th><th>32</th><th>40</th><th>48</th><th>56</th><th>64</th><th>80</th></tr></thead>
+          <tbody><tr><th>Prototype px</th><td>0</td><td>2</td><td>4</td><td>6</td><td>8</td><td>12</td><td>14</td><td>16</td><td>20</td><td>22</td><td>28</td><td>34</td><td>40</td><td>44</td><td>56</td></tr></tbody>
+        </table>
+      </div>
+      <p>
+        Keep 24 px icons, 48 px controls, the 56 px header, the 64 px bottom
+        navigation, 20 px radios, typography, strokes and all touch targets of
+        at least 44 × 44 px unchanged.
+      </p>
+      <span class="spec-trace">Frame 8779:34761 · prototype density override</span>
+    </section>
+
+    <section class="spec-section" id="mobile-shell">
+      <h2>Mobile application shell</h2>
+      <div class="spec-mobile-frame" aria-label="390 pixel mobile shell example">
+        <div class="spec-app-header">
+          <button class="spec-icon-target" type="button" aria-label="Back"><span class="spec-icon-shape" aria-hidden="true">‹</span></button>
+          <div class="spec-app-title">Availability</div>
+          <button class="spec-icon-target" type="button" aria-label="More"><span class="spec-icon-shape" aria-hidden="true">•••</span></button>
+        </div>
+        <div class="spec-mobile-content">
+          <div class="spec-mobile-card">
+            <strong>390 px application frame</strong>
+            <span>12 px content inset and 8 px card rhythm after global compression.</span>
+          </div>
+          <div class="spec-mobile-card">
+            <strong>Touch geometry stays intact</strong>
+            <span>Header icons remain 24 px inside 48 px hit areas.</span>
+          </div>
+        </div>
+        <nav class="spec-bottom-nav" aria-label="Example bottom navigation">
+          <div class="spec-nav-item is-active"><span class="spec-nav-icon" aria-hidden="true">&#8203;</span><span>Home</span></div>
+          <div class="spec-nav-item"><span class="spec-nav-icon" aria-hidden="true">&#8203;</span><span>Availability</span></div>
+          <div class="spec-nav-item"><span class="spec-nav-icon" aria-hidden="true">&#8203;</span><span>Rates</span></div>
+          <div class="spec-nav-item"><span class="spec-nav-icon" aria-hidden="true">&#8203;</span><span>More</span></div>
+        </nav>
+      </div>
+      <ul class="spec-measure-list">
+        <li>Review viewport: 390 px.</li>
+        <li>Header: 56 px; title: DM Sans 16/22 Bold.</li>
+        <li>Content inset: 12 px (16 px source value compressed globally).</li>
+        <li>Bottom navigation: 64 px; four equal tabs; 20 px icon; 10/12 label.</li>
+      </ul>
+      <span class="spec-trace">Frames 6032:15106 · 3015:226 · 7382:29745 · 4176:3888 · 4176:1998 · real screens 2572:121024 and 7490:107756</span>
+    </section>
+
+    <section class="spec-section" id="buttons">
+      <h2>Buttons</h2>
+      <div class="spec-button-stack">
+        <div class="spec-button-row"><span>XL · 64</span><button class="spec-button primary xl" type="button">Primary XL</button></div>
+        <div class="spec-button-row"><span>L · 48</span><button class="spec-button primary l" type="button">Primary mobile action</button></div>
+        <div class="spec-button-row"><span>M · 40</span><div class="spec-touch-guard"><button class="spec-button positive m" type="button">Positive M</button></div></div>
+        <div class="spec-button-row"><span>S · 32</span><div class="spec-touch-guard"><button class="spec-button secondary s" type="button">Secondary S</button></div></div>
+      </div>
+      <ul class="spec-measure-list">
+        <li>Radius: 8 px. Main mobile action: full-width L at 48 px.</li>
+        <li>Primary: #1174BB; hover/pressed: #0F5180.</li>
+        <li>Positive action: #76B82A; hover/pressed: #5FA013.</li>
+        <li>M and S visual buttons require a surrounding hit area of at least 44 × 44 px.</li>
+      </ul>
+      <span class="spec-trace">Frame 3097:13934 · SPA source buttons.less:44–85</span>
+    </section>
+
+    <section class="spec-section" id="inputs">
+      <h2>Inputs</h2>
+      <div class="spec-component-grid">
+        <div class="spec-demo-card">
+          <div class="spec-demo-copy">
+            <div class="spec-field">
+              <label for="spec-default">Default</label>
+              <input class="spec-input" id="spec-default" value="Property name" readonly>
+              <span class="spec-helper">Optional helper text uses 12/16.</span>
+            </div>
+          </div>
+        </div>
+        <div class="spec-demo-card">
+          <div class="spec-demo-copy">
+            <div class="spec-field focus">
+              <label for="spec-focus">Focus</label>
+              <input class="spec-input" id="spec-focus" value="Availability value" readonly>
+              <span class="spec-helper">SPA focus halo #1174BB33.</span>
+            </div>
+          </div>
+        </div>
+        <div class="spec-demo-card">
+          <div class="spec-demo-copy">
+            <div class="spec-field error">
+              <label for="spec-error">Error</label>
+              <input class="spec-input" id="spec-error" value="" aria-invalid="true" readonly>
+              <span class="spec-helper">Enter a valid value.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ul class="spec-measure-list">
+        <li>Label: 14/20 Medium; label gap: 4 px.</li>
+        <li>Field: 48 px high; radius 8 px; 1 px border.</li>
+        <li>Horizontal field inset: 12 px in the prototype (16 px original).</li>
+        <li>Value: 16/22 SemiBold; helper/error: 12/16.</li>
+      </ul>
+      <span class="spec-trace">Frames 4909:20695 · 4909:20379</span>
+    </section>
+
+    <section class="spec-section" id="cards-chips">
+      <h2>Cards, chips and badges</h2>
+      <div class="spec-component-grid">
+        <article class="spec-mobile-card">
+          <div class="spec-chip-row" style="margin-top:0">
+            <span class="spec-chip info">Confirmed</span>
+            <span class="spec-chip">Secondary status</span>
+          </div>
+          <strong>Reservation card title</strong>
+          <span>Card padding 12 px; internal gap 8 px; radius 12 px.</span>
+          <span class="spec-helper">Metadata uses DM Sans 12/16.</span>
+        </article>
+        <div class="spec-demo-card">
+          <div class="spec-demo-copy">
+            <strong>Digit badges</strong>
+            <div class="spec-chip-row">
+              <span class="spec-badge">1</span>
+              <span class="spec-badge two">12</span>
+              <span class="spec-badge dot" aria-label="Unread">&#8203;</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ul class="spec-measure-list">
+        <li>Cards: white, radius 8 or 12 px; list cards use a 1 px separator by default.</li>
+        <li>Chips: neutral-200 or semantic tint, radius 8 px, 12/16 type.</li>
+        <li>Badge: 16 × 16 px one digit; 23 × 16 px two digits; 8 × 8 px dot; full radius.</li>
+      </ul>
+      <span class="spec-trace">Frames 3097:13926 · 10452:33446 · 6726:7931 · 6726:13200 · 6750:11273 · 3097:14271 · 8953:52739</span>
+    </section>
+
+    <section class="spec-section" id="list-groups">
+      <h2>List groups</h2>
+      <div class="spec-list-group" aria-label="Example mobile list group">
+        <div class="spec-list-row"><span aria-hidden="true">○</span><span><strong>Property details</strong><small>Identity, address and contacts</small></span><span aria-hidden="true">›</span></div>
+        <div class="spec-list-row"><span aria-hidden="true">○</span><span><strong>Policies</strong><small>Cancellation and guest rules</small></span><span aria-hidden="true">›</span></div>
+        <div class="spec-list-row"><span aria-hidden="true">○</span><span><strong>Users</strong><small>Access and permissions</small></span><span aria-hidden="true">›</span></div>
+      </div>
+      <ul class="spec-measure-list">
+        <li>Row: minimum 56 px, 12 px horizontal inset, 8 px internal gap.</li>
+        <li>Leading icon: 24 px; separator: 1 px neutral-400.</li>
+        <li>Primary label: 14/20 SemiBold; supporting text: 12/16.</li>
+      </ul>
+      <span class="spec-trace">Frames 7490:107756 · 7582:12028 · row geometry aligned with 6281:4792</span>
+    </section>
+
+    <section class="spec-section" id="availability-matrix">
+      <h2>Horizontal availability matrix</h2>
+      <p>Swipe horizontally. The date header and 132 px descriptor column stay sticky.</p>
+      <div class="spec-matrix-viewport" tabindex="0" aria-label="Scrollable availability matrix example">
+        <table class="spec-matrix availability">
+          <thead>
+            <tr><th class="label-cell">Room type</th><th class="day-cell">Mon<br>12</th><th class="day-cell">Tue<br>13</th><th class="day-cell">Wed<br>14</th><th class="day-cell">Thu<br>15</th><th class="day-cell">Fri<br>16</th><th class="day-cell">Sat<br>17</th></tr>
+          </thead>
+          <tbody>
+            <tr><th class="label-cell">Double room</th><td class="day-cell">—</td><td class="day-cell">—</td><td class="day-cell">—</td><td class="day-cell">—</td><td class="day-cell">—</td><td class="day-cell">—</td></tr>
+            <tr><th class="label-cell">Apartment</th><td class="day-cell">—</td><td class="day-cell">—</td><td class="day-cell">—</td><td class="day-cell">—</td><td class="day-cell">—</td><td class="day-cell">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ul class="spec-measure-list">
+        <li>Sticky descriptor: 132 px.</li>
+        <li>Day cell: 52 px wide; row: minimum 52 px high.</li>
+        <li>Horizontal overflow remains accessible; never clip the matrix.</li>
+      </ul>
+      <span class="spec-trace">SPA source availability-overview/index.less:33–106 · mobile adaptation: 132 px descriptor</span>
+    </section>
+
+    <section class="spec-section" id="rate-matrix">
+      <h2>Horizontal rate matrix</h2>
+      <p>Swipe horizontally. The date header and 132 px descriptor column stay sticky.</p>
+      <div class="spec-matrix-viewport" tabindex="0" aria-label="Scrollable rate matrix example">
+        <table class="spec-matrix rates">
+          <thead>
+            <tr><th class="label-cell">Rate plan</th><th class="day-cell">Mon 12</th><th class="day-cell">Tue 13</th><th class="day-cell">Wed 14</th><th class="day-cell">Thu 15</th></tr>
+          </thead>
+          <tbody>
+            <tr><th class="label-cell">Flexible</th><td class="day-cell"><span class="spec-matrix-value">Value</span></td><td class="day-cell"><span class="spec-matrix-value">Value</span></td><td class="day-cell"><span class="spec-matrix-value">Value</span></td><td class="day-cell"><span class="spec-matrix-value">Value</span></td></tr>
+            <tr><th class="label-cell">Non-refundable</th><td class="day-cell"><span class="spec-matrix-value">Value</span></td><td class="day-cell"><span class="spec-matrix-value">Value</span></td><td class="day-cell"><span class="spec-matrix-value">Value</span></td><td class="day-cell"><span class="spec-matrix-value">Value</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ul class="spec-measure-list">
+        <li>Sticky descriptor: 132 px.</li>
+        <li>Day/value cell: 82 px wide; row: minimum 56 px high.</li>
+        <li>Editable value control: 48 px high inside the row.</li>
+      </ul>
+      <span class="spec-trace">SPA source rates/accommodation.less:73–146 · mobile adaptation: 132 px descriptor and 56 px row</span>
+    </section>
+
+    <section class="spec-section" id="bottom-sheet">
+      <h2>Bottom sheet</h2>
+      <div class="spec-sheet-stage" aria-label="Bottom sheet geometry example">
+        <div class="spec-sheet">
+          <div class="spec-sheet-handle" aria-hidden="true"></div>
+          <div class="spec-sheet-title">Select a rate plan</div>
+          <div class="spec-choice-row"><span>Flexible rate</span><span class="spec-radio" aria-hidden="true">&#8203;</span></div>
+          <div class="spec-choice-row"><span>Non-refundable</span><span aria-hidden="true">○</span></div>
+          <div class="spec-choice-row"><span>Package rate</span><span aria-hidden="true">○</span></div>
+        </div>
+      </div>
+      <ul class="spec-measure-list">
+        <li>Scrim: rgba(0,0,0,.4); sheet top radius: 24 px.</li>
+        <li>Handle: 32 × 4 px; choice row: 56 px; radio: 20 px.</li>
+        <li>Elevation: 0 -2px 12px rgba(0,0,0,.16).</li>
+      </ul>
+      <span class="spec-trace">Frames 6281:4792 · 6281:2413 · real sheet 7735:17250</span>
+    </section>
+
+    <section class="spec-section" id="implementation-guardrails">
+      <h2>Implementation guardrails</h2>
+      <ul class="spec-measure-list">
+        <li>Use one shared token source; SPA.CZ is a semantic colour skin, not per-screen colour overrides.</li>
+        <li>Use Outfit for headings and DM Sans for body/interface text; do not inherit the legacy extranet Poppins declaration.</li>
+        <li>Apply density only through the global 0.70 mapping. Preserve control heights and touch targets.</li>
+        <li>Keep matrices horizontally scrollable with sticky header and descriptor column.</li>
+        <li>Do not introduce desktop web navigation, desktop sidebars or desktop screen specifications into this mobile artifact.</li>
+      </ul>
+      <span class="spec-trace">Full provenance: research/design-system.md</span>
+    </section>
+  </main>
+
+  <footer class="spec-footer">
+    SPA.CZ Partner App · mobile 390 px component reference · source `.fig` files are referenced in place and are not copied into this repository.
+  </footer>
+</body>
+</html>

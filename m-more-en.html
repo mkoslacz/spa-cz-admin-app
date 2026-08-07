@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=390, initial-scale=1, maximum-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>More · SPA.CZ partner app prototype</title>
+  <link rel="stylesheet" href="tokens-m.css?v=20260807c">
+  <link rel="stylesheet" href="app-m.css?v=20260807c">
+  <link rel="stylesheet" href="proto-tools.css?v=20260807c">
+  <link rel="stylesheet" href="proto-comments.css?v=20260807c">
+  <link rel="stylesheet" href="proto-m.css?v=20260807c">
+</head>
+<body data-page="more" data-viewport="mobile" data-auth="in" data-access="full" data-connection="manual" data-density="dense" data-inv="many" data-hotel="active">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="prototype-hint">Interactive prototype · public package facts + clearly labelled demo account data</div>
+  <nav class="langswitch" aria-label="Language">
+    <a href="m-more.html" data-carry-state data-lang="cs" class="">CZ</a>
+    <a href="m-more-en.html" data-carry-state data-lang="en" class="on">EN</a>
+  </nav>
+  <div class="product-surface">
+    <div class="mobile-app">
+      <header class="mobile-header">
+    <button class="mobile-brand" type="button" data-open-sheet="property-sheet" aria-label="Select property">
+      <img src="assets/logo.svg" alt="SPA.CZ">
+      <span class="hotel-summary">
+        <strong>SPA HOTEL ČAJKOVSKIJ</strong>
+        <small><span class="connection-pill"><span class="connection-manual">Manual</span><span class="connection-chm">Channel Manager</span></span></small>
+      </span>
+    </button>
+    <button class="header-button" type="button" data-toast="In prototype: notification centre." aria-label="Notifications"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M18 16v-5a6 6 0 0 0-5-5.9V4a1 1 0 0 0-2 0v1.1A6 6 0 0 0 6 11v5l-2 2h16l-2-2Zm-8 3h4a2 2 0 0 1-4 0Z"/></svg></button>
+  </header>
+      <main class="mobile-main" id="main">
+        <div class="page-head">
+    <div><h1>More</h1><p>Secondary modules are grouped by job and filtered by role.</p><span class="demo-label">Demo data</span></div>
+    
+  </div>
+    <div class="alert warning readonly-alert"><strong>Read-only access.</strong>&nbsp;Editing is disabled for this role.</div>
+  
+  <div class="alert info test-alert"><strong>Test property.</strong>&nbsp;Changes are not published on SPA.CZ.</div>
+    <section class="more-group"><div class="section-head"><h2>Property and offer</h2></div><div class="more-grid">
+      <a class="more-tile" href="#"  data-toast="In prototype: Rooms."><span class="tile-icon"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M3 4h2v8h4V7h6a4 4 0 0 1 4 4v1h2v8h-2v-2H5v2H3V4Zm8 8h6v-1a2 2 0 0 0-2-2h-4v3Z"/></svg></span><span><h2>Rooms</h2><p>Capacity, beds and equipment</p></span></a>
+      <a class="more-tile" href="#"  data-toast="In prototype: Photo gallery."><span class="tile-icon"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M4 3h16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm0 16h16l-5-6-4 4-3-3-4 5Zm11-9a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg></span><span><h2>Photo gallery</h2><p>Galleries and profile images</p></span></a>
+      <a class="more-tile" href="#"  data-toast="In prototype: Hotel profile."><span class="tile-icon"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M4 21V3h11v6h5v12h-7v-4h-2v4H4Zm3-14h2V5H7v2Zm4 0h2V5h-2v2ZM7 11h2V9H7v2Zm4 0h2V9h-2v2Zm-4 4h2v-2H7v2Zm8-2v2h2v-2h-2Zm0 4v2h2v-2h-2Z"/></svg></span><span><h2>Hotel profile</h2><p>Address, contacts and classification</p></span></a>
+      <a class="more-tile" href="#"  data-toast="In prototype: Upload price list."><span class="tile-icon"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M11 16h2V8l3.5 3.5 1.4-1.4L12 4.2l-5.9 5.9 1.4 1.4L11 8v8Zm-7 4h16v-5h2v7H2v-7h2v5Z"/></svg></span><span><h2>Upload price list</h2><p>PDF / JSON and rate mapping</p></span></a>
+    </div></section>
+    <section class="more-group"><div class="section-head"><h2>Finance</h2></div><div class="more-grid">
+      <a class="more-tile" href="m-billing-en.html" data-carry-state><span class="tile-icon"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M5 2h14v20l-3-2-2 2-2-2-2 2-2-2-3 2V2Zm4 5h6V5H9v2Zm-1 4h8V9H8v2Zm0 4h8v-2H8v2Z"/></svg></span><span><h2>Billing</h2><p>3 demo items for approval</p></span></a>
+      <a class="more-tile" href="#"  data-toast="In prototype: Invoices."><span class="tile-icon"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M6 2h8l5 5v15H6V2Zm8 2.5V8h3.5L14 4.5ZM9 13h7v-2H9v2Zm0 4h7v-2H9v2Z"/></svg></span><span><h2>Invoices</h2><p>Detail, status and PDF</p></span></a>
+      <a class="more-tile" href="#"  data-toast="In prototype: Payment documents."><span class="tile-icon"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M6 2h8l5 5v15H6V2Zm8 2.5V8h3.5L14 4.5ZM9 13h7v-2H9v2Zm0 4h7v-2H9v2Z"/></svg></span><span><h2>Payment documents</h2><p>Received documents and PDF</p></span></a>
+      <a class="more-tile" href="#"  data-toast="In prototype: Contract."><span class="tile-icon"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M6 2h8l5 5v15H6V2Zm8 2.5V8h3.5L14 4.5ZM9 13h7v-2H9v2Zm0 4h7v-2H9v2Z"/></svg></span><span><h2>Contract</h2><p>Electronic contract</p></span></a>
+    </div></section>
+    <section class="more-group"><div class="section-head"><h2>Team and system</h2></div><div class="more-grid">
+      <a class="more-tile" href="#" class="full-access-only" data-toast="In prototype: Users."><span class="tile-icon"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm6-1a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM9 13c-4 0-7 2-7 5v2h14v-2c0-3-3-5-7-5Zm7 0c-.6 0-1.2.1-1.8.2 2.3 1 3.8 2.7 3.8 4.8v2h4v-2c0-3-2.6-5-6-5Z"/></svg></span><span><h2>Users</h2><p>Invites, roles and status</p></span></a>
+      <a class="more-tile" href="#" class="full-access-only" data-toast="In prototype: Permissions."><span class="tile-icon"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m19.4 13 .1-1-.1-1 2-1.5-2-3.4-2.4 1a8 8 0 0 0-1.7-1L15 3.5h-4l-.4 2.6a8 8 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.5-.1 1 .1 1-2 1.5 2 3.4 2.4-1a8 8 0 0 0 1.7 1l.4 2.6h4l.4-2.6a8 8 0 0 0 1.7-1l2.4 1 2-3.4-2-1.5ZM13 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z"/></svg></span><span><h2>Permissions</h2><p>Read only or full access</p></span></a>
+      <a class="more-tile" href="#"  data-toast="In prototype: Channel manager."><span class="tile-icon"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7 1.4 1.4L15 5a3 3 0 0 1 4.2 4.2l-3 3a3 3 0 0 1-4.2 0L10 13Zm4-2a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7-1.4-1.4L9 19a3 3 0 1 1-4.2-4.2l3-3a3 3 0 0 1 4.2 0L14 11Z"/></svg></span><span><h2>Channel manager</h2><p>Room and plan IDs, CSV</p></span></a>
+      <a class="more-tile" href="#"  data-toast="In prototype: Settings."><span class="tile-icon"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m19.4 13 .1-1-.1-1 2-1.5-2-3.4-2.4 1a8 8 0 0 0-1.7-1L15 3.5h-4l-.4 2.6a8 8 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.5-.1 1 .1 1-2 1.5 2 3.4 2.4-1a8 8 0 0 0 1.7 1l.4 2.6h4l.4-2.6a8 8 0 0 0 1.7-1l2.4 1 2-3.4-2-1.5ZM13 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z"/></svg></span><span><h2>Settings</h2><p>Property and notifications</p></span></a>
+    </div></section>
+    <section class="more-group" id="changes"><div class="section-head"><h2>Approvals and help</h2></div><div class="more-grid">
+      <a class="more-tile" href="#"  data-toast="In prototype: Changes (2)."><span class="tile-icon"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M4 17.3V21h3.7L18.8 9.9l-3.7-3.7L4 17.3ZM21.7 7a1 1 0 0 0 0-1.4l-3.3-3.3a1 1 0 0 0-1.4 0l-1.8 1.8 3.7 3.7L21.7 7Z"/></svg></span><span><h2>Changes (2)</h2><p>Four-eyes process · demo</p></span></a>
+      <a class="more-tile" href="#"  data-toast="In prototype: Help centre."><span class="tile-icon"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 17h-2v-2h2v2Zm2.1-7.8-.9.9c-.8.7-1.2 1.3-1.2 2.9h-2v-.5c0-1.1.4-2.1 1.2-2.9l1.2-1.2a2 2 0 1 0-3.4-1.4H8a4 4 0 1 1 7.1 2.2Z"/></svg></span><span><h2>Help centre</h2><p>Manual, FAQ and account manager</p></span></a>
+    </div></section>
+      </main>
+      <nav class="mobile-bottom-nav" aria-label="Primary navigation">
+    <a href="m-dashboard-en.html" data-carry-state class="" >
+    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M4 13h6V4H4v9Zm0 7h6v-5H4v5Zm10 0h6v-9h-6v9Zm0-16v5h6V4h-6Z"/></svg><span>Overview</span>
+  </a>
+    <a href="m-reservations-en.html" data-carry-state class="" >
+    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M6 3h12a2 2 0 0 1 2 2v15l-3-2-3 2-3-2-3 2-3-2-3 2V5a2 2 0 0 1 2-2h2Zm2 5h8V6H8v2Zm0 4h8v-2H8v2Zm0 4h5v-2H8v2Z"/></svg><span class="nav-badge" data-kind="reservation">5</span><span>Reservations</span>
+  </a>
+    <a href="m-availability-en.html" data-carry-state class="" >
+    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M5 3h2v2h10V3h2v2h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h1V3Zm15 7H4v10h16V10ZM7 12h3v3H7v-3Zm5 0h3v3h-3v-3Zm5 0h2v3h-2v-3ZM7 17h3v2H7v-2Zm5 0h3v2h-3v-2Z"/></svg><span>Availability</span>
+  </a>
+    <a href="m-offer-en.html" data-carry-state class="" >
+    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m3 12 9-9h7a2 2 0 0 1 2 2v7l-9 9L3 12Zm13-4.5A1.5 1.5 0 1 0 16 4a1.5 1.5 0 0 0 0 3.5Z"/></svg><span>Offer</span>
+  </a>
+    <a href="m-more-en.html" data-carry-state class="active" aria-current="page">
+    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M5 10a2 2 0 1 1 0 4 2 2 0 0 1 0-4Zm7 0a2 2 0 1 1 0 4 2 2 0 0 1 0-4Zm7 0a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z"/></svg><span class="nav-badge" data-kind="changes">2</span><span>More</span>
+  </a>
+  </nav>
+    </div>
+  </div>
+  <section class="signed-out-wall"><div class="wall-card"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm6-1a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM9 13c-4 0-7 2-7 5v2h14v-2c0-3-3-5-7-5Zm7 0c-.6 0-1.2.1-1.8.2 2.3 1 3.8 2.7 3.8 4.8v2h4v-2c0-3-2.6-5-6-5Z"/></svg><h1>Signed-out demo account</h1><p>Use the floating settings panel to switch back to “Signed in”. No real credentials are used.</p><button class="button primary" type="button" data-toast="Use the prototype settings panel to sign in.">Open demo account</button></div></section>
+  <section class="access-wall"><div class="wall-card"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m19.4 13 .1-1-.1-1 2-1.5-2-3.4-2.4 1a8 8 0 0 0-1.7-1L15 3.5h-4l-.4 2.6a8 8 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.5-.1 1 .1 1-2 1.5 2 3.4 2.4-1a8 8 0 0 0 1.7 1l.4 2.6h4l.4-2.6a8 8 0 0 0 1.7-1l2.4 1 2-3.4-2-1.5ZM13 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z"/></svg><h1>No access in this demo state</h1><p>Use the floating settings panel to select Read only or Full access.</p></div></section>
+  <div class="modal-backdrop" id="property-sheet" aria-hidden="true"><section class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="property-sheet-title"><div class="sheet-grabber"></div><header class="sheet-head"><h2 id="property-sheet-title">Select property</h2><button class="header-button" type="button" data-close-sheet aria-label="Close">×</button></header><div class="sheet-body"><button class="button full primary" type="button" data-close-sheet>SPA HOTEL ČAJKOVSKIJ <span class="test-label">TEST</span></button><p class="subtle">The only public property used in the prototype.</p></div></section></div>
+  <div class="toast" role="status" aria-live="polite"></div>
+  <div class="state-debug" data-state-output></div>
+  <a class="screen-reader-only" href="m-more.html" data-carry-state>Čeština</a>
+  <script src="proto-tools.js?v=20260807c" defer></script>
+  <script src="proto-comments.js?v=20260807c" defer></script>
+  <script src="proto-m.js?v=20260807c" defer></script>
+</body>
+</html>

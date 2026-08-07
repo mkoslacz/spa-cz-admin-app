@@ -1,0 +1,122 @@
+// Firestore rules for the prototype stakeholder comment layer.
+// Replace the example hosted domains before deploying. An empty domain list and
+// no allowed/{email} document deny everybody; there is deliberately no open mode.
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedInWithEmail() {
+      return request.auth != null
+        && request.auth.token.email is string
+        && request.auth.token.email_verified == true;
+    }
+
+    function hostedDomain() {
+      // Add real, escaped domains here when deploying; these example domains are not access.
+      return request.auth.token.email.matches('^[^@]+@(your-company\\.example|partner\\.example)$');
+    }
+
+    function explicitlyAllowed() {
+      return exists(/databases/$(database)/documents/allowed/$(request.auth.token.email));
+    }
+
+    function reviewer() {
+      return signedInWithEmail() && (hostedDomain() || explicitlyAllowed());
+    }
+
+    function owner() {
+      return signedInWithEmail()
+        && get(/databases/$(database)/documents/allowed/$(request.auth.token.email)).data.user == 'owner';
+    }
+
+    function boundedString(value, minimum, maximum) {
+      return value is string
+        && value.size() >= minimum
+        && value.size() <= maximum
+        && (minimum == 0 || value.matches('.*\\S.*'));
+    }
+
+    // Rules-enforceable anchor core. Dynamic map values cannot be universally
+    // type-checked in Rules; browser and Admin validators additionally require
+    // every state key and value to be a bounded string.
+    function validAnchor(anchor) {
+      return anchor is map
+        && anchor.keys().hasOnly([
+          'page', 'viewport', 'lang', 'state', 'selector', 'selectorKind', 'rx', 'ry', 'label', 'text'
+        ])
+        && anchor.keys().hasAll([
+          'page', 'viewport', 'lang', 'state', 'selector', 'selectorKind', 'rx', 'ry', 'label', 'text'
+        ])
+        && boundedString(anchor.page, 1, 512)
+        && anchor.viewport in ['desktop', 'mobile']
+        && boundedString(anchor.lang, 1, 35)
+        && anchor.state is map
+        && anchor.state.size() <= 32
+        && boundedString(anchor.selector, 1, 1024)
+        && anchor.selectorKind in ['data', 'id', 'path']
+        && anchor.rx is number && anchor.rx >= 0 && anchor.rx <= 1
+        && anchor.ry is number && anchor.ry >= 0 && anchor.ry <= 1
+        && boundedString(anchor.label, 1, 240)
+        && boundedString(anchor.text, 0, 4000);
+    }
+
+    function parentAfter(prototypeId, threadId) {
+      return getAfter(/databases/$(database)/documents/prototypes/$(prototypeId)/threads/$(threadId));
+    }
+
+    match /allowed/{email} {
+      allow get: if signedInWithEmail() && email == request.auth.token.email;
+      allow list, create, update, delete: if false;
+    }
+
+    match /prototypes/{prototypeId}/threads/{threadId} {
+      allow read: if reviewer();
+      allow create: if reviewer()
+        && request.resource.data.createdBy.uid == request.auth.uid
+        && request.resource.data.createdBy.email == request.auth.token.email
+        && request.resource.data.status == 'open'
+        && request.resource.data.resolvedAt == null
+        && request.resource.data.resolvedBy == null
+        && request.resource.data.orphaned == false
+        && validAnchor(request.resource.data.anchor);
+
+      // Ordinary review updates can never leave or restore a deleting state.
+      allow update: if reviewer()
+        && resource.data.status in ['open', 'resolved']
+        && request.resource.data.createdBy == resource.data.createdBy
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.anchor == resource.data.anchor
+        && request.resource.data.status in ['open', 'resolved']
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['status', 'resolvedAt', 'resolvedBy', 'orphaned', 'updatedAt']);
+
+      // Deletion is a persisted, one-way transition. Messages are removed
+      // first and the parent is deleted last; Firestore does not cascade.
+      allow update: if owner()
+        && resource.data.status in ['open', 'resolved']
+        && request.resource.data.status == 'deleting'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt']);
+      allow delete: if owner() && resource.data.status == 'deleting';
+
+      match /messages/{messageId} {
+        allow read: if reviewer();
+        allow create: if reviewer()
+          && parentAfter(prototypeId, threadId).data.status in ['open', 'resolved']
+          && request.resource.data.author.uid == request.auth.uid
+          && request.resource.data.author.email == request.auth.token.email
+          && request.resource.data.agent == false;
+        allow update: if reviewer()
+          && parentAfter(prototypeId, threadId).data.status in ['open', 'resolved']
+          && resource.data.author.uid == request.auth.uid
+          && request.resource.data.author == resource.data.author
+          && request.resource.data.agent == resource.data.agent;
+        allow delete: if owner()
+          && get(/databases/$(database)/documents/prototypes/$(prototypeId)/threads/$(threadId)).data.status
+            == 'deleting';
+      }
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

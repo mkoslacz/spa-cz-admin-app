@@ -1,0 +1,148 @@
+/* ============================================================
+   Prototype · inline discussion
+   The thread as it sits under an entry, the way an issue tracker shows one.
+   Deliberately quiet: this is apparatus around someone else's content, so it
+   reads as a footnote to the entry until it has something to say. Variables
+   come from proto-review.css, which every page carrying discussions loads
+   first — this file adds no palette of its own.
+   ============================================================ */
+
+.pd {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--rp-line);
+}
+
+/* An entry nobody has commented on is the common case and must not shout. */
+.pd-empty {
+  opacity: 0.65;
+}
+.pd-empty:hover,
+.pd-empty:focus-within {
+  opacity: 1;
+}
+
+.pd-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.pd-count {
+  color: var(--rp-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.pd-thread {
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--rp-line);
+  border-radius: 12px;
+  background: var(--rp-surface);
+}
+.pd-thread:last-child {
+  margin-bottom: 0;
+}
+/* Resolved stays readable rather than hidden: the decision trail is the point. */
+.pd-done {
+  opacity: 0.6;
+}
+.pd-deleting { border-style: dashed; background: var(--rp-warn-bg); }
+
+.pd-msg + .pd-msg {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--rp-line);
+}
+.pd-who {
+  margin: 0 0 2px;
+  color: var(--rp-muted);
+  font-size: 12.5px;
+}
+.pd-body {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.5;
+  /* Comment text is reviewer input: keep its line breaks, and never let a long
+     unbroken token push the page wider than the viewport. */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.pd-loading {
+  color: var(--rp-muted);
+}
+
+.pd-form {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin-top: 10px;
+}
+.pd-input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid var(--rp-line);
+  border-radius: 10px;
+  background: var(--rp-bg);
+  color: var(--rp-ink);
+  font: inherit;
+  font-size: 14px;
+  resize: vertical;
+}
+.pd-input:focus-visible {
+  outline: 2px solid var(--rp-accent);
+  outline-offset: 1px;
+}
+
+.pd-send,
+.pd-resolve,
+.pd-delete {
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--rp-accent);
+  color: #fff;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.pd-resolve {
+  margin-top: 8px;
+  background: var(--rp-surface);
+  color: var(--rp-accent);
+  box-shadow: inset 0 0 0 1.5px var(--rp-accent);
+}
+.pd-delete {
+  margin-top: 8px; margin-left: 8px; color: #7D1220; background: #FFF0F2;
+  box-shadow: inset 0 0 0 1.5px #9D1C2C;
+}
+.pd-delete-state { margin: 8px 0 0; color: var(--rp-warn-ink); font-size: 13.5px; }
+.pd-send:disabled,
+.pd-resolve:disabled,
+.pd-delete:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.pd-signin,
+.pd-error {
+  margin: 8px 0 0;
+  font-size: 13.5px;
+}
+.pd-signin {
+  color: var(--rp-muted);
+}
+.pd-error {
+  color: var(--rp-warn-ink);
+}
+
+@media (max-width: 720px) {
+  .pd-form {
+    flex-direction: column;
+  }
+  .pd-send {
+    align-self: flex-start;
+  }
+}

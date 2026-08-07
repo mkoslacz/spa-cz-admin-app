@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=390, initial-scale=1, maximum-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Offer · SPA.CZ partner app prototype</title>
+  <link rel="stylesheet" href="tokens-m.css?v=20260807c">
+  <link rel="stylesheet" href="app-m.css?v=20260807c">
+  <link rel="stylesheet" href="proto-tools.css?v=20260807c">
+  <link rel="stylesheet" href="proto-comments.css?v=20260807c">
+  <link rel="stylesheet" href="proto-m.css?v=20260807c">
+</head>
+<body data-page="offer" data-viewport="mobile" data-auth="in" data-access="full" data-connection="manual" data-density="dense" data-inv="many" data-hotel="active">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="prototype-hint">Interactive prototype · public package facts + clearly labelled demo account data</div>
+  <nav class="langswitch" aria-label="Language">
+    <a href="m-offer.html" data-carry-state data-lang="cs" class="">CZ</a>
+    <a href="m-offer-en.html" data-carry-state data-lang="en" class="on">EN</a>
+  </nav>
+  <div class="product-surface">
+    <div class="mobile-app">
+      <header class="mobile-header">
+    <button class="mobile-brand" type="button" data-open-sheet="property-sheet" aria-label="Select property">
+      <img src="assets/logo.svg" alt="SPA.CZ">
+      <span class="hotel-summary">
+        <strong>SPA HOTEL ČAJKOVSKIJ</strong>
+        <small><span class="connection-pill"><span class="connection-manual">Manual</span><span class="connection-chm">Channel Manager</span></span></small>
+      </span>
+    </button>
+    <button class="header-button" type="button" data-toast="In prototype: notification centre." aria-label="Notifications"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M18 16v-5a6 6 0 0 0-5-5.9V4a1 1 0 0 0-2 0v1.1A6 6 0 0 0 6 11v5l-2 2h16l-2-2Zm-8 3h4a2 2 0 0 1-4 0Z"/></svg></button>
+  </header>
+      <main class="mobile-main" id="main">
+        <div class="page-head">
+    <div><h1>Offer</h1><p>Stay packages, publication status and pricing readiness.</p></div>
+    <button class="page-action-icon" type="button" data-toast="In prototype: create package." aria-label="New package"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M4 17.3V21h3.7L18.8 9.9l-3.7-3.7L4 17.3ZM21.7 7a1 1 0 0 0 0-1.4l-3.3-3.3a1 1 0 0 0-1.4 0l-1.8 1.8 3.7 3.7L21.7 7Z"/></svg></button>
+  </div>
+    <div class="alert warning readonly-alert"><strong>Read-only access.</strong>&nbsp;Editing is disabled for this role.</div>
+  
+  <div class="alert info test-alert"><strong>Test property.</strong>&nbsp;Changes are not published on SPA.CZ.</div>
+    <div class="alert info"><strong>Verified pricing baseline.</strong>&nbsp;SPA HOTEL ČAJKOVSKIJ · 3 days / 2 nights · from CZK 3,577.</div>
+    <div class="filter-scroll"><button class="chip active" type="button" data-filter-chip>All</button><button class="chip" type="button" data-filter-chip>Active</button><button class="chip" type="button" data-filter-chip>SPA.CZ</button><button class="chip" type="button" data-filter-chip>Missing rates</button></div>
+    <div class="offer-list inventory-content">
+      <article class="offer-card featured" data-inventory-rank="1">
+    <div class="offer-visual"><div><small>SPA HOTEL ČAJKOVSKIJ</small><strong>3 days / 2 nights</strong></div></div>
+    <div class="offer-copy"><div class="card-line"><h2>SPA HOTEL ČAJKOVSKIJ stay</h2><span class="status info">Public fact</span></div><p>Publicly verified offer facts</p><div class="offer-meta"><span class="status success">Active</span><span class="status info">SPA.CZ</span></div></div>
+    <div class="offer-price"><div><small>from</small><strong data-price="base">3 577 Kč</strong></div><a class="button primary" href="m-rate-edit-en.html" data-carry-state>Rates</a></div>
+  </article>
+      <article class="offer-card compact" data-inventory-rank="2">
+    <div class="offer-visual"><div><small>DEMO OFFER</small><strong>3 days / 2 nights</strong></div></div>
+    <div class="offer-copy"><div class="card-line"><h2>Wellness weekend · demo</h2><span class="demo-label">Demo</span></div><p>Breakfast · demo value</p><div class="offer-meta"><span class="status success">Active</span><span class="status info">SPA.CZ</span></div></div>
+    <div class="offer-price"><div><small>from</small><strong>4 890 Kč</strong></div><a class="button primary" href="m-rate-edit-en.html" data-carry-state>Rates</a></div>
+  </article>
+      <article class="offer-card compact" data-inventory-rank="3">
+    <div class="offer-visual"><div><small>DEMO OFFER</small><strong>8 days / 7 nights</strong></div></div>
+    <div class="offer-copy"><div class="card-line"><h2>Spa week · demo</h2><span class="demo-label">Demo</span></div><p>Half board · demo value</p><div class="offer-meta"><span class="status success">Active</span><span class="status info">SPA.CZ</span></div></div>
+    <div class="offer-price"><div><small>from</small><strong>14 200 Kč</strong></div><a class="button primary" href="m-rate-edit-en.html" data-carry-state>Rates</a></div>
+  </article>
+      <article class="offer-card compact" data-inventory-rank="4">
+    <div class="offer-visual"><div><small>DEMO OFFER</small><strong>4 days / 3 nights</strong></div></div>
+    <div class="offer-copy"><div class="card-line"><h2>Break for two · demo</h2><span class="demo-label">Demo</span></div><p>Breakfast · demo value</p><div class="offer-meta"><span class="status success">Active</span><span class="status info">SPA.CZ</span></div></div>
+    <div class="offer-price"><div><small>from</small><strong>7 460 Kč</strong></div><a class="button primary" href="m-rate-edit-en.html" data-carry-state>Rates</a></div>
+  </article>
+    </div>
+    <div class="empty-state"><div class="empty-inner">
+    <svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m3 12 9-9h7a2 2 0 0 1 2 2v7l-9 9L3 12Zm13-4.5A1.5 1.5 0 1 0 16 4a1.5 1.5 0 0 0 0 3.5Z"/></svg>
+    <h2>No packages</h2>
+    <p>There are no offers in this demo state.</p>
+  </div></div>
+      </main>
+      <nav class="mobile-bottom-nav" aria-label="Primary navigation">
+    <a href="m-dashboard-en.html" data-carry-state class="" >
+    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M4 13h6V4H4v9Zm0 7h6v-5H4v5Zm10 0h6v-9h-6v9Zm0-16v5h6V4h-6Z"/></svg><span>Overview</span>
+  </a>
+    <a href="m-reservations-en.html" data-carry-state class="" >
+    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M6 3h12a2 2 0 0 1 2 2v15l-3-2-3 2-3-2-3 2-3-2-3 2V5a2 2 0 0 1 2-2h2Zm2 5h8V6H8v2Zm0 4h8v-2H8v2Zm0 4h5v-2H8v2Z"/></svg><span class="nav-badge" data-kind="reservation">5</span><span>Reservations</span>
+  </a>
+    <a href="m-availability-en.html" data-carry-state class="" >
+    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M5 3h2v2h10V3h2v2h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h1V3Zm15 7H4v10h16V10ZM7 12h3v3H7v-3Zm5 0h3v3h-3v-3Zm5 0h2v3h-2v-3ZM7 17h3v2H7v-2Zm5 0h3v2h-3v-2Z"/></svg><span>Availability</span>
+  </a>
+    <a href="m-offer-en.html" data-carry-state class="active" aria-current="page">
+    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m3 12 9-9h7a2 2 0 0 1 2 2v7l-9 9L3 12Zm13-4.5A1.5 1.5 0 1 0 16 4a1.5 1.5 0 0 0 0 3.5Z"/></svg><span>Offer</span>
+  </a>
+    <a href="m-more-en.html" data-carry-state class="" >
+    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M5 10a2 2 0 1 1 0 4 2 2 0 0 1 0-4Zm7 0a2 2 0 1 1 0 4 2 2 0 0 1 0-4Zm7 0a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z"/></svg><span class="nav-badge" data-kind="changes">2</span><span>More</span>
+  </a>
+  </nav>
+    </div>
+  </div>
+  <section class="signed-out-wall"><div class="wall-card"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm6-1a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM9 13c-4 0-7 2-7 5v2h14v-2c0-3-3-5-7-5Zm7 0c-.6 0-1.2.1-1.8.2 2.3 1 3.8 2.7 3.8 4.8v2h4v-2c0-3-2.6-5-6-5Z"/></svg><h1>Signed-out demo account</h1><p>Use the floating settings panel to switch back to “Signed in”. No real credentials are used.</p><button class="button primary" type="button" data-toast="Use the prototype settings panel to sign in.">Open demo account</button></div></section>
+  <section class="access-wall"><div class="wall-card"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m19.4 13 .1-1-.1-1 2-1.5-2-3.4-2.4 1a8 8 0 0 0-1.7-1L15 3.5h-4l-.4 2.6a8 8 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.5-.1 1 .1 1-2 1.5 2 3.4 2.4-1a8 8 0 0 0 1.7 1l.4 2.6h4l.4-2.6a8 8 0 0 0 1.7-1l2.4 1 2-3.4-2-1.5ZM13 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z"/></svg><h1>No access in this demo state</h1><p>Use the floating settings panel to select Read only or Full access.</p></div></section>
+  <div class="modal-backdrop" id="property-sheet" aria-hidden="true"><section class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="property-sheet-title"><div class="sheet-grabber"></div><header class="sheet-head"><h2 id="property-sheet-title">Select property</h2><button class="header-button" type="button" data-close-sheet aria-label="Close">×</button></header><div class="sheet-body"><button class="button full primary" type="button" data-close-sheet>SPA HOTEL ČAJKOVSKIJ <span class="test-label">TEST</span></button><p class="subtle">The only public property used in the prototype.</p></div></section></div>
+  <div class="toast" role="status" aria-live="polite"></div>
+  <div class="state-debug" data-state-output></div>
+  <a class="screen-reader-only" href="m-offer.html" data-carry-state>Čeština</a>
+  <script src="proto-tools.js?v=20260807c" defer></script>
+  <script src="proto-comments.js?v=20260807c" defer></script>
+  <script src="proto-m.js?v=20260807c" defer></script>
+</body>
+</html>

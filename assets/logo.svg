@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="168" height="48" viewBox="0 0 168 48" role="img" aria-labelledby="title description">
+  <title id="title">SPA.CZ</title>
+  <desc id="description">SPA.CZ blue wordmark with a green spa leaf.</desc>
+  <path fill="#89C02C" d="M19 4c8 3 13 9 14 17-8 0-15-4-19-11 0 6 3 11 9 15-7 1-13-2-17-8C2 11 7 6 19 4Z"/>
+  <circle cx="23" cy="28" r="5" fill="#1174BB"/>
+  <text x="40" y="34" fill="#0F5180" font-family="Arial, sans-serif" font-size="30" font-weight="800" letter-spacing="-.8">SPA</text>
+  <circle cx="101" cy="31" r="3.5" fill="#89C02C"/>
+  <text x="109" y="34" fill="#1174BB" font-family="Arial, sans-serif" font-size="24" font-weight="800">CZ</text>
+</svg>

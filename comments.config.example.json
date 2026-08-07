@@ -1,0 +1,12 @@
+{
+  "prototypeId": "spa-cz-partner-mobile",
+  "prototypeUrl": "https://replace-with-owner.github.io/spa-cz-partner-mobile/",
+  "firebase": {
+    "apiKey": "replace-with-firebase-web-api-key",
+    "authDomain": "replace-with-project.firebaseapp.com",
+    "projectId": "replace-with-project-id",
+    "appId": "replace-with-firebase-app-id"
+  },
+  "allowedEmailDomains": ["replace-with-approved-domain.example"],
+  "stateKeys": ["auth", "access", "connection", "density", "inv", "hotel"]
+}

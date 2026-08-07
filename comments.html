@@ -1,0 +1,446 @@
+<!doctype html>
+<!-- ============================================================
+     Comments — every thread in one place
+     The pins on the screens answer "what is wrong with this element". This
+     page answers the question a workshop round opens with: how many threads
+     are open, on which screens, and what do they say.
+
+     It reads through proto-comments.js — the same protoComments.init() entry
+     point, the same configuration, the same store. Never a second Firebase
+     client: two clients mean two auth states and two answers to "am I signed
+     in", and the reviewer gets to see them disagree.
+
+     The layer's own on-screen UI (pin toolbar, detached tray, popover) is
+     addressed to a screen with anchors to pin against, which this page is not.
+     It is started with `overview: true`, which stops it building that chrome at
+     all. That flag is the whole mechanism. This page also carried a
+     `display:none` rule over the same elements; it is gone, because hiding a
+     pin never stopped the store write that failing to place it issued, and a
+     second mechanism that has to agree with the first one for ever is worse
+     than none.
+
+     The SPA.cz product title is the only product-specific value in this page.
+     ============================================================ -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Comments — SPA.cz partner mobile prototype</title>
+<link rel="stylesheet" href="proto-review.css">
+<link rel="stylesheet" href="proto-discussion.css">
+<script>if (location.protocol === 'file:') document.documentElement.dataset.origin = 'file';</script>
+</head>
+<body class="rp-page">
+<div class="rp-wrap">
+  <header class="rp-head">
+    <a class="rp-back" href="index.html">← Review hub</a>
+    <h1 class="rp-title">Comments</h1>
+    <p class="rp-lede">
+      Every comment thread in one place, grouped by screen — how many are open, and what they say.
+    </p>
+    <nav class="rp-nav" aria-label="Review pages">
+      <a href="changelog.html">Changelog</a>
+      <a href="usecases.html">Use cases</a>
+      <a href="comments.html" aria-current="page">Comments</a>
+    </nav>
+  </header>
+
+  <p class="rp-note rp-file-note">
+    This page is open from <code>file://</code>, where the comment layer never starts. Open the
+    published URL — the same one the Google provider's authorized-domain list carries.
+  </p>
+
+  <main class="rp-main rp-needs-url">
+    <p class="rp-note rp-note-warn" id="cm-unconfigured" hidden>
+      The comment layer is not configured for this prototype (<code>comments.config.json</code> is
+      missing or invalid), or its backend is not responding. There is nothing to show until then —
+      see the "Stakeholder comments" section of the README.
+    </p>
+
+    <p class="rp-note" id="cm-signedout" hidden>
+      You are not signed in. Threads are private to allowlisted reviewers — sign in with the Google
+      account on the allowlist to see them, exactly as on the screens.
+      <br><br>
+      <button type="button" class="rp-btn" id="cm-signin">Sign in with Google</button>
+    </p>
+
+    <p class="rp-note rp-note-warn" id="cm-error" hidden></p>
+
+    <p class="rp-msg" id="cm-loading">Loading comment threads…</p>
+
+    <div class="rp-toolbar" id="cm-toolbar" hidden>
+      <button type="button" class="rp-chip" data-filter="all" aria-pressed="true">All</button>
+      <button type="button" class="rp-chip" data-filter="open" aria-pressed="false">Open</button>
+      <button type="button" class="rp-chip" data-filter="resolved" aria-pressed="false">Resolved</button>
+      <span class="rp-count" id="cm-count"></span>
+    </div>
+
+    <div id="cm-groups"></div>
+    <p class="rp-msg" id="cm-empty" hidden>No comment threads yet.</p>
+  </main>
+</div>
+
+<script src="proto-comments.js"></script>
+<script src="proto-discussion.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  // file:// is handled by the shell's CSS — the page shows the note above and
+  // never reaches the layer, which would refuse to start anyway.
+  if (location.protocol === 'file:') return;
+
+  var $ = function (id) { return document.getElementById(id); };
+  var groupsEl = $('cm-groups');
+  var toolbarEl = $('cm-toolbar');
+  var countEl = $('cm-count');
+  var loadingEl = $('cm-loading');
+  var emptyEl = $('cm-empty');
+  var errorEl = $('cm-error');
+  var signedOutEl = $('cm-signedout');
+  var unconfiguredEl = $('cm-unconfigured');
+  var filter = 'all';
+
+  function el(tag, className, text) {
+    var node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text != null) node.textContent = String(text);
+    return node;
+  }
+
+  function fmtDate(value) {
+    var date = new Date(value);
+    return isNaN(date.getTime()) ? String(value || 'unknown') : date.toLocaleString();
+  }
+
+  function personLabel(person) {
+    if (!person) return 'Reviewer';
+    return person.name || person.email || person.uid || 'Reviewer';
+  }
+
+  /* A thread stored before the anchor carried a page, or one whose page no
+     longer resolves, has no reliable home. Group it apart rather than guessing
+     it belongs to whatever page this overview happens to be — comments.html
+     owns no anchors at all. Coerce the page value to a string once, so the same
+     value keys both the groups map and enters the order list; a non-string page
+     would call localeCompare on a non-string and throw. */
+  function groupKey(thread) {
+    var page = (thread && thread.anchor && thread.anchor.page) || 'Unknown page';
+    return String(page);
+  }
+
+  /* Two link kinds, and this page must not confuse them. deepLink resolves
+     against the origin the reviewer is actually on; shareLink resolves against
+     the configured prototypeUrl and belongs only to a link handed to somebody
+     else. A row here is clicked, not pasted: built from shareLink it walked a
+     reviewer reading their own copy straight onto the published site — the same
+     defect the pins carried, at the one surface whose whole job is linking to
+     other pages.
+
+     The no-link case is decided here rather than caught. deepLink never throws:
+     an anchor it cannot resolve falls back to the page being viewed, which on
+     this page is the overview itself, so a catch block waits for an exception
+     that never arrives while a thread with a broken anchor gets a live-looking
+     link back to this very page. Compare the produced path against this page's
+     own and there is no link to render — which is also the right answer for a
+     thread anchored to the overview, since the overview draws no pins for a
+     link to open. */
+  function pinLink(layer, thread) {
+    var anchor = (thread && thread.anchor) || {};
+    if (!anchor.page) return null;
+    var url = layer.deepLink(thread);
+    return url.pathname === layer.pageBase().pathname ? null : url.href;
+  }
+
+  function threadCard(layer, thread) {
+    var anchor = thread.anchor || {};
+    var messages = Array.isArray(thread.messages) ? thread.messages : null;
+    var first = messages && messages[0];
+    var replies = messages ? messages.slice(1) : [];
+    var link = pinLink(layer, thread);
+
+    var card = el('article', 'rp-card');
+    /* The anchor for a second, in-page discussion about this row — proto-
+       discussion's own contract: the identity has to come from the data,
+       never from position, because this page's rows are regenerated on every
+       delivery and a positional identity would silently drift onto a
+       different thread the moment the store's order shifts. thread.id is the
+       store's own document id, so it survives every re-render, re-sort and
+       reload. */
+    if (thread.id) card.setAttribute('data-c', 'th-' + thread.id);
+
+    var title = el('h3');
+    var resolved = thread.status === 'resolved';
+    var deleting = thread.status === 'deleting';
+    title.appendChild(el(
+      'span',
+      'rp-tag ' + (resolved ? 'rp-tag-done' : 'rp-tag-open'),
+      deleting ? 'deleting' : (resolved ? 'resolved' : 'open')
+    ));
+    title.appendChild(document.createTextNode(' ' + (anchor.label || 'Unlabelled comment')));
+    card.appendChild(title);
+
+    var meta = el('p', 'rp-meta', personLabel(thread.createdBy) + ' · ' + fmtDate(thread.createdAt)
+      + (anchor.viewport ? ' · ' + anchor.viewport : '')
+      + (anchor.lang ? ' · ' + anchor.lang : ''));
+    if (thread.orphaned) {
+      var orphan = el('span', '', ' · detached');
+      orphan.title = 'The anchor no longer finds its element on the screen.';
+      meta.appendChild(orphan);
+    }
+    card.appendChild(meta);
+
+    var body = el('p', 'rp-body');
+    if (first) {
+      body.textContent = first.body;
+    } else if (messages) {
+      body.textContent = '(this thread has no messages)';
+    } else {
+      body.textContent = 'Loading the text…';
+      body.style.opacity = '.6';
+    }
+    card.appendChild(body);
+
+    if (replies.length) {
+      var wrap = el('div');
+      wrap.style.marginTop = '10px';
+      wrap.appendChild(el('p', 'rp-sub', replies.length + (replies.length === 1 ? ' reply' : ' replies')));
+      replies.forEach(function (message) {
+        var reply = el('p', 'rp-body');
+        reply.style.margin = '0 0 8px';
+        reply.appendChild(el('strong', '', personLabel(message.author)));
+        reply.appendChild(document.createTextNode(' · ' + fmtDate(message.createdAt)));
+        reply.appendChild(document.createElement('br'));
+        reply.appendChild(document.createTextNode(message.body));
+        wrap.appendChild(reply);
+      });
+      card.appendChild(wrap);
+    }
+
+    var links = el('p', 'rp-links');
+    if (link) {
+      var a = el('a', '', 'Open the pin (' + anchor.page + ')');
+      a.href = link;
+      links.appendChild(a);
+    } else {
+      /* The heading above still groups this thread under whatever the store
+         says its page is; that is what the store claims, and this sentence is
+         what can be opened. The two do not contradict each other. */
+      links.appendChild(
+        el('span', 'rp-meta', 'No pin to open — the stored page is missing, unresolvable, or this page itself.')
+      );
+    }
+    card.appendChild(links);
+
+    if (deleting) {
+      card.appendChild(el('p', 'rp-delete-state', 'Deletion is incomplete. This thread is read-only until it finishes.'));
+    }
+    if (layer.canDelete(thread)) {
+      var remove = el('button', 'rp-delete-thread', deleting ? 'Retry deletion' : 'Delete thread');
+      remove.type = 'button';
+      remove.onclick = function () {
+        remove.disabled = true;
+        Promise.resolve(layer.deleteThread(thread)).catch(function (error) {
+          if (window.console && console.error) console.error('[comments.html] deletion failed:', thread.id, error);
+          render(layer);
+        }).finally(function () {
+          remove.disabled = false;
+        });
+      };
+      card.appendChild(remove);
+    }
+
+    return card;
+  }
+
+  /* proto-discussion is the second, in-page presentation over this same
+     layer — the third caller, after changelog.html and usecases.html. It
+     discovers threads by matching an element's data-c against a stored
+     thread's own anchor.selector *and* anchor.page, so a discussion mounted
+     here only ever surfaces threads anchored to comments.html itself: a
+     remark left through one of these rows, not the pinned thread's own reply
+     chain, which stays reachable through "Open the pin" above.
+
+     mount() walks the DOM once per call and wraps layer.setThreads/setUser to
+     redraw its own fixed set of elements — built for a page that renders once
+     and then sits still. This page rebuilds #cm-groups on every delivery, so
+     mount() has to run again after every render against the new elements, and
+     calling it repeatedly would otherwise chain another wrapper onto
+     layer.setThreads/setUser forever. discussionBase is the wire()-installed
+     pair captured once, on the first call; every later call resets to that
+     same clean base before re-wrapping, so exactly one mount-layer sits on
+     top of it at a time instead of one per delivery. */
+  var discussionBase = null;
+
+  function refreshDiscussion(layer) {
+    if (!window.protoDiscussion) return;
+    if (discussionBase) {
+      layer.setThreads = discussionBase.setThreads;
+      layer.setUser = discussionBase.setUser;
+    } else {
+      discussionBase = { setThreads: layer.setThreads, setUser: layer.setUser };
+    }
+    protoDiscussion.mount(layer, { root: groupsEl });
+  }
+
+  function render(layer) {
+    loadingEl.hidden = true;
+    var threads = layer.threads.slice();
+    var visible = threads.filter(function (thread) {
+      if (filter === 'open') return thread.status !== 'resolved';
+      if (filter === 'resolved') return thread.status === 'resolved';
+      return true;
+    });
+    var openCount = threads.filter(function (thread) { return thread.status !== 'resolved'; }).length;
+    countEl.textContent = openCount + ' open, ' + (threads.length - openCount) + ' resolved (' + threads.length + ' total)';
+    toolbarEl.hidden = false;
+    emptyEl.hidden = visible.length !== 0;
+
+    var groups = {};
+    var order = [];
+    visible.forEach(function (thread) {
+      var key = groupKey(thread);
+      if (!groups[key]) { groups[key] = []; order.push(key); }
+      groups[key].push(thread);
+    });
+    order.sort(function (a, b) { return a.localeCompare(b); });
+
+    groupsEl.replaceChildren();
+    order.forEach(function (key) {
+      var section = el('section', 'rp-section');
+      section.appendChild(el('h2', '', key));
+      groups[key]
+        .slice()
+        .sort(function (a, b) { return String(b.createdAt).localeCompare(String(a.createdAt)); })
+        .forEach(function (thread) { section.appendChild(threadCard(layer, thread)); });
+      groupsEl.appendChild(section);
+    });
+
+    refreshDiscussion(layer);
+  }
+
+  /* The store keeps thread summaries; a message body lives in a subcollection
+     and reaches the browser only through CommentLayer.loadDetail — the fetch
+     without the navigation, the scroll or the popover, all of which
+     CommentLayer.openThread carries for a pin on the page it belongs to and
+     none of which this overview wants. loadDetail touches no history and no
+     location, so hydrating every row here needs nothing saved and nothing
+     restored: the stub-and-restore machinery this function used to carry
+     existed only to neutralise behaviour loadDetail does not have. */
+  var hydrating = {};
+
+  function hydrate(layer, threads) {
+    var pending = threads.filter(function (thread) {
+      return !Array.isArray(thread.messages) && !hydrating[thread.id];
+    });
+    pending.forEach(function (thread) {
+      hydrating[thread.id] = true;
+      // Release the in-flight marker on both paths, or a thread whose detail
+      // fetch failed once is never retried and its card stays on "Loading the
+      // text…" for the life of the page.
+      Promise.resolve(layer.loadDetail(thread))
+        .catch(function (error) {
+          if (window.console && console.error) console.error('[comments.html] thread detail failed:', thread.id, error);
+        })
+        .finally(function () {
+          delete hydrating[thread.id];
+        });
+    });
+  }
+
+  function wire(layer) {
+    var stopCapabilities = null;
+    var originalSetThreads = layer.setThreads.bind(layer);
+    layer.setThreads = function (threads, merge) {
+      originalSetThreads(threads, merge);
+      render(layer);
+      hydrate(layer, layer.threads);
+    };
+
+    var originalSetUser = layer.setUser.bind(layer);
+    layer.setUser = function (user) {
+      originalSetUser(user);
+      var signedIn = Boolean(layer.user);
+      signedOutEl.hidden = signedIn;
+      if (!signedIn) {
+        loadingEl.hidden = true;
+        toolbarEl.hidden = true;
+        groupsEl.replaceChildren();
+        emptyEl.hidden = true;
+      }
+    };
+
+    var originalShowError = layer.showError.bind(layer);
+    layer.showError = function (message, cause) {
+      originalShowError(message, cause);
+      loadingEl.hidden = true;
+      errorEl.hidden = false;
+      errorEl.textContent = message;
+    };
+
+    $('cm-signin').onclick = function () { layer.signIn(); };
+
+    stopCapabilities = layer.onCapabilitiesChanged(function () {
+      if (layer.threadsDelivered) render(layer);
+    });
+    if (typeof window.addEventListener === 'function') {
+      window.addEventListener('pagehide', function () {
+        if (stopCapabilities) stopCapabilities();
+        layer.destroy();
+      }, { once: true });
+    }
+
+    Array.prototype.forEach.call(document.querySelectorAll('#cm-toolbar .rp-chip'), function (chip) {
+      chip.onclick = function () {
+        filter = chip.dataset.filter;
+        Array.prototype.forEach.call(document.querySelectorAll('#cm-toolbar .rp-chip'), function (other) {
+          other.setAttribute('aria-pressed', String(other === chip));
+        });
+        render(layer);
+      };
+    });
+
+    // The layer applies its initial state through the same setUser/setThreads
+    // hooks once start() has wired auth and the store, so a reviewer who is
+    // already signed in from an earlier visit is reflected too, not only a
+    // future change.
+    signedOutEl.hidden = Boolean(layer.user);
+    // Hydrate as well as render: a delivery that landed before wire() replaced
+    // setThreads would otherwise leave every card on "Loading the text…".
+    // The condition is "has a delivery happened", not "are there threads":
+    // `threads.length` reads an empty store and a store that has not answered
+    // yet as the same state, so an empty prototype sat on "Loading comment
+    // threads…" for ever instead of showing the empty state. Re-running both on
+    // a delivery the patched setThreads already handled is harmless —
+    // replaceChildren makes render idempotent, the hydrating map makes hydrate
+    // idempotent.
+    if (layer.threadsDelivered) {
+      render(layer);
+      hydrate(layer, layer.threads);
+    }
+  }
+
+  function unconfigured(error) {
+    loadingEl.hidden = true;
+    unconfiguredEl.hidden = false;
+    if (error && window.console && console.error) console.error('[comments.html] init failed:', error);
+  }
+
+  if (!window.protoComments) {
+    unconfigured(null);
+    return;
+  }
+
+  // `overview: true` is what keeps this page read-only. Without it the layer
+  // draws pins against a page that has no anchors, every thread misses, and
+  // each miss is written back to the store as `orphaned: true` — a backend
+  // write issued by opening a page that says it only reads. The CSS above hides
+  // the layer's chrome; only this flag stops the writes.
+  protoComments.init({ overview: true }).then(function (layer) {
+    if (!layer) unconfigured(null);
+    else wire(layer);
+  }).catch(unconfigured);
+})();
+</script>
+</body>
+</html>

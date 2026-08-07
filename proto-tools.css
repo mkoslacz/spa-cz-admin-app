@@ -1,0 +1,109 @@
+/* ============================================================
+   Prototype · settings — panel styling
+   Deliberately NOT built from the product's design tokens: this is
+   scaffolding, and a reviewer must never mistake it for a component.
+   Bottom left on desktop, bottom right on mobile (thumb reach), so it
+   never sits under a fixed action bar.
+   ============================================================ */
+.proto-tools {
+  position: fixed; left: 18px; bottom: 18px; z-index: 9000; width: 194px;
+  background: #fff; border: 1px solid #D8D8D8; border-radius: 14px;
+  box-shadow: 0 8px 28px rgba(20, 20, 20, .16); padding: 11px;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+.proto-tools .pt-h {
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
+  color: #6B6B6B; margin-bottom: 9px; padding-right: 16px;
+}
+.proto-tools .pt-row { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
+.proto-tools .pt-row + .pt-row { margin-top: 9px; }
+.proto-tools .pt-lbl { font-size: 12px; font-weight: 600; color: #3C3C3C; }
+.proto-tools .pt-seg {
+  display: inline-flex; border: 1px solid #D8D8D8; border-radius: 8px; overflow: hidden; max-width: 100%;
+}
+.proto-tools .pt-b {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 26px; height: 26px; padding: 0 8px; font-size: 12px; font-weight: 700;
+  color: #3C3C3C; cursor: pointer; text-decoration: none; white-space: nowrap;
+}
+.proto-tools .pt-b + .pt-b { border-left: 1px solid #D8D8D8; }
+.proto-tools .pt-b.on { background: #1F1F1F; color: #fff; }
+.proto-tools .pt-sheet-row { gap: 6px; }
+.proto-tools .pt-sheet-toggle {
+  width: 100%; min-height: 28px; padding: 0 9px; border: 1px dashed #A7A7A7; border-radius: 7px;
+  background: #F7F7F7; color: #3C3C3C; font: 700 12px/1 system-ui, -apple-system, "Segoe UI", sans-serif;
+  text-align: left; cursor: pointer;
+}
+.proto-tools .pt-sheet-toggle::after { content: '⌄'; float: right; color: #777; }
+.proto-tools .pt-sheet-toggle[aria-expanded="true"]::after { transform: rotate(180deg); }
+.proto-tools .pt-sheet {
+  box-sizing: border-box; width: 100%; max-height: min(300px, calc(100vh - 190px)); overflow-y: auto;
+  border: 1px dashed #C4C4C4; border-radius: 7px; background: #FCFCFC; padding: 8px;
+  color: #444; font-size: 11px; line-height: 1.38;
+}
+.proto-tools .pt-sheet[hidden] { display: none; }
+.proto-tools .pt-sheet-message { margin: 0; color: #707070; }
+.proto-tools .pt-sheet-heading { margin: 8px 0 4px; color: #666; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; }
+.proto-tools .pt-sheet-heading:first-child { margin-top: 0; }
+.proto-tools .pt-change,
+.proto-tools .pt-usecase { padding: 7px 0; border-top: 1px solid #E5E5E5; }
+.proto-tools .pt-sheet-heading + .pt-change { border-top: 0; }
+.proto-tools .pt-change-meta { color: #444; font-weight: 600; }
+.proto-tools .pt-commit,
+.proto-tools .pt-sheet a { color: #245A86; text-decoration: underline; text-underline-offset: 2px; }
+.proto-tools .pt-sheet-links { margin-top: 3px; color: #6B6B6B; }
+.proto-tools .pt-usecase-title { margin: 0; color: #3C3C3C; font-size: 12px; line-height: 1.3; }
+.proto-tools .pt-usecase-id { color: #767676; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10px; }
+.proto-tools .pt-usecase-state { margin: 4px 0; color: #5F5F5F; }
+.proto-tools .pt-usecase-open,
+.proto-tools .pt-usecase-docs { display: inline-block; margin-top: 3px; font-weight: 700; }
+.proto-tools .pt-usecase-notes { margin-top: 5px; color: #5F5F5F; }
+.proto-tools .pt-usecase-notes summary { cursor: pointer; font-weight: 700; }
+.proto-tools .pt-usecase-notes p { margin: 5px 0; }
+.proto-tools .pt-usecase-rules { margin: 5px 0 0; padding-left: 16px; }
+.proto-tools .pt-usecase-docs { margin-top: 9px; }
+.proto-tools .pt-state-docs { width: 100%; margin-top: 1px; border-left: 2px solid #D8D8D8; padding-left: 6px; }
+.proto-tools .pt-state-doc { margin-top: 3px; color: #646464; font-size: 10px; line-height: 1.35; }
+.proto-tools .pt-state-doc strong { color: #4A4A4A; }
+.proto-tools .pt-state-reference { margin-top: 10px; }
+.proto-tools .pt-state-reference-item { margin-top: 7px; }
+.proto-tools .pt-state-reference-item p { margin: 3px 0; }
+.proto-tools .pt-min {
+  position: absolute; top: 7px; right: 9px; width: 18px; height: 18px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 700; line-height: 1; color: #8A8A8A; cursor: pointer; user-select: none;
+}
+/* collapsed: a small tab that says what it is, so it is still discoverable */
+.proto-tools.mini { width: auto; padding: 7px 10px; }
+.proto-tools.mini .pt-row { display: none; }
+.proto-tools.mini .pt-h { margin: 0; padding-right: 14px; }
+.proto-tools.mini .pt-min { transform: rotate(45deg); }
+
+/* raised above a fixed bottom bar (pass raised: true) */
+.proto-tools.up { bottom: 88px; }
+
+@media (max-width: 700px) {
+  .proto-tools {
+    right: 12px;
+    bottom: calc(var(--bottom-nav-height, 64px) + 12px);
+    left: auto;
+    width: min(280px, calc(100vw - 24px));
+    max-height: calc(100vh - var(--bottom-nav-height, 64px) - 36px);
+    overflow-y: auto;
+  }
+  .proto-tools .pt-seg { width: 100%; }
+  .proto-tools .pt-b { min-width: 0; flex: 1; padding-inline: 6px; }
+  .proto-tools.mini { width: auto; max-height: none; overflow: hidden; }
+}
+
+/* ============================================================
+   Export mode — set by ?nopanel=1 on <body>.
+   Fixed bars must join the normal flow, otherwise the DOM dump
+   captures them at the bottom edge of the 1200px capture window,
+   which lands in the middle of a several-thousand-pixel frame.
+   Extend this block with every position:fixed element you add.
+   ============================================================ */
+body[data-export="1"] .fixed-bar,
+body[data-export="1"] .booking-bar,
+body[data-export="1"] .action-bar { position: static !important; transform: none !important; }
+body[data-export="1"] .proto-hint { display: none !important; }

@@ -1,0 +1,46 @@
+{
+  "name": "design-prototype-tools",
+  "private": true,
+  "description": "The .fig <-> HTML pipeline shipped by the design-prototype skill. This manifest declares what the tools need; it is installed in the target prototype, never in this repository.",
+  "license": "MIT",
+  "//": [
+    "The versions the tools were originally developed against could not be determined:",
+    "there was no lockfile, no node_modules and no version recorded in any comment or",
+    "document. These are therefore the current releases as resolved from the registry on",
+    "2026-07-27, pinned to their major so a breaking bump cannot arrive silently.",
+    "kiwi-schema matters most: it is a 0.x package, so the caret pins the minor as well,",
+    "which is what this pipeline wants — a change in what the encoder emits shows up as",
+    "Figma hanging at '0 of 1 files' with no error message.",
+    "The Node floor is >=22: the shipped generator needs zlib.zstdCompressSync and",
+    "the executable-quality gate uses Node's native --experimental-test-coverage.",
+    "No patch-level floor is claimed because none was verified."
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node test-mobile.js",
+    "test:browser": "node test-mobile-browser.js",
+    "lint": "eslint --max-warnings=0 \"*.js\"",
+    "format": "prettier --write \"*.js\" \"*.cjs\" \"*.json\"",
+    "format:check": "prettier --check \"*.js\" \"*.cjs\" \"*.json\""
+  },
+  "dependencies": {
+    "firebase-admin": "^14.2.0",
+    "kiwi-schema": "^0.5.0",
+    "pako": "^3.0.1",
+    "puppeteer-core": "^25.4.0"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "5.0.1",
+    "eslint": "10.8.0",
+    "firebase": "12.11.0",
+    "firebase-tools": "15.26.0",
+    "prettier": "3.9.6"
+  },
+  "overrides": {
+    "@opentelemetry/core": "2.8.0",
+    "uuid": "^11.1.1"
+  },
+  "//overrides": "@opentelemetry/core 2.8.0 closes advisory 1120821 in firebase-tools' Pub/Sub-only transitive path; uuid closes advisory 1119441 in firebase-admin's Google transitive path. Remove either override once npm ls shows its upstream resolves the safe version unaided."
+}

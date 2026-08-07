@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=390, initial-scale=1, maximum-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Package rates · SPA.CZ partner app prototype</title>
+  <link rel="stylesheet" href="tokens-m.css?v=20260807c">
+  <link rel="stylesheet" href="app-m.css?v=20260807c">
+  <link rel="stylesheet" href="proto-tools.css?v=20260807c">
+  <link rel="stylesheet" href="proto-comments.css?v=20260807c">
+  <link rel="stylesheet" href="proto-m.css?v=20260807c">
+</head>
+<body data-page="rate-edit" data-viewport="mobile" data-auth="in" data-access="full" data-connection="manual" data-density="dense" data-inv="many" data-hotel="active">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="prototype-hint">Interactive prototype · public package facts + clearly labelled demo account data</div>
+  <nav class="langswitch" aria-label="Language">
+    <a href="m-rate-edit.html" data-carry-state data-lang="cs" class="">CZ</a>
+    <a href="m-rate-edit-en.html" data-carry-state data-lang="en" class="on">EN</a>
+  </nav>
+  <div class="product-surface">
+    <div class="mobile-app">
+      <header class="mobile-header">
+    <button class="mobile-brand" type="button" data-open-sheet="property-sheet" aria-label="Select property">
+      <img src="assets/logo.svg" alt="SPA.CZ">
+      <span class="hotel-summary">
+        <strong>SPA HOTEL ČAJKOVSKIJ</strong>
+        <small><span class="connection-pill"><span class="connection-manual">Manual</span><span class="connection-chm">Channel Manager</span></span></small>
+      </span>
+    </button>
+    <button class="header-button" type="button" data-toast="In prototype: notification centre." aria-label="Notifications"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M18 16v-5a6 6 0 0 0-5-5.9V4a1 1 0 0 0-2 0v1.1A6 6 0 0 0 6 11v5l-2 2h16l-2-2Zm-8 3h4a2 2 0 0 1-4 0Z"/></svg></button>
+  </header>
+      <main class="mobile-main" id="main">
+        <a class="back-link" href="m-offer-en.html" data-carry-state><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m15 18-6-6 6-6 1.4 1.4-4.6 4.6 4.6 4.6L15 18Z"/></svg> Offer</a>
+    <div class="page-head">
+    <div><h1>Package rates</h1><p>SPA HOTEL ČAJKOVSKIJ · 3 days / 2 nights</p></div>
+    
+  </div>
+    <div class="alert warning readonly-alert"><strong>Read-only access.</strong>&nbsp;Editing is disabled for this role.</div>
+  <div class="alert warning chm-alert"><strong>Channel Manager.</strong>&nbsp;Availability and rates are managed in the connected system.</div>
+  <div class="alert info test-alert"><strong>Test property.</strong>&nbsp;Changes are not published on SPA.CZ.</div>
+    <div class="alert info"><strong>Demo pricing scenario.</strong>&nbsp;Only the CZK 3,577 baseline is public; all other values are derived demo data.</div>
+    <div class="tabs"><button class="active" type="button">Dates & rates</button><button type="button" data-toast="In prototype: basic details.">Basics</button><button type="button" data-toast="In prototype: settings.">Settings</button></div>
+    <section class="card">
+      <div class="form-two-col"><label class="field"><span class="meta">Pricing model</span><select><option>Person / stay</option><option>Room / stay</option></select></label><label class="field"><span class="meta">Hotel currency</span><input value="CZK" readonly></label></div>
+    </section>
+    <div class="section-head"><h2>Rate by arrival</h2><span class="demo-label">Demo</span></div>
+    <div class="matrix-toolbar"><button class="page-action-icon" type="button" data-grid-shift="-1" aria-label="Previous days"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m15 18-6-6 6-6 1.4 1.4-4.6 4.6 4.6 4.6L15 18Z"/></svg></button><strong>12–18 October 2026</strong><button class="page-action-icon" type="button" data-grid-shift="1" aria-label="Next days"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m9 18 6-6-6-6 1.4-1.4 7.4 7.4-7.4 7.4L9 18Z"/></svg></button></div>
+    <div class="matrix-wrap"><table class="matrix rate-matrix"><thead><tr><th class="sticky-col">Room / arrival</th><th class="today">12. 10.</th><th class="">13. 10.</th><th class="">14. 10.</th><th class="">15. 10.</th><th class="">16. 10.</th><th class="weekend">17. 10.</th><th class="weekend">18. 10.</th></tr></thead><tbody><tr><td class="sticky-col"><strong>Double</strong><small>2 os. · demo</small></td><td><input class="rate-input" type="number" value="3577" inputmode="numeric" aria-label="Double 3577 CZK" data-write-action data-chm-write></td><td><input class="rate-input" type="number" value="3577" inputmode="numeric" aria-label="Double 3577 CZK" data-write-action data-chm-write></td><td><input class="rate-input" type="number" value="3827" inputmode="numeric" aria-label="Double 3827 CZK" data-write-action data-chm-write></td><td><input class="rate-input" type="number" value="4117" inputmode="numeric" aria-label="Double 4117 CZK" data-write-action data-chm-write></td><td><input class="rate-input" type="number" value="4117" inputmode="numeric" aria-label="Double 4117 CZK" data-write-action data-chm-write></td><td><input class="rate-input" type="number" value="3577" inputmode="numeric" aria-label="Double 3577 CZK" data-write-action data-chm-write></td><td><input class="rate-input" type="number" value="3577" inputmode="numeric" aria-label="Double 3577 CZK" data-write-action data-chm-write></td></tr><tr><td class="sticky-col"><strong>Deluxe double</strong><small>2 os. · demo</small></td><td><input class="rate-input" type="number" value="3977" inputmode="numeric" aria-label="Deluxe double 3977 CZK" data-write-action data-chm-write></td><td><input class="rate-input" type="number" value="3977" inputmode="numeric" aria-label="Deluxe double 3977 CZK" data-write-action data-chm-write></td><td><input class="rate-input" type="number" value="4227" inputmode="numeric" aria-label="Deluxe double 4227 CZK" data-write-action data-chm-write></td><td><input class="rate-input" type="number" value="4517" inputmode="numeric" aria-label="Deluxe double 4517 CZK" data-write-action data-chm-write></td><td><input class="rate-input" type="number" value="4517" inputmode="numeric" aria-label="Deluxe double 4517 CZK" data-write-action data-chm-write></td><td><input class="rate-input" type="number" value="3977" inputmode="numeric" aria-label="Deluxe double 3977 CZK" data-write-action data-chm-write></td><td><input class="rate-input" type="number" value="3977" inputmode="numeric" aria-label="Deluxe double 3977 CZK" data-write-action data-chm-write></td></tr><tr><td class="sticky-col"><strong>Suite</strong><small>2 os. · demo</small></td><td><input class="rate-input" type="number" value="4577" inputmode="numeric" aria-label="Suite 4577 CZK" data-write-action data-chm-write></td><td><input class="rate-input" type="number" value="4577" inputmode="numeric" aria-label="Suite 4577 CZK" data-write-action data-chm-write></td><td><input class="rate-input" type="number" value="4827" inputmode="numeric" aria-label="Suite 4827 CZK" data-write-action data-chm-write></td><td><input class="rate-input" type="number" value="5117" inputmode="numeric" aria-label="Suite 5117 CZK" data-write-action data-chm-write></td><td><input class="rate-input" type="number" value="5117" inputmode="numeric" aria-label="Suite 5117 CZK" data-write-action data-chm-write></td><td><input class="rate-input" type="number" value="4577" inputmode="numeric" aria-label="Suite 4577 CZK" data-write-action data-chm-write></td><td><input class="rate-input" type="number" value="4577" inputmode="numeric" aria-label="Suite 4577 CZK" data-write-action data-chm-write></td></tr></tbody></table></div>
+    <div class="sticky-action-bar"><span><small>Public baseline</small><strong data-price="base">3 577 Kč</strong></span><button class="button primary" type="button" data-toast="Demo rates were sent for approval." data-write-action data-chm-write>Save</button></div>
+      </main>
+      <nav class="mobile-bottom-nav" aria-label="Primary navigation">
+    <a href="m-dashboard-en.html" data-carry-state class="" >
+    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M4 13h6V4H4v9Zm0 7h6v-5H4v5Zm10 0h6v-9h-6v9Zm0-16v5h6V4h-6Z"/></svg><span>Overview</span>
+  </a>
+    <a href="m-reservations-en.html" data-carry-state class="" >
+    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M6 3h12a2 2 0 0 1 2 2v15l-3-2-3 2-3-2-3 2-3-2-3 2V5a2 2 0 0 1 2-2h2Zm2 5h8V6H8v2Zm0 4h8v-2H8v2Zm0 4h5v-2H8v2Z"/></svg><span class="nav-badge" data-kind="reservation">5</span><span>Reservations</span>
+  </a>
+    <a href="m-availability-en.html" data-carry-state class="" >
+    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M5 3h2v2h10V3h2v2h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h1V3Zm15 7H4v10h16V10ZM7 12h3v3H7v-3Zm5 0h3v3h-3v-3Zm5 0h2v3h-2v-3ZM7 17h3v2H7v-2Zm5 0h3v2h-3v-2Z"/></svg><span>Availability</span>
+  </a>
+    <a href="m-offer-en.html" data-carry-state class="active" aria-current="page">
+    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m3 12 9-9h7a2 2 0 0 1 2 2v7l-9 9L3 12Zm13-4.5A1.5 1.5 0 1 0 16 4a1.5 1.5 0 0 0 0 3.5Z"/></svg><span>Offer</span>
+  </a>
+    <a href="m-more-en.html" data-carry-state class="" >
+    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M5 10a2 2 0 1 1 0 4 2 2 0 0 1 0-4Zm7 0a2 2 0 1 1 0 4 2 2 0 0 1 0-4Zm7 0a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z"/></svg><span class="nav-badge" data-kind="changes">2</span><span>More</span>
+  </a>
+  </nav>
+    </div>
+  </div>
+  <section class="signed-out-wall"><div class="wall-card"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm6-1a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM9 13c-4 0-7 2-7 5v2h14v-2c0-3-3-5-7-5Zm7 0c-.6 0-1.2.1-1.8.2 2.3 1 3.8 2.7 3.8 4.8v2h4v-2c0-3-2.6-5-6-5Z"/></svg><h1>Signed-out demo account</h1><p>Use the floating settings panel to switch back to “Signed in”. No real credentials are used.</p><button class="button primary" type="button" data-toast="Use the prototype settings panel to sign in.">Open demo account</button></div></section>
+  <section class="access-wall"><div class="wall-card"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m19.4 13 .1-1-.1-1 2-1.5-2-3.4-2.4 1a8 8 0 0 0-1.7-1L15 3.5h-4l-.4 2.6a8 8 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.5-.1 1 .1 1-2 1.5 2 3.4 2.4-1a8 8 0 0 0 1.7 1l.4 2.6h4l.4-2.6a8 8 0 0 0 1.7-1l2.4 1 2-3.4-2-1.5ZM13 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z"/></svg><h1>No access in this demo state</h1><p>Use the floating settings panel to select Read only or Full access.</p></div></section>
+  <div class="modal-backdrop" id="property-sheet" aria-hidden="true"><section class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="property-sheet-title"><div class="sheet-grabber"></div><header class="sheet-head"><h2 id="property-sheet-title">Select property</h2><button class="header-button" type="button" data-close-sheet aria-label="Close">×</button></header><div class="sheet-body"><button class="button full primary" type="button" data-close-sheet>SPA HOTEL ČAJKOVSKIJ <span class="test-label">TEST</span></button><p class="subtle">The only public property used in the prototype.</p></div></section></div>
+  <div class="toast" role="status" aria-live="polite"></div>
+  <div class="state-debug" data-state-output></div>
+  <a class="screen-reader-only" href="m-rate-edit.html" data-carry-state>Čeština</a>
+  <script src="proto-tools.js?v=20260807c" defer></script>
+  <script src="proto-comments.js?v=20260807c" defer></script>
+  <script src="proto-m.js?v=20260807c" defer></script>
+</body>
+</html>

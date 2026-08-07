@@ -1,0 +1,153 @@
+name: Refresh and publish the prototype
+
+# Static screens remain plain HTML that opens from file:// with no build step.
+# This workflow regenerates their derived artifacts and publishes the result to
+# GitHub Pages in one process, so one push to the published branch produces
+# exactly one deployment. It writes nothing back to the repository: no commit,
+# no push, and therefore no second publication to guard against.
+#
+# The receiving repository must serve Pages from Settings -> Pages -> Source:
+# GitHub Actions. One still set to a branch keeps publishing that branch and
+# ignores the package uploaded here, which reads as a deploy that succeeds and
+# changes nothing.
+on:
+  push:
+    # Change this when the prototype is published from a branch other than main.
+    branches: [main]
+  workflow_dispatch:
+
+# Exactly what an artifact deployment needs: the checkout, a Pages deployment,
+# and the OIDC token deploy-pages exchanges for it. Repository write is
+# deliberately absent, which is also why a fork and a protected branch are
+# ordinary runs here -- neither has a writable token to withhold.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  # One published site, so one deployment at a time for the whole repository.
+  # cancel-in-progress is false on purpose: a superseded queued run costs
+  # nothing, while cancelling a deployment that is already publishing leaves the
+  # live site half-swapped. A job whose output was a commit made the opposite
+  # trade; a job that deploys is not the same thing.
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # build-changelog.js refuses a shallow history rather than publishing
+          # a changelog that silently looks complete but is truncated. The full
+          # depth costs the published package nothing: the package is assembled
+          # from the include list below, never from the working directory.
+          fetch-depth: 0
+
+      # Fails early and by name when Pages is not enabled here, instead of
+      # leaving deploy-pages to fail after a full regeneration.
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: tools/package-lock.json
+
+      - name: Install prototype tools
+        working-directory: tools
+        run: npm ci
+
+      - name: Validate mobile prototype
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+        run: |
+          npm --prefix tools test
+          npm --prefix tools run lint
+          npm --prefix tools run test:browser
+
+      - name: Regenerate derived artifacts
+        env:
+          # ubuntu-latest supplies this Chrome binary for puppeteer-core.
+          CHROME_PATH: /usr/bin/google-chrome
+        run: node tools/refresh.js --allow-package-scripts
+
+      - name: Assemble the published package
+        env:
+          PACKAGE_DIR: ${{ runner.temp }}/pages-package
+          # An include list, never an exclude list: whatever a later round adds
+          # to the prototype root stays out of the published package until it is
+          # named here. The build toolchain, everything npm installs beside it,
+          # the captured research material and the whole repository history are
+          # absent by construction rather than by a rule somebody has to
+          # remember to extend. Add a line to publish more.
+          #
+          # Entries are shell globs resolved in the prototype root, and one that
+          # matches nothing is skipped: use cases, the comment layer and the
+          # Figma export are all opt-in and a prototype without them is normal.
+          #
+          # The regenerated .fig ships inside the site, so it keeps a stable URL
+          # beside the hub for as long as the site exists. It is deliberately
+          # not a separate workflow artifact, whose retention window expires,
+          # and never a commit.
+          PACKAGE_INCLUDE: |
+            index.html
+            changelog.html
+            usecases.html
+            comments.html
+            specs.html
+            m-*.html
+            *.css
+            *.js
+            *.fig
+            assets
+            preview-*.png
+            comments.config*.json
+            changelog.json
+            usecases.built.json
+            docs/usecases.md
+            docs/usecases
+        run: |
+          set -euo pipefail
+          # nocaseglob so a .FIG export is not silently dropped; nullglob so an
+          # opt-in artifact that was never generated simply does not appear.
+          shopt -s nullglob nocaseglob
+          rm -rf "$PACKAGE_DIR"
+          mkdir -p "$PACKAGE_DIR"
+          while IFS= read -r entry; do
+            [[ -n "$entry" ]] || continue
+            # Unquoted on purpose: the entry is the pattern. What it matches is
+            # not word-split again, so a file name with a space survives.
+            matches=($entry)
+            [[ ${#matches[@]} -gt 0 ]] || continue
+            for match in "${matches[@]}"; do
+              [[ -e "$match" ]] || continue
+              destination="$PACKAGE_DIR/$(dirname "$match")"
+              mkdir -p "$destination"
+              cp -R "$match" "$destination/"
+              echo "packaged $match"
+            done
+          done <<< "$PACKAGE_INCLUDE"
+          # The hub is the one URL a reviewer is handed, so a package without it
+          # fails here instead of deploying a blank site.
+          if [[ ! -f "$PACKAGE_DIR/index.html" ]]; then
+            echo "index.html did not reach the package; refusing to publish." >&2
+            exit 1
+          fi
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ runner.temp }}/pages-package
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

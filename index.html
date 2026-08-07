@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SPA.cz Partner — mobile app prototype</title>
+<link rel="stylesheet" href="proto-review.css">
+<style>
+  :root {
+    --brand: #1174BB;
+    --brand-dark: #0F5180;
+    --brand-pale: #E7F1F8;
+    --accent: #76B82A;
+    --ink: #1C1F21;
+    --muted: #576771;
+    --line: #E1EAEF;
+    --canvas: #EEF3F5;
+    --paper: #FFFFFF;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    color: var(--ink);
+    background: var(--canvas);
+    font-family: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  a { color: var(--brand-dark); }
+  .wrap { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 48px 0 72px; }
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding: 40px;
+    color: #fff;
+    border-radius: 24px;
+    background: linear-gradient(135deg, var(--brand-dark), var(--brand) 62%, #279CEB);
+    box-shadow: 0 18px 44px rgba(15, 81, 128, .18);
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    width: 360px;
+    height: 360px;
+    right: -150px;
+    top: -190px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.1);
+  }
+  .eyebrow { margin: 0 0 10px; font-size: 13px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+  h1, h2, h3 { font-family: Outfit, "DM Sans", system-ui, sans-serif; }
+  h1 { max-width: 760px; margin: 0; font-size: clamp(34px, 5vw, 56px); line-height: 1.02; letter-spacing: -.035em; }
+  .lede { max-width: 780px; margin: 18px 0 0; font-size: 17px; line-height: 1.65; color: rgba(255,255,255,.88); }
+  .hero-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+  .hero-tag { padding: 7px 11px; border: 1px solid rgba(255,255,255,.3); border-radius: 999px; background: rgba(255,255,255,.1); font-size: 13px; font-weight: 700; }
+  .proposal {
+    display: grid;
+    grid-template-columns: 1.15fr .85fr;
+    gap: 20px;
+    margin: 24px 0 0;
+  }
+  .note {
+    padding: 22px 24px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--paper);
+    box-shadow: 0 5px 18px rgba(28,31,33,.05);
+    font-size: 14.5px;
+    line-height: 1.65;
+  }
+  .note h2, .note h3 { margin: 0 0 8px; }
+  .note p { margin: 0; }
+  .note p + p { margin-top: 10px; }
+  .proposal-main { border-top: 4px solid var(--accent); }
+  .proposal-main strong { color: #4D8210; }
+  .section { margin-top: 48px; }
+  .section-head { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 16px; }
+  .section h2 { margin: 0; font-size: 27px; letter-spacing: -.02em; }
+  .section-intro { max-width: 720px; margin: 6px 0 0; color: var(--muted); line-height: 1.55; }
+  .flow { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 16px; }
+  .screen {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--paper);
+    box-shadow: 0 4px 14px rgba(28,31,33,.05);
+  }
+  .screen img { display: block; width: 100%; height: 340px; object-fit: cover; object-position: top; background: #DDE6EB; border-bottom: 1px solid var(--line); }
+  .screen-body { padding: 15px; }
+  .screen-kicker { display: block; margin-bottom: 5px; color: var(--brand); font-size: 11px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
+  .screen h3 { margin: 0; font-size: 18px; }
+  .screen p { min-height: 58px; margin: 7px 0 13px; color: var(--muted); font-size: 13px; line-height: 1.48; }
+  .actions { display: flex; gap: 7px; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 38px; padding: 8px 13px; border-radius: 9px; background: var(--brand); color: #fff; text-decoration: none; font-size: 13px; font-weight: 800; }
+  .btn.alt { color: var(--brand-dark); background: var(--brand-pale); }
+  .review-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; }
+  .review-card { padding: 20px; border: 1px solid var(--line); border-radius: 16px; background: var(--paper); }
+  .review-card h3 { margin: 0; font-size: 19px; }
+  .review-card p { margin: 8px 0 16px; color: var(--muted); font-size: 14px; line-height: 1.55; }
+  .axis-table, .mapping-table { width: 100%; border-collapse: separate; border-spacing: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--paper); font-size: 14px; }
+  .axis-table th, .mapping-table th { padding: 12px 14px; color: #fff; background: var(--brand-dark); text-align: left; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
+  .axis-table td, .mapping-table td { padding: 12px 14px; border-top: 1px solid var(--line); vertical-align: top; line-height: 1.5; }
+  .axis-table tbody tr:first-child td, .mapping-table tbody tr:first-child td { border-top: 0; }
+  .swatch { display: inline-block; width: 14px; height: 14px; margin-right: 7px; border: 1px solid rgba(0,0,0,.1); border-radius: 4px; vertical-align: -2px; }
+  code { padding: 2px 6px; border-radius: 5px; background: #E7EDF0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; }
+  .rules { margin: 0; padding-left: 20px; }
+  .rules li { margin: 8px 0; }
+  .privacy { border-left: 4px solid #E6A400; }
+  .handoff { border-top: 4px solid var(--brand); }
+  .muted { color: var(--muted); }
+  @media (max-width: 980px) {
+    .flow { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .proposal { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 700px) {
+    .wrap { width: min(100% - 20px, 1180px); padding-top: 10px; }
+    .hero { padding: 28px 22px; border-radius: 18px; }
+    .flow, .review-grid { grid-template-columns: 1fr; }
+    .screen img { height: 420px; }
+    .axis-table, .mapping-table { display: block; overflow-x: auto; white-space: normal; }
+    .section { margin-top: 38px; }
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="hero">
+    <p class="eyebrow">SPA.cz Partner · mobile app proposal A</p>
+    <h1>Hotel operations designed as a focused mobile app</h1>
+    <p class="lede">
+      A clickable Czech and English app prototype for daily reservation, availability, offer, rate and billing work. The existing <strong>spa/spacz_web</strong> panel is the source of functionality and business rules; this artifact does not propose a replacement desktop web interface. Its visual system comes from the supplied Szallas design-system export and the confirmed SPA.cz brand values.
+    </p>
+    <div class="hero-tags">
+      <span class="hero-tag">8 product areas</span>
+      <span class="hero-tag">390 px mobile app</span>
+      <span class="hero-tag">CZ + EN</span>
+      <span class="hero-tag">24 editable Figma frames</span>
+    </div>
+  </header>
+
+  <div class="proposal">
+    <section class="note proposal-main">
+      <h2>The proposal</h2>
+      <p><strong>Variant A is the current proposal.</strong> It turns the broad existing web panel into a focused operating sequence for a phone. There is no desktop web proposal in this artifact and there are no superseded visual variants in this round.</p>
+      <p>This is a working prototype, not a collection of pictures. Start on Dashboard, open Reservations, inspect a reservation, then review its Billing item. The second path runs from Dashboard through Availability to Offer and Rate edit. Selected demo state carries across those screens.</p>
+    </section>
+    <section class="note">
+      <h2>What to try</h2>
+      <p>Filter the reservation queue, open a reservation, switch an availability day, follow the offer-to-rate path, and test both billing decisions. In the floating prototype panel, compare permissions, channel-manager mode, density, fixture volume and test-property mode.</p>
+    </section>
+  </div>
+
+  <section class="section" aria-labelledby="panel-title">
+    <div class="section-head"><div><h2 id="panel-title">Floating prototype panel</h2><p class="section-intro">The panel is demonstration chrome, not proposed product UI. Every selection is also a URL parameter, so the exact state can be shared and exported. Add <code>nopanel=1</code> for clean captures.</p></div></div>
+    <table class="axis-table">
+      <thead><tr><th>Row</th><th>URL parameter</th><th>Options</th><th>Default</th></tr></thead>
+      <tbody>
+        <tr><td>Session</td><td><code>auth</code></td><td><code>in</code> · <code>out</code></td><td><code>in</code></td></tr>
+        <tr><td>Access</td><td><code>access</code></td><td><code>full</code> · <code>read</code> · <code>none</code></td><td><code>full</code></td></tr>
+        <tr><td>Inventory connection</td><td><code>connection</code></td><td><code>manual</code> · <code>chm</code></td><td><code>manual</code></td></tr>
+        <tr><td>Information density</td><td><code>density</code></td><td><code>compact</code> · <code>dense</code></td><td><code>dense</code></td></tr>
+        <tr><td>Demo inventory</td><td><code>inv</code></td><td><code>many</code> · <code>some</code> · <code>none</code></td><td><code>many</code></td></tr>
+        <tr><td>Property mode</td><td><code>hotel</code></td><td><code>active</code> · <code>test</code></td><td><code>active</code></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="section" aria-labelledby="mobile-title">
+    <div class="section-head">
+      <div>
+        <h2 id="mobile-title">Mobile app — complete operating map</h2>
+        <p class="section-intro">The screens follow two connected paths: reservation review and billing, plus inventory, offer and rate maintenance. Navigation, summaries and actions are organized for one-handed review. “More” keeps lower-frequency administration reachable without crowding the primary navigation.</p>
+      </div>
+    </div>
+    <div class="flow">
+      <article class="screen"><img src="preview-m-dashboard.png" alt="Mobile dashboard preview" loading="lazy"><div class="screen-body"><span class="screen-kicker">Start</span><h3>Dashboard</h3><p>A short, prioritized operating brief with direct routes into the highest-value work.</p><div class="actions"><a class="btn" href="m-dashboard.html">CZ</a><a class="btn alt" href="m-dashboard-en.html">EN</a></div></div></article>
+      <article class="screen"><img src="preview-m-reservations.png" alt="Mobile reservations preview" loading="lazy"><div class="screen-body"><span class="screen-kicker">Reservations</span><h3>Reservation queue</h3><p>Scan status, guest, stay and value in a purposeful phone-sized queue.</p><div class="actions"><a class="btn" href="m-reservations.html">CZ</a><a class="btn alt" href="m-reservations-en.html">EN</a></div></div></article>
+      <article class="screen"><img src="preview-m-reservation-detail.png" alt="Mobile reservation detail preview" loading="lazy"><div class="screen-body"><span class="screen-kicker">Reservations</span><h3>Reservation detail</h3><p>Progressive sections keep the most urgent guest and stay facts near the top.</p><div class="actions"><a class="btn" href="m-reservation-detail.html">CZ</a><a class="btn alt" href="m-reservation-detail-en.html">EN</a></div></div></article>
+      <article class="screen"><img src="preview-m-billing.png" alt="Mobile billing preview" loading="lazy"><div class="screen-body"><span class="screen-kicker">Finance</span><h3>Billing</h3><p>Review the amount, approve it, or open the structured dispute path.</p><div class="actions"><a class="btn" href="m-billing.html">CZ</a><a class="btn alt" href="m-billing-en.html">EN</a></div></div></article>
+      <article class="screen"><img src="preview-m-availability.png" alt="Mobile availability preview" loading="lazy"><div class="screen-body"><span class="screen-kicker">Inventory</span><h3>Availability</h3><p>A room-and-day view with safe editing and a clear read-only channel-manager state.</p><div class="actions"><a class="btn" href="m-availability.html">CZ</a><a class="btn alt" href="m-availability-en.html">EN</a></div></div></article>
+      <article class="screen"><img src="preview-m-offer.png" alt="Mobile offer preview" loading="lazy"><div class="screen-body"><span class="screen-kicker">Commercial</span><h3>Offer</h3><p>Review the public package promise before changing the rate behind it.</p><div class="actions"><a class="btn" href="m-offer.html">CZ</a><a class="btn alt" href="m-offer-en.html">EN</a></div></div></article>
+      <article class="screen"><img src="preview-m-rate-edit.png" alt="Mobile rate edit preview" loading="lazy"><div class="screen-body"><span class="screen-kicker">Commercial</span><h3>Rate edit</h3><p>One deliberate pricing task with validation, summary and permission feedback.</p><div class="actions"><a class="btn" href="m-rate-edit.html">CZ</a><a class="btn alt" href="m-rate-edit-en.html">EN</a></div></div></article>
+      <article class="screen"><img src="preview-m-more.png" alt="Mobile more and settings preview" loading="lazy"><div class="screen-body"><span class="screen-kicker">Administration</span><h3>More</h3><p>Lower-frequency hotel and account management stays reachable but secondary.</p><div class="actions"><a class="btn" href="m-more.html">CZ</a><a class="btn alt" href="m-more-en.html">EN</a></div></div></article>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="review-title">
+    <div class="section-head"><div><h2 id="review-title">Review pages</h2><p class="section-intro">These surfaces support review rounds; they are not part of the partner product. They read sibling data files, so open the published URL or serve this folder over HTTP rather than opening them through <code>file://</code>.</p></div></div>
+    <div class="review-grid">
+      <article class="review-card"><h3>Changelog</h3><p>Every generated change entry, newest first, with its full rationale and links back to touched screens.</p><a class="btn" href="changelog.html">Open changelog</a></article>
+      <article class="review-card"><h3>Use cases</h3><p>Eight declared product situations, their exact panel state, deep links, rules and the complete axis reference.</p><a class="btn" href="usecases.html">Open use cases</a></article>
+      <article class="review-card"><h3>Comments</h3><p>Private review threads grouped by screen, available only after a Firebase configuration and reviewer allowlist are supplied.</p><a class="btn" href="comments.html">Open comments</a></article>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="mapping-title">
+    <div class="section-head"><div><h2 id="mapping-title">Design-system and brand mapping</h2><p class="section-intro">Structure and interaction patterns stay aligned with the supplied Szallas design system; SPA.cz identity replaces the borrowed product color layer.</p></div></div>
+    <table class="mapping-table">
+      <thead><tr><th>Element</th><th>Confirmed source</th><th>Prototype mapping</th><th>Decision</th></tr></thead>
+      <tbody>
+        <tr><td>Primary brand</td><td>SPA.cz extranet variables and logo</td><td><span class="swatch" style="background:#1174BB"></span><code>#1174BB</code></td><td>Primary actions, links and selected navigation.</td></tr>
+        <tr><td>Primary dark</td><td>SPA.cz extranet variables</td><td><span class="swatch" style="background:#0F5180"></span><code>#0F5180</code></td><td>Strong emphasis, headings on color and navigation depth.</td></tr>
+        <tr><td>Positive states and actions</td><td>SPA.cz extranet variables</td><td><span class="swatch" style="background:#89C02C"></span><code>#89C02C</code> · <span class="swatch" style="background:#76B82A"></span><code>#76B82A</code></td><td>Brand-positive status and positive operational actions; action hover uses <code>#5FA013</code>.</td></tr>
+        <tr><td>Canvas and line</td><td>SPA.cz extranet variables</td><td><span class="swatch" style="background:#EEF3F5"></span><code>#EEF3F5</code> · <span class="swatch" style="background:#E1EAEF"></span><code>#E1EAEF</code></td><td>Quiet operational surface with explicit boundaries.</td></tr>
+        <tr><td>Keyboard focus</td><td>SPA.cz semantic skin</td><td><code>#1174BB33</code> halo · <code>#1174BBCC</code> edge</td><td>Visible focus treatment remains part of the app contract.</td></tr>
+        <tr><td>Type</td><td>Szallas design-system typography</td><td>Outfit headings · DM Sans body/UI</td><td>Kept from the supplied mobile design system.</td></tr>
+        <tr><td>Shape and rhythm</td><td>Szallas radius and spacing frames</td><td>8–12 px cards/controls; 70% layout rhythm</td><td>Compact spacing without shrinking type, icons or 44 px minimum tap targets.</td></tr>
+      </tbody>
+    </table>
+    <p class="muted" style="font-size:13px;line-height:1.55">Design-system evidence frames: color <code>8778:30914</code>, semantic color <code>8922:35914</code>, spacing <code>8779:34761</code>, radius <code>8779:34779</code>, shadows <code>4279:13739</code>, mobile typography <code>8778:32941</code>, buttons <code>3097:13934</code>, inputs <code>4909:20695</code>, header <code>6032:15106</code>, bottom navigation <code>4176:3888</code>, sheet <code>6281:4792</code>, reservations <code>6726:7931</code>.</p>
+  </section>
+
+  <section class="section" aria-labelledby="rules-title">
+    <div class="section-head"><div><h2 id="rules-title">Business rules, not visual taste</h2></div></div>
+    <div class="note">
+      <ul class="rules">
+        <li>An active channel manager makes availability read-only in the partner panel — <code>AvailabilityOverviewController.php:19–32</code> and <code>availability-overview/index.tpl:1–5</code>.</li>
+        <li>Billing approval requires an eligible account; dispute additionally requires a reason and a positive price — <code>ajax/BillingController.php:43–112</code>.</li>
+        <li>Reservation detail is scoped to the selected hotel/product and assembles rooms, guests, status, voucher, cancellation, package, contact and invoice context — <code>ReservationsController.php:46–157</code>.</li>
+        <li>The public fixture is SPA HOTEL ČAJKOVSKIJ: 3 days, 2 nights, from 3,577 CZK, check-in 14:00 and check-out 10:00 — verified on the <a href="https://www.spa.cz/lazne-karlovy-vary/spa-hotel-cajkovskij/wellness-pobyt-dle-vaseho-vyberu/">public package page</a> on 7 August 2026.</li>
+        <li>The prototype uses deterministic fixture data only. No production database dump or local copy of the supplied user row is required.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="privacy-title">
+    <div class="section-head"><div><h2 id="privacy-title">Comment privacy</h2></div></div>
+    <div class="note privacy">
+      <p>The comment layer is included but currently disabled because <code>comments.config.json</code> is intentionally absent. When configured, Google-signed-in comments use the selected third-party Firebase project and threads are stored there, not in these static files. Reviewer allowlists are required. Comment dumps contain reviewer names and email addresses; keep them private and never commit or publish them.</p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="handoff-title">
+    <div class="section-head"><div><h2 id="handoff-title">Handoff</h2></div></div>
+    <div class="note handoff">
+      <p><strong>Design:</strong> <a href="spa-cz-partner-mobile.fig"><code>spa-cz-partner-mobile.fig</code></a> contains 24 editable mobile frames: 8 Czech, 8 English and 8 declared states, all at 390 px. Drag it onto the Figma home screen; reload once if the first import remains on its loading bar.</p>
+      <p><strong>Development:</strong> <code>tokens-m.css</code> and <code>app-m.css</code> are the mobile visual source of truth, <code>specs.html</code> documents the reusable patterns, and the screens are plain HTML/CSS/JS. <code>proto-m.js</code> and the <code>proto-*</code> files are prototype scaffolding, not production application code.</p>
+    </div>
+  </section>
+</main>
+</body>
+</html>

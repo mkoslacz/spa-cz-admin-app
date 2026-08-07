@@ -1,0 +1,200 @@
+/* Prototype-only behaviour and reviewer scaffolding. Product components live in app-m.css. */
+
+:focus-visible {
+  outline: 3px solid rgba(17, 116, 187, 0.42);
+  outline-offset: 2px;
+}
+
+.prototype-hint {
+  display: flex;
+  min-height: 28px;
+  align-items: center;
+  justify-content: center;
+  padding: 4px var(--space-3);
+  background: var(--ink-950);
+  color: var(--white);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 14px;
+  text-align: center;
+}
+
+.prototype-hint[hidden] {
+  display: none;
+}
+
+.langswitch {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.connection-pill {
+  display: inline-flex;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 22px;
+  align-items: center;
+  gap: 4px;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--success-100);
+  color: var(--success-700);
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 14px;
+  white-space: nowrap;
+}
+
+.connection-pill > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.connection-pill::before {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: currentColor;
+  content: "";
+}
+
+body[data-connection="chm"] .connection-pill {
+  background: #e8f3fb;
+  color: var(--brand-700);
+}
+
+.connection-manual,
+.connection-chm {
+  display: none;
+}
+
+body[data-connection="manual"] .connection-manual,
+body[data-connection="chm"] .connection-chm {
+  display: block;
+}
+
+.nav-badge {
+  position: absolute;
+  top: 5px;
+  left: calc(50% + 7px);
+  display: grid;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  place-items: center;
+  border: 2px solid var(--white);
+  border-radius: var(--radius-full);
+  background: var(--danger-700);
+  color: var(--white);
+  font-size: 9px;
+  font-weight: 900;
+  line-height: 12px;
+}
+
+body[data-inv="some"] .nav-badge[data-kind="reservation"] {
+  min-width: 14px;
+  height: 14px;
+  font-size: 0;
+}
+
+body[data-inv="some"] .nav-badge[data-kind="reservation"]::after {
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-full);
+  background: currentColor;
+  content: "";
+}
+
+body[data-inv="none"] .nav-badge[data-kind="reservation"] {
+  display: none;
+}
+
+.toast {
+  position: fixed;
+  z-index: 1000;
+  right: max(var(--space-3), calc((100vw - var(--mobile-width)) / 2 + var(--space-3)));
+  bottom: calc(var(--bottom-nav-height) + var(--space-3));
+  left: max(var(--space-3), calc((100vw - var(--mobile-width)) / 2 + var(--space-3)));
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  transform: translateY(180%);
+  border-radius: var(--radius-12);
+  background: var(--ink-950);
+  box-shadow: var(--shadow-float);
+  color: var(--white);
+  font-size: var(--small-size);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform var(--motion-base), opacity var(--motion-base);
+}
+
+.toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.toast::before {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  place-items: center;
+  border-radius: var(--radius-full);
+  background: var(--accent-500);
+  color: #173600;
+  content: "✓";
+  font-weight: 900;
+}
+
+.state-debug {
+  display: none;
+}
+
+body[data-export="1"] {
+  min-height: 0;
+  box-shadow: none;
+}
+
+body[data-export="1"] .prototype-hint,
+body[data-export="1"] .toast {
+  display: none !important;
+}
+
+body[data-export="1"] .mobile-header,
+body[data-export="1"] .sticky-action-bar,
+body[data-export="1"] .mobile-bottom-nav {
+  position: relative;
+  inset: auto;
+}
+
+body[data-export="1"] .mobile-bottom-nav {
+  width: 100%;
+  margin-top: var(--space-3);
+}
+
+body[data-export="1"] .mobile-app {
+  padding-bottom: 0;
+}
+
+body[data-export="1"] .modal-backdrop {
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

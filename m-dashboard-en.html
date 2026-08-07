@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=390, initial-scale=1, maximum-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Overview · SPA.CZ partner app prototype</title>
+  <link rel="stylesheet" href="tokens-m.css?v=20260807c">
+  <link rel="stylesheet" href="app-m.css?v=20260807c">
+  <link rel="stylesheet" href="proto-tools.css?v=20260807c">
+  <link rel="stylesheet" href="proto-comments.css?v=20260807c">
+  <link rel="stylesheet" href="proto-m.css?v=20260807c">
+</head>
+<body data-page="dashboard" data-viewport="mobile" data-auth="in" data-access="full" data-connection="manual" data-density="dense" data-inv="many" data-hotel="active">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="prototype-hint">Interactive prototype · public package facts + clearly labelled demo account data</div>
+  <nav class="langswitch" aria-label="Language">
+    <a href="m-dashboard.html" data-carry-state data-lang="cs" class="">CZ</a>
+    <a href="m-dashboard-en.html" data-carry-state data-lang="en" class="on">EN</a>
+  </nav>
+  <div class="product-surface">
+    <div class="mobile-app">
+      <header class="mobile-header">
+    <button class="mobile-brand" type="button" data-open-sheet="property-sheet" aria-label="Select property">
+      <img src="assets/logo.svg" alt="SPA.CZ">
+      <span class="hotel-summary">
+        <strong>SPA HOTEL ČAJKOVSKIJ</strong>
+        <small><span class="connection-pill"><span class="connection-manual">Manual</span><span class="connection-chm">Channel Manager</span></span></small>
+      </span>
+    </button>
+    <button class="header-button" type="button" data-toast="In prototype: notification centre." aria-label="Notifications"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M18 16v-5a6 6 0 0 0-5-5.9V4a1 1 0 0 0-2 0v1.1A6 6 0 0 0 6 11v5l-2 2h16l-2-2Zm-8 3h4a2 2 0 0 1-4 0Z"/></svg></button>
+  </header>
+      <main class="mobile-main" id="main">
+        <div class="page-head">
+    <div><h1>Overview</h1><p>Today’s operation and partner tasks in one place.</p><span class="demo-label">Demo data</span></div>
+    
+  </div>
+    <div class="alert warning readonly-alert"><strong>Read-only access.</strong>&nbsp;Editing is disabled for this role.</div>
+  
+  <div class="alert info test-alert"><strong>Test property.</strong>&nbsp;Changes are not published on SPA.CZ.</div>
+    <div class="metrics-grid inventory-content">
+      <article class="card metric-card"><span class="metric-icon"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M5 3h2v2h10V3h2v2h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h1V3Zm15 7H4v10h16V10ZM7 12h3v3H7v-3Zm5 0h3v3h-3v-3Zm5 0h2v3h-2v-3ZM7 17h3v2H7v-2Zm5 0h3v2h-3v-2Z"/></svg></span><div class="metric-copy"><small>Today’s arrivals · demo</small><strong class="metric-value">4</strong></div></article>
+      <article class="card metric-card"><span class="metric-icon"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 11h5v-2h-4V6h-2v7h1Z"/></svg></span><div class="metric-copy"><small>Today’s departures · demo</small><strong class="metric-value">3</strong></div></article>
+      <article class="card metric-card"><span class="metric-icon"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M3 4h2v8h4V7h6a4 4 0 0 1 4 4v1h2v8h-2v-2H5v2H3V4Zm8 8h6v-1a2 2 0 0 0-2-2h-4v3Z"/></svg></span><div class="metric-copy"><small>Rooms available · demo</small><strong class="metric-value">22</strong></div></article>
+      <article class="card metric-card"><span class="metric-icon"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M5 2h14v20l-3-2-2 2-2-2-2 2-2-2-3 2V2Zm4 5h6V5H9v2Zm-1 4h8V9H8v2Zm0 4h8v-2H8v2Z"/></svg></span><div class="metric-copy"><small>Awaiting approval · demo</small><strong class="metric-value">3</strong></div></article>
+    </div>
+    <div class="empty-state"><div class="empty-inner">
+    <svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m3 12 9-9h7a2 2 0 0 1 2 2v7l-9 9L3 12Zm13-4.5A1.5 1.5 0 1 0 16 4a1.5 1.5 0 0 0 0 3.5Z"/></svg>
+    <h2>No demo activity</h2>
+    <p>Demo inventory is set to none.</p>
+  </div></div>
+
+    <div class="section-head"><h2>Needs attention</h2><span class="demo-label">Demo</span></div>
+    <section class="card flush inventory-content">
+      <ul class="task-list">
+        <li class="task-item" data-inventory-rank="1"><span class="task-count">3</span><span><strong>Reservations to settle</strong><small>Review price and commission</small></span><a href="m-billing-en.html" data-carry-state aria-label="Open billing"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m9 18 6-6-6-6-1.4 1.4 4.6 4.6-4.6 4.6L9 18Z"/></svg></a></li>
+        <li class="task-item" data-inventory-rank="2"><span class="task-count">2</span><span><strong>Changes await approval</strong><small>Four-eyes process · demo</small></span><a href="m-more-en.html#changes" data-carry-state aria-label="Open changes"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m9 18 6-6-6-6-1.4 1.4 4.6 4.6-4.6 4.6L9 18Z"/></svg></a></li>
+        <li class="task-item" data-inventory-rank="3"><span class="task-count">7</span><span><strong>Low availability</strong><small>Seven nights in the demo calendar</small></span><a href="m-availability-en.html" data-carry-state aria-label="Open availability"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m9 18 6-6-6-6-1.4 1.4 4.6 4.6-4.6 4.6L9 18Z"/></svg></a></li>
+      </ul>
+    </section>
+
+    <div class="section-head"><h2>Recent reservations</h2><a href="m-reservations-en.html" data-carry-state>View all</a></div>
+    <div class="reservation-list inventory-content">
+      <a class="reservation-card" data-inventory-rank="1" href="m-reservation-detail-en.html?reservation=DEMO-10482" data-carry-state>
+    <div class="card-line"><strong class="truncate">Jana Nováková</strong><span class="status success">Confirmed</span></div>
+    <div class="card-line secondary"><span>DEMO-10482 · demo</span><span>Created 8. 10.</span></div>
+    <div class="card-line financial"><span>12.–14. 10. 2026</span><strong>7 154 Kč</strong></div>
+  </a>
+      <a class="reservation-card" data-inventory-rank="2" href="m-reservation-detail-en.html?reservation=DEMO-10477" data-carry-state>
+    <div class="card-line"><strong class="truncate">Petr Dvořák</strong><span class="status info">New</span></div>
+    <div class="card-line secondary"><span>DEMO-10477 · demo</span><span>Created 8. 10.</span></div>
+    <div class="card-line financial"><span>16.–19. 10. 2026</span><strong>6 240 Kč</strong></div>
+  </a>
+    </div>
+
+    <div class="section-head"><h2>Public offer fact</h2></div>
+    <article class="offer-card">
+      <div class="offer-visual"><div><small>SPA HOTEL ČAJKOVSKIJ</small><strong>3 days / 2 nights</strong></div></div>
+      <div class="offer-copy"><h2>Stay on SPA.CZ</h2><p>Publicly verified facts used as the prototype pricing baseline.</p></div>
+      <div class="offer-price"><div><small>from</small><strong data-price="base">3 577 Kč</strong></div><a class="button primary" href="m-offer-en.html" data-carry-state>Offer</a></div>
+    </article>
+      </main>
+      <nav class="mobile-bottom-nav" aria-label="Primary navigation">
+    <a href="m-dashboard-en.html" data-carry-state class="active" aria-current="page">
+    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M4 13h6V4H4v9Zm0 7h6v-5H4v5Zm10 0h6v-9h-6v9Zm0-16v5h6V4h-6Z"/></svg><span>Overview</span>
+  </a>
+    <a href="m-reservations-en.html" data-carry-state class="" >
+    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M6 3h12a2 2 0 0 1 2 2v15l-3-2-3 2-3-2-3 2-3-2-3 2V5a2 2 0 0 1 2-2h2Zm2 5h8V6H8v2Zm0 4h8v-2H8v2Zm0 4h5v-2H8v2Z"/></svg><span class="nav-badge" data-kind="reservation">5</span><span>Reservations</span>
+  </a>
+    <a href="m-availability-en.html" data-carry-state class="" >
+    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M5 3h2v2h10V3h2v2h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h1V3Zm15 7H4v10h16V10ZM7 12h3v3H7v-3Zm5 0h3v3h-3v-3Zm5 0h2v3h-2v-3ZM7 17h3v2H7v-2Zm5 0h3v2h-3v-2Z"/></svg><span>Availability</span>
+  </a>
+    <a href="m-offer-en.html" data-carry-state class="" >
+    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m3 12 9-9h7a2 2 0 0 1 2 2v7l-9 9L3 12Zm13-4.5A1.5 1.5 0 1 0 16 4a1.5 1.5 0 0 0 0 3.5Z"/></svg><span>Offer</span>
+  </a>
+    <a href="m-more-en.html" data-carry-state class="" >
+    <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M5 10a2 2 0 1 1 0 4 2 2 0 0 1 0-4Zm7 0a2 2 0 1 1 0 4 2 2 0 0 1 0-4Zm7 0a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z"/></svg><span class="nav-badge" data-kind="changes">2</span><span>More</span>
+  </a>
+  </nav>
+    </div>
+  </div>
+  <section class="signed-out-wall"><div class="wall-card"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm6-1a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM9 13c-4 0-7 2-7 5v2h14v-2c0-3-3-5-7-5Zm7 0c-.6 0-1.2.1-1.8.2 2.3 1 3.8 2.7 3.8 4.8v2h4v-2c0-3-2.6-5-6-5Z"/></svg><h1>Signed-out demo account</h1><p>Use the floating settings panel to switch back to “Signed in”. No real credentials are used.</p><button class="button primary" type="button" data-toast="Use the prototype settings panel to sign in.">Open demo account</button></div></section>
+  <section class="access-wall"><div class="wall-card"><svg class="" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="m19.4 13 .1-1-.1-1 2-1.5-2-3.4-2.4 1a8 8 0 0 0-1.7-1L15 3.5h-4l-.4 2.6a8 8 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.5-.1 1 .1 1-2 1.5 2 3.4 2.4-1a8 8 0 0 0 1.7 1l.4 2.6h4l.4-2.6a8 8 0 0 0 1.7-1l2.4 1 2-3.4-2-1.5ZM13 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z"/></svg><h1>No access in this demo state</h1><p>Use the floating settings panel to select Read only or Full access.</p></div></section>
+  <div class="modal-backdrop" id="property-sheet" aria-hidden="true"><section class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="property-sheet-title"><div class="sheet-grabber"></div><header class="sheet-head"><h2 id="property-sheet-title">Select property</h2><button class="header-button" type="button" data-close-sheet aria-label="Close">×</button></header><div class="sheet-body"><button class="button full primary" type="button" data-close-sheet>SPA HOTEL ČAJKOVSKIJ <span class="test-label">TEST</span></button><p class="subtle">The only public property used in the prototype.</p></div></section></div>
+  <div class="toast" role="status" aria-live="polite"></div>
+  <div class="state-debug" data-state-output></div>
+  <a class="screen-reader-only" href="m-dashboard.html" data-carry-state>Čeština</a>
+  <script src="proto-tools.js?v=20260807c" defer></script>
+  <script src="proto-comments.js?v=20260807c" defer></script>
+  <script src="proto-m.js?v=20260807c" defer></script>
+</body>
+</html>

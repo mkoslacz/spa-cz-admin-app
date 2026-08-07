@@ -1,0 +1,181 @@
+{
+  "_comment": "Manifest for the mobile-only SPA.cz partner app prototype. One entry is one editable Figma frame; URL parameters pin every exported demo state.",
+  "fileName": "SPA.cz Partner — Mobile App",
+  "canvasName": "SPA.cz Partner — Mobile App",
+  "out": "spa-cz-partner-mobile.fig",
+  "background": "#EEF3F5",
+  "thumbnail": "preview-m-dashboard.png",
+  "pagesDir": ".",
+  "assets": "assets",
+  "dumpDir": "tools/dumps",
+  "schemaFrom": "tools/.schema/canvas.fig",
+  "width": 390,
+  "jobs": 3,
+  "refresh": {
+    "previews": {
+      "command": ["node", "tools/capture-previews.js"],
+      "timeoutMs": 180000
+    }
+  },
+  "rows": [
+    {
+      "label": "Mobile app · Czech",
+      "frames": [
+        {
+          "id": "m-dashboard",
+          "page": "m-dashboard.html",
+          "width": 390,
+          "name": "Mobile / Dashboard"
+        },
+        {
+          "id": "m-reservations",
+          "page": "m-reservations.html",
+          "width": 390,
+          "name": "Mobile / Reservations"
+        },
+        {
+          "id": "m-reservation-detail",
+          "page": "m-reservation-detail.html",
+          "width": 390,
+          "name": "Mobile / Reservation detail"
+        },
+        {
+          "id": "m-availability",
+          "page": "m-availability.html",
+          "width": 390,
+          "name": "Mobile / Availability"
+        },
+        {
+          "id": "m-offer",
+          "page": "m-offer.html",
+          "width": 390,
+          "name": "Mobile / Offer"
+        },
+        {
+          "id": "m-rate-edit",
+          "page": "m-rate-edit.html",
+          "width": 390,
+          "name": "Mobile / Rate edit"
+        },
+        {
+          "id": "m-billing",
+          "page": "m-billing.html",
+          "width": 390,
+          "name": "Mobile / Billing"
+        },
+        {
+          "id": "m-more",
+          "page": "m-more.html",
+          "width": 390,
+          "name": "Mobile / More"
+        }
+      ]
+    },
+    {
+      "label": "Mobile app · English",
+      "frames": [
+        {
+          "id": "m-dashboard-en",
+          "page": "m-dashboard-en.html",
+          "width": 390,
+          "name": "Mobile EN / Dashboard"
+        },
+        {
+          "id": "m-reservations-en",
+          "page": "m-reservations-en.html",
+          "width": 390,
+          "name": "Mobile EN / Reservations"
+        },
+        {
+          "id": "m-reservation-detail-en",
+          "page": "m-reservation-detail-en.html",
+          "width": 390,
+          "name": "Mobile EN / Reservation detail"
+        },
+        {
+          "id": "m-availability-en",
+          "page": "m-availability-en.html",
+          "width": 390,
+          "name": "Mobile EN / Availability"
+        },
+        {
+          "id": "m-offer-en",
+          "page": "m-offer-en.html",
+          "width": 390,
+          "name": "Mobile EN / Offer"
+        },
+        {
+          "id": "m-rate-edit-en",
+          "page": "m-rate-edit-en.html",
+          "width": 390,
+          "name": "Mobile EN / Rate edit"
+        },
+        {
+          "id": "m-billing-en",
+          "page": "m-billing-en.html",
+          "width": 390,
+          "name": "Mobile EN / Billing"
+        },
+        {
+          "id": "m-more-en",
+          "page": "m-more-en.html",
+          "width": 390,
+          "name": "Mobile EN / More"
+        }
+      ]
+    },
+    {
+      "label": "Mobile app · declared states",
+      "frames": [
+        {
+          "id": "m-dashboard-read-compact",
+          "page": "m-dashboard.html?access=read&density=compact",
+          "width": 390,
+          "name": "Mobile / Dashboard — read-only compact"
+        },
+        {
+          "id": "m-reservations-some",
+          "page": "m-reservations.html?inv=some&density=compact",
+          "width": 390,
+          "name": "Mobile / Reservations — shorter queue"
+        },
+        {
+          "id": "m-reservations-empty",
+          "page": "m-reservations.html?inv=none&density=dense",
+          "width": 390,
+          "name": "Mobile / Reservations — empty inventory"
+        },
+        {
+          "id": "m-availability-chm",
+          "page": "m-availability.html?connection=chm&access=full",
+          "width": 390,
+          "name": "Mobile / Availability — channel manager"
+        },
+        {
+          "id": "m-offer-test",
+          "page": "m-offer.html?hotel=test&inv=some",
+          "width": 390,
+          "name": "Mobile / Offer — test property"
+        },
+        {
+          "id": "m-rate-edit-read",
+          "page": "m-rate-edit.html?access=read",
+          "width": 390,
+          "name": "Mobile / Rate edit — read only"
+        },
+        {
+          "id": "m-billing-en-read",
+          "page": "m-billing-en.html?access=read&inv=many",
+          "width": 390,
+          "name": "Mobile EN / Billing — read only"
+        },
+        {
+          "id": "m-more-en-signed-out",
+          "page": "m-more-en.html?auth=out&access=none&hotel=test",
+          "width": 390,
+          "name": "Mobile EN / More — signed out, no access, test property"
+        }
+      ]
+    }
+  ]
+}
