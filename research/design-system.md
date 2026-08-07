@@ -7,11 +7,12 @@ design file.
 
 ## Prototype scope
 
-The deliverable is a **mobile application at a 390 px review viewport only**.
+The deliverable is a **mobile application at a 390 × 844 phone review viewport only**.
 Desktop web navigation, sidebars, desktop content widths and desktop screen
 claims are out of scope. Desktop values encountered in the legacy partner
 source are research evidence only and must not be interpreted as prototype
-requirements.
+requirements. The live HTML remains vertically scrollable; 844 px is the
+review-capture and editable-frame height, not a content-height limit.
 
 ## Source handling
 
@@ -237,6 +238,25 @@ extranet's Poppins declaration is not carried over. Colour semantics come from
 the SPA.CZ extranet, so the Szallas purple skin and the Hotely.cz colour skin
 are not carried over.
 
+## Workshop readability override
+
+The 7 August 2026 review established a product-specific readability correction
+on top of the sourced SPA.CZ values:
+
+- application canvas and primary surfaces use white (`#FFFFFF`);
+- primary text uses near-black (`#111111`) and boundaries use neutral greys;
+- SPA.CZ blue (`#1174BB`) remains the navigation, link, icon and action colour;
+- SPA.CZ green (`#76B82A` / `#89C02C`) remains the positive-state colour;
+- the implemented type floor is body 17/24, supporting 15/21, metadata 13/18
+  and bottom-navigation labels 12/16;
+- review captures and editable frames use 390 × 844, while HTML screens scroll;
+- prototype scaffolding is outside the product surface; the former top hint bar
+  is intentionally absent.
+
+This is one shared semantic layer in `tokens-m.css`, not a set of per-screen
+exceptions. The source colour table above remains intact as provenance; this
+section records the approved applied mapping.
+
 ## Prototype density override
 
 Mateusz requested approximately 30% less whitespace. The prototype therefore
@@ -281,22 +301,23 @@ and compressed prototype values are separate facts. New screens use the same
 
 ## Component measurement contract
 
-- Mobile review viewport: 390 px. The 375 px Figma frames remain source
-  references, while the prototype uses fluid content inside the 390 px frame.
+- Mobile review viewport: 390 × 844. The 375 px Figma frames remain source
+  references, while the prototype uses fluid content inside the 390 px frame
+  and remains vertically scrollable below the captured fold.
 - Mobile content inset: 12 px in the prototype (16 px original, compressed by
   the global rule).
 - App header: 56 px high; 24 px icons inside 48 px hit areas.
-- Bottom navigation: 64 px high; four equal tabs; 20 px icon; 10/12 px label.
+- Bottom navigation: 64 px high; four equal tabs; 20 px icon; 12/16 px label.
 - Primary mobile controls: 48 px high, 8 px radius.
-- Inputs: 14/20 px label, 4 px label gap, 48 px field, 8 px radius,
+- Inputs: 15/21 px label, 4 px label gap, 48 px field, 8 px radius,
   12 px prototype horizontal inset (16 px original), 16/22 px value and
-  12/16 px helper/error text.
+  13/18 px helper/error text.
 - Buttons: XL/L/M/S heights 64/48/40/32 px; use L (48 px) for the main mobile
   action. Keep a minimum 44 × 44 px hit area for smaller visual variants.
 - Cards: white surface, 8 or 12 px radius; list cards normally use a 1 px
   separator instead of an added shadow. Prototype card padding is 12 px where
   the source uses 16 px.
-- Status chips: neutral-200 (`#F7F5F3`) surface, 8 px radius, 12/16 px type.
+- Status chips: neutral-200 (`#F7F5F3`) surface, 8 px radius, 13/18 px type.
 - Digit badge: 16 × 16 px for one digit, 23 × 16 px for two digits, 8 × 8 px
   for a dot, with a full radius.
 - Bottom sheet: `rgba(0,0,0,.4)` scrim, 24 px top radius, 32 × 4 px drag
@@ -305,18 +326,18 @@ and compressed prototype values are separate facts. New screens use the same
   336 × 372 px month, 40 px month header, seven 48 × 48 px weekday/day cells,
   136 px sticky bottom affix and a 48 px action.
 - Reservation list: 56 px header plus 64 px filter strip; cards are 170–218 px
-  high with a bottom separator. Card title is Outfit 18/22; metadata is
-  DM Sans 12/16.
+  high with a bottom separator. Card title is Outfit 19/24; metadata is
+  DM Sans 13/18.
 - Horizontal reservation card: 375 × 258 px with a bottom border.
 - Vertical reservation card: 220 × 394 px, 12 px radius and 1 px neutral border.
 
 Partner matrices preserve current product geometry where it is functional
 data rather than decorative whitespace, then adapt the leading column for the
-390 px application frame:
+390 × 844 phone review frame:
 
-- mobile availability descriptor column: 132 px; day cell: 52 px wide; row:
-  at least 52 px high;
-- mobile rate descriptor column: 132 px; day/value cell: 82 px wide; row:
+- mobile availability descriptor column: 138 px; day cell: 54 px wide; row:
+  at least 56 px high;
+- mobile rate descriptor column: 138 px; day/value cell: 82 px wide; row:
   at least 56 px high, with a 48 px input inside it;
 - the header row and 132 px descriptor column remain sticky;
 - horizontal overflow is a required touch interaction, not a clipped layout.
@@ -324,7 +345,8 @@ data rather than decorative whitespace, then adapt the leading column for the
 The source day-cell geometry is evidenced in
 `www/extranetspacz/less/main/pages/availability-overview/index.less:33-106`
 and `www/extranetspacz/less/main/pages/rates/accommodation.less:73-146`; the
-132 px leading column and 56 px rate row are the mobile prototype adaptation.
+138 px leading column and 56 px rows are the readable mobile prototype
+adaptation.
 
 The developer-facing visual reference for these measurements is
 `../specs.html`.

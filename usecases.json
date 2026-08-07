@@ -103,7 +103,7 @@
         "The populated fixture is deterministic across Czech and English app screens."
       ],
       "screens": ["m-dashboard.html", "m-reservations.html"],
-      "viewport": { "name": "mobile", "width": 390 },
+      "viewport": { "name": "mobile", "width": 390, "height": 844 },
       "state": {
         "auth": "in",
         "access": "full",
@@ -122,7 +122,7 @@
         "The selected reservation opens the same detail record from each queue presentation."
       ],
       "screens": ["m-reservations.html", "m-reservation-detail.html"],
-      "viewport": { "name": "mobile", "width": 390 },
+      "viewport": { "name": "mobile", "width": 390, "height": 844 },
       "state": {
         "auth": "in",
         "access": "full",
@@ -141,7 +141,7 @@
         "Filters remain available so the partner can broaden the search."
       ],
       "screens": ["m-reservations.html"],
-      "viewport": { "name": "mobile", "width": 390 },
+      "viewport": { "name": "mobile", "width": 390, "height": 844 },
       "state": {
         "auth": "in",
         "access": "full",
@@ -164,7 +164,7 @@
         "m-rate-edit.html",
         "m-billing.html"
       ],
-      "viewport": { "name": "mobile", "width": 390 },
+      "viewport": { "name": "mobile", "width": 390, "height": 844 },
       "state": {
         "auth": "in",
         "access": "read",
@@ -183,7 +183,7 @@
         "The test-property label remains visible wherever it prevents confusion about live operations."
       ],
       "screens": ["m-more.html"],
-      "viewport": { "name": "mobile", "width": 390 },
+      "viewport": { "name": "mobile", "width": 390, "height": 844 },
       "state": {
         "auth": "out",
         "access": "none",
@@ -202,7 +202,7 @@
         "The page still presents the selected date range and room-day values for review."
       ],
       "screens": ["m-availability.html"],
-      "viewport": { "name": "mobile", "width": 390 },
+      "viewport": { "name": "mobile", "width": 390, "height": 844 },
       "state": {
         "auth": "in",
         "access": "full",
@@ -221,7 +221,7 @@
         "Offer and rate actions respect the selected access level."
       ],
       "screens": ["m-offer.html", "m-rate-edit.html"],
-      "viewport": { "name": "mobile", "width": 390 },
+      "viewport": { "name": "mobile", "width": 390, "height": 844 },
       "state": {
         "auth": "in",
         "access": "full",
@@ -240,7 +240,7 @@
         "A dispute requires a reason and a positive price; the prototype demonstrates validation without making a backend write."
       ],
       "screens": ["m-billing.html", "m-reservation-detail.html"],
-      "viewport": { "name": "mobile", "width": 390 },
+      "viewport": { "name": "mobile", "width": 390, "height": 844 },
       "state": {
         "auth": "in",
         "access": "full",

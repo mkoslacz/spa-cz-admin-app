@@ -162,14 +162,23 @@ function deepLink(screen, state) {
 }
 
 function viewportFor(screen, usecase) {
+  const fallbackName = /^m-/.test(path.basename(screen)) ? 'mobile' : 'desktop';
   if (usecase.viewport && typeof usecase.viewport === 'object' && !Array.isArray(usecase.viewport)) {
+    const name = usecase.viewport.name || fallbackName;
     const width = Number(usecase.viewport.width);
-    if (Number.isFinite(width) && width > 0)
-      return { name: usecase.viewport.name || (width < 700 ? 'mobile' : 'desktop'), width };
+    const height = Number(usecase.viewport.height);
+    if (Number.isSafeInteger(width) && width > 0 && Number.isSafeInteger(height) && height > 0)
+      return { name, width, height };
+    throw new ToolError('use case "' + usecase.id + '" viewport must declare positive integer width and height');
   }
-  if (typeof usecase.viewport === 'string')
-    return { name: usecase.viewport, width: usecase.viewport === 'mobile' ? 430 : 1440 };
-  return /^m-/.test(path.basename(screen)) ? { name: 'mobile', width: 430 } : { name: 'desktop', width: 1440 };
+  if (typeof usecase.viewport === 'string') {
+    return usecase.viewport === 'mobile'
+      ? { name: 'mobile', width: 390, height: 844 }
+      : { name: usecase.viewport, width: 1440, height: 900 };
+  }
+  return fallbackName === 'mobile'
+    ? { name: 'mobile', width: 390, height: 844 }
+    : { name: 'desktop', width: 1440, height: 900 };
 }
 
 function relativeScreenLink(outFile, root, screen, state) {
@@ -181,7 +190,13 @@ function relativeScreenLink(outFile, root, screen, state) {
 function normaliseUsecase(usecase, root) {
   const screens = usecase.screens.map(screen => {
     const viewport = viewportFor(screen, usecase);
-    return { screen, viewport: viewport.name, deepLink: deepLink(screen, usecase.state), width: viewport.width };
+    return {
+      screen,
+      viewport: viewport.name,
+      deepLink: deepLink(screen, usecase.state),
+      width: viewport.width,
+      height: viewport.height,
+    };
   });
   return {
     id: usecase.id,
@@ -259,7 +274,18 @@ function markdown(matrix, entries, outFile, root, captures, captureEnabled) {
     for (const screen of entry.screens) {
       const docLink = relativeScreenLink(outFile, root, screen.screen, entry.state);
       const capture = captures.get(entry.id + '\0' + screen.screen);
-      let line = '- **' + screen.viewport + '** — [' + screen.screen + '](' + docLink + ')';
+      let line =
+        '- **' +
+        screen.viewport +
+        ' · ' +
+        screen.width +
+        '×' +
+        screen.height +
+        '** — [' +
+        screen.screen +
+        '](' +
+        docLink +
+        ')';
       if (captureEnabled && capture) {
         const imageLink = path.relative(path.dirname(outFile), capture).split(path.sep).join('/');
         line += ' · [capture](' + imageLink + ')';
@@ -335,7 +361,7 @@ async function captureEntries(entries, root, outFile, dependencies = {}) {
         const temporary = target + '.tmp-' + process.pid + '-' + Math.random().toString(36).slice(2, 8);
         const page = await browser.newPage();
         try {
-          await page.setViewport({ width: screen.width, height: 1200 });
+          await page.setViewport({ width: screen.width, height: screen.height, deviceScaleFactor: 1 });
           const url = pathToFileURL(source);
           for (const [key, value] of new URLSearchParams(queryForState(entry.state, { nopanel: 1 })))
             url.searchParams.set(key, value);
@@ -345,14 +371,15 @@ async function captureEntries(entries, root, outFile, dependencies = {}) {
             'capture ' + entry.id + ' ' + screen.screen
           );
           await page.evaluate(() => document.fonts && document.fonts.ready);
-          const height = await page.evaluate(() =>
-            Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)
+          await page.evaluate(() => {
+            delete document.body.dataset.export;
+          });
+          await page.evaluate(
+            () => new Promise(resolve => window.requestAnimationFrame(() => window.requestAnimationFrame(resolve)))
           );
-          // This is the Puppeteer equivalent of an explicit --window-size=<width>,<height>.
-          await page.setViewport({ width: screen.width, height: Math.max(1, Math.ceil(height)) });
           fileSystem.mkdirSync(path.dirname(target), { recursive: true });
           await timeout(
-            page.screenshot({ path: temporary, fullPage: false }),
+            page.screenshot({ path: temporary, fullPage: false, captureBeyondViewport: false }),
             captureTimeout,
             'capture ' + entry.id + ' ' + screen.screen
           );
@@ -403,7 +430,7 @@ async function build(options, cwd = process.cwd()) {
     states: matrix.states,
     usecases: entries.map(({ screens, ...entry }) => ({
       ...entry,
-      screens: screens.map(({ width, ...screen }) => screen),
+      screens: screens.map(({ width, height, ...screen }) => screen),
     })),
   };
   writeAtomic(markdownOutput, markdown(matrix, entries, markdownOutput, root, captures, options.capture));
@@ -443,6 +470,7 @@ module.exports = {
   validateMatrix,
   queryForState,
   deepLink,
+  viewportFor,
   normaliseUsecase,
   markdown,
   captureEntries,

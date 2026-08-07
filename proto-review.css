@@ -101,7 +101,7 @@
 
 .rp-page {
   margin: 0; padding: 50px 20px;
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 15px; line-height: 1.55;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.55;
   color: var(--rp-ink); background: var(--rp-bg);
 }
 .rp-page * { box-sizing: border-box; }
@@ -110,14 +110,14 @@
 .rp-head { margin-bottom: 26px; }
 .rp-back {
   display: inline-block; margin-bottom: 14px;
-  color: var(--rp-accent-soft); font-size: 14px; font-weight: 700; text-decoration: none;
+  color: var(--rp-accent-soft); font-size: 15px; font-weight: 700; text-decoration: none;
 }
 .rp-back:hover { text-decoration: underline; }
 .rp-title { margin: 0 0 6px; font-size: 34px; line-height: 1.15; font-weight: 700; }
 .rp-title span { color: var(--rp-muted); font-weight: 500; }
-.rp-lede { margin: 0; max-width: 760px; color: var(--rp-muted); font-size: 15.5px; }
+.rp-lede { margin: 0; max-width: 760px; color: var(--rp-muted); font-size: 16px; }
 
-/* The nav strip is what makes the three pages one family from inside; the
+/* The header nav is what makes the three pages one family from inside; the
    back-link is what makes them one family with the hub. */
 .rp-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
 /* `display` at class specificity beats the UA sheet's `[hidden] { display: none }`,
@@ -132,6 +132,19 @@
   background: var(--rp-surface); box-shadow: var(--rp-shadow);
   color: var(--rp-accent); font-size: 13.5px; font-weight: 700; text-decoration: none;
 }
+.rp-head > .rp-nav {
+  width: min(100%, 360px);
+  flex-direction: column;
+  flex-wrap: nowrap;
+}
+.rp-head > .rp-nav a {
+  display: flex;
+  width: 100%; min-height: 44px;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 15px;
+}
 .rp-nav a:hover { border-color: var(--rp-accent); }
 .rp-nav a[aria-current="page"] {
   background: var(--rp-accent); border-color: var(--rp-accent); color: #fff;
@@ -142,14 +155,14 @@
 .rp-note {
   margin: 0 0 22px; padding: 14px 18px; border-radius: 14px;
   background: var(--rp-info-bg); border: 1px solid var(--rp-info-line);
-  color: var(--rp-accent-soft); font-size: 14.5px; line-height: 1.55;
+  color: var(--rp-accent-soft); font-size: 15px; line-height: 1.55;
 }
-.rp-note code { font-family: var(--rp-mono); font-size: 13px; }
+.rp-note code { font-family: var(--rp-mono); font-size: 14px; }
 .rp-note-warn {
   background: var(--rp-warn-bg); border-color: var(--rp-warn-line); color: var(--rp-warn-ink);
 }
 
-.rp-msg { margin: 0; padding: 18px 0; color: var(--rp-muted); font-size: 15px; }
+.rp-msg { margin: 0; padding: 18px 0; color: var(--rp-muted); font-size: 16px; }
 
 /* The page's content container. `<main>` is already a block, so this rule adds
    no appearance — it exists because the shell has to *declare* every class the
@@ -183,7 +196,7 @@
 .rp-section > h2 { margin: 0 0 14px; font-size: 22px; font-weight: 700; }
 .rp-section > h2 a { color: inherit; text-decoration: none; }
 .rp-sub {
-  margin: 0 0 12px; color: var(--rp-muted); font-size: 12px; font-weight: 800;
+  margin: 0 0 12px; color: var(--rp-muted); font-size: 14px; font-weight: 800;
   letter-spacing: .06em; text-transform: uppercase;
 }
 
@@ -200,25 +213,25 @@
 .rp-card p:last-child { margin-bottom: 0; }
 .rp-card a { color: var(--rp-accent-soft); }
 
-.rp-meta { color: var(--rp-muted); font-size: 13px; }
-.rp-meta .rp-mono { font-family: var(--rp-mono); font-size: 12.5px; }
+.rp-meta { color: var(--rp-muted); font-size: 15px; }
+.rp-meta .rp-mono { font-family: var(--rp-mono); font-size: 14px; }
 .rp-body { margin: 8px 0 0; white-space: pre-wrap; }
 
-.rp-links { margin-top: 10px; font-size: 13.5px; }
+.rp-links { margin-top: 10px; font-size: 15px; }
 .rp-links a { color: var(--rp-accent-soft); text-decoration: underline; text-underline-offset: 2px; }
 .rp-links a + a { margin-left: 10px; }
 
 .rp-tag {
   display: inline-block; padding: 1px 7px; border-radius: 5px;
   background: var(--rp-accent); color: #fff;
-  font-family: var(--rp-mono); font-size: 11.5px; font-weight: 400;
+  font-family: var(--rp-mono); font-size: 13px; font-weight: 500;
 }
 .rp-tag-open { background: #C2410C; }
 .rp-tag-done { background: #0B5E38; }
-.rp-delete-state { color: #7A3E06; font-size: 13px; }
+.rp-delete-state { color: #7A3E06; font-size: 15px; }
 .rp-delete-thread {
   min-height: 34px; margin-top: 10px; padding: 0 12px; border: 1px solid #9D1C2C; border-radius: 8px;
-  color: #7D1220; background: #FFF0F2; font: inherit; font-size: 13px; font-weight: 750; cursor: pointer;
+  color: #7D1220; background: #FFF0F2; font: inherit; font-size: 15px; font-weight: 750; cursor: pointer;
 }
 .rp-delete-thread:disabled { cursor: wait; opacity: .6; }
 
@@ -228,7 +241,7 @@
 a.rp-btn, button.rp-btn {
   display: inline-block; padding: 9px 18px; border: 0; border-radius: 10px;
   background: var(--rp-accent); color: #fff;
-  font: inherit; font-size: 14px; font-weight: 700; text-decoration: none; cursor: pointer;
+  font: inherit; font-size: 15px; font-weight: 700; text-decoration: none; cursor: pointer;
 }
 a.rp-btn:hover, button.rp-btn:hover { filter: brightness(1.35); }
 a.rp-btn-alt { background: var(--rp-surface); color: var(--rp-accent); box-shadow: inset 0 0 0 1.5px var(--rp-accent); }

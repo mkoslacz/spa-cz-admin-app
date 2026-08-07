@@ -28,9 +28,9 @@
       --spec-neutral-700: #57585A;
       --spec-neutral-800: #323334;
       --spec-neutral-900: #1E1E1E;
-      --spec-spa-bg: #EEF3F5;
-      --spec-spa-stroke: #E1EAEF;
-      --spec-spa-ink: #1C1F21;
+      --spec-spa-bg: #FFFFFF;
+      --spec-spa-stroke: #C9C9C9;
+      --spec-spa-ink: #111111;
       --spec-spa-blue: #1174BB;
       --spec-spa-blue-dark: #0F5180;
       --spec-spa-blue-light: #3EB3FF;
@@ -45,7 +45,7 @@
       margin: 0;
       background: var(--spec-spa-bg);
       color: var(--spec-spa-ink);
-      font: 500 14px/20px "DM Sans", sans-serif;
+      font: 500 16px/23px "DM Sans", sans-serif;
     }
 
     .spec-page button,
@@ -214,7 +214,7 @@
       overflow: hidden;
       border: 1px solid var(--spec-neutral-600);
       border-radius: 24px;
-      background: var(--spec-spa-bg);
+      background: var(--spec-white);
       box-shadow: 0 4px 16px rgba(0, 0, 0, .16);
     }
 
@@ -250,7 +250,7 @@
 
     .spec-app-title {
       flex: 1;
-      font: 700 16px/22px "DM Sans", sans-serif;
+      font: 700 17px/24px "DM Sans", sans-serif;
     }
 
     .spec-mobile-content {
@@ -269,7 +269,7 @@
     }
 
     .spec-mobile-card strong {
-      font: 600 18px/22px "Outfit", sans-serif;
+      font: 600 19px/24px "Outfit", sans-serif;
     }
 
     .spec-bottom-nav {
@@ -287,7 +287,7 @@
       justify-items: center;
       gap: 2px;
       color: var(--spec-neutral-700);
-      font: 600 10px/12px "DM Sans", sans-serif;
+      font: 600 12px/16px "DM Sans", sans-serif;
     }
 
     .spec-nav-item.is-active {
@@ -362,7 +362,7 @@
 
     .spec-field label {
       color: var(--spec-neutral-700);
-      font: 500 14px/20px "DM Sans", sans-serif;
+      font: 500 15px/21px "DM Sans", sans-serif;
     }
 
     .spec-input {
@@ -373,7 +373,7 @@
       border-radius: 8px;
       background: var(--spec-white);
       color: var(--spec-spa-ink);
-      font: 600 16px/22px "DM Sans", sans-serif;
+      font: 600 17px/24px "DM Sans", sans-serif;
     }
 
     .spec-field.focus .spec-input {
@@ -390,7 +390,7 @@
 
     .spec-helper {
       color: var(--spec-neutral-700);
-      font: 500 12px/16px "DM Sans", sans-serif;
+      font: 500 13px/18px "DM Sans", sans-serif;
     }
 
     .spec-field.error .spec-helper {
@@ -413,7 +413,7 @@
       border-radius: 8px;
       background: var(--spec-neutral-200);
       color: var(--spec-neutral-800);
-      font: 600 12px/16px "DM Sans", sans-serif;
+      font: 600 13px/18px "DM Sans", sans-serif;
     }
 
     .spec-chip.info {
@@ -472,7 +472,7 @@
     .spec-list-row small {
       display: block;
       color: var(--spec-neutral-700);
-      font: 500 12px/16px "DM Sans", sans-serif;
+      font: 500 13px/18px "DM Sans", sans-serif;
     }
 
     .spec-matrix-viewport {
@@ -513,9 +513,9 @@
       position: sticky;
       left: 0;
       z-index: 2;
-      width: 132px;
-      min-width: 132px;
-      max-width: 132px;
+      width: 138px;
+      min-width: 138px;
+      max-width: 138px;
       background: var(--spec-white);
       text-align: left;
       font-weight: 700;
@@ -537,14 +537,14 @@
 
     .spec-matrix.availability th,
     .spec-matrix.availability td {
-      height: 52px;
-      min-height: 52px;
+      height: 56px;
+      min-height: 56px;
     }
 
     .spec-matrix.availability .day-cell {
-      width: 52px;
-      min-width: 52px;
-      max-width: 52px;
+      width: 54px;
+      min-width: 54px;
+      max-width: 54px;
     }
 
     .spec-matrix.rates th,
@@ -567,7 +567,7 @@
       border-radius: 8px;
       background: var(--spec-white);
       color: var(--spec-spa-ink);
-      font: 600 14px/20px "DM Sans", sans-serif;
+      font: 600 15px/21px "DM Sans", sans-serif;
     }
 
     .spec-sheet-stage {
@@ -659,11 +659,11 @@
     <h1>SPA.CZ Partner App — mobile component specification</h1>
     <p>
       Developer-facing measurements for the clickable mobile application
-      prototype. Product scope is fixed to a 390 px review viewport.
+      prototype. Product scope is fixed to a 390 × 844 phone review viewport.
     </p>
     <div class="spec-scope" aria-label="Specification scope">
       <span class="spec-pill">Mobile app only</span>
-      <span class="spec-pill">390 px viewport</span>
+      <span class="spec-pill">390 × 844 phone viewport</span>
       <span class="spec-pill">SPA.CZ colour skin</span>
       <span class="spec-pill">0.70 spacing density</span>
     </div>
@@ -675,7 +675,8 @@
       <div class="spec-note">
         Desktop web navigation, sidebars, desktop content widths and desktop
         product screens are out of scope. The 375 px Figma screens are source
-        references; the delivered app is reviewed at 390 px.
+        references; review captures and editable frames use 390 × 844 while
+        the HTML application remains vertically scrollable.
       </div>
       <p>
         This page links the expected implementation stylesheets
@@ -727,22 +728,22 @@
           <div class="spec-swatch-copy"><strong>Brand / positive green</strong><code>#89C02C</code></div>
         </div>
         <div class="spec-swatch">
-          <div class="spec-swatch-color" style="background:#EEF3F5"></div>
-          <div class="spec-swatch-copy"><strong>Application background</strong><code>#EEF3F5</code></div>
+          <div class="spec-swatch-color" style="background:#FFFFFF"></div>
+          <div class="spec-swatch-copy"><strong>Application background</strong><code>#FFFFFF</code></div>
         </div>
         <div class="spec-swatch">
-          <div class="spec-swatch-color" style="background:#E1EAEF"></div>
-          <div class="spec-swatch-copy"><strong>SPA.CZ base stroke</strong><code>#E1EAEF</code></div>
+          <div class="spec-swatch-color" style="background:#C9C9C9"></div>
+          <div class="spec-swatch-copy"><strong>Neutral boundary</strong><code>#C9C9C9</code></div>
         </div>
         <div class="spec-swatch">
-          <div class="spec-swatch-color" style="background:#1C1F21"></div>
-          <div class="spec-swatch-copy"><strong>Primary ink</strong><code>#1C1F21</code></div>
+          <div class="spec-swatch-color" style="background:#111111"></div>
+          <div class="spec-swatch-copy"><strong>Primary ink</strong><code>#111111</code></div>
         </div>
       </div>
       <h3>Typography</h3>
       <ul class="spec-measure-list">
-        <li><strong>Headings:</strong> Outfit; H1 36/40, H2 32/36, H3 24/28, H4 22/26, H5 20/24, H6 18/22.</li>
-        <li><strong>Body and controls:</strong> DM Sans; 16/22, 14/20, 12/16 and 10/12.</li>
+        <li><strong>Headings:</strong> Outfit; H1 36/40, H2 32/36, H3 26/31, H4 24/29, H5 22/27, H6 19/24.</li>
+        <li><strong>Body and controls:</strong> DM Sans; body 17/24, supporting text 15/21, metadata 13/18 and navigation 12/16.</li>
         <li>Typography is not reduced by the density override.</li>
       </ul>
       <span class="spec-trace">Frames 8778:30914 · 8778:31203 · 8922:35914 · 8778:32941 · SPA source variables.less:9–35 · logo.svg:5–9</span>
@@ -770,7 +771,7 @@
 
     <section class="spec-section" id="mobile-shell">
       <h2>Mobile application shell</h2>
-      <div class="spec-mobile-frame" aria-label="390 pixel mobile shell example">
+      <div class="spec-mobile-frame" aria-label="390 by 844 pixel mobile shell example">
         <div class="spec-app-header">
           <button class="spec-icon-target" type="button" aria-label="Back"><span class="spec-icon-shape" aria-hidden="true">‹</span></button>
           <div class="spec-app-title">Availability</div>
@@ -778,7 +779,7 @@
         </div>
         <div class="spec-mobile-content">
           <div class="spec-mobile-card">
-            <strong>390 px application frame</strong>
+            <strong>390 × 844 review frame</strong>
             <span>12 px content inset and 8 px card rhythm after global compression.</span>
           </div>
           <div class="spec-mobile-card">
@@ -794,10 +795,10 @@
         </nav>
       </div>
       <ul class="spec-measure-list">
-        <li>Review viewport: 390 px.</li>
-        <li>Header: 56 px; title: DM Sans 16/22 Bold.</li>
+        <li>Review viewport: 390 × 844; the live HTML remains scrollable.</li>
+        <li>Header: 56 px; title: DM Sans 17/24 Bold.</li>
         <li>Content inset: 12 px (16 px source value compressed globally).</li>
-        <li>Bottom navigation: 64 px; four equal tabs; 20 px icon; 10/12 label.</li>
+        <li>Bottom navigation: 64 px; four equal tabs; 20 px icon; 12/16 label.</li>
       </ul>
       <span class="spec-trace">Frames 6032:15106 · 3015:226 · 7382:29745 · 4176:3888 · 4176:1998 · real screens 2572:121024 and 7490:107756</span>
     </section>
@@ -827,7 +828,7 @@
             <div class="spec-field">
               <label for="spec-default">Default</label>
               <input class="spec-input" id="spec-default" value="Property name" readonly>
-              <span class="spec-helper">Optional helper text uses 12/16.</span>
+              <span class="spec-helper">Optional helper text uses 13/18.</span>
             </div>
           </div>
         </div>
@@ -851,10 +852,10 @@
         </div>
       </div>
       <ul class="spec-measure-list">
-        <li>Label: 14/20 Medium; label gap: 4 px.</li>
+        <li>Label: 15/21 Medium; label gap: 4 px.</li>
         <li>Field: 48 px high; radius 8 px; 1 px border.</li>
         <li>Horizontal field inset: 12 px in the prototype (16 px original).</li>
-        <li>Value: 16/22 SemiBold; helper/error: 12/16.</li>
+        <li>Value: 17/24 SemiBold; helper/error: 13/18.</li>
       </ul>
       <span class="spec-trace">Frames 4909:20695 · 4909:20379</span>
     </section>
@@ -869,7 +870,7 @@
           </div>
           <strong>Reservation card title</strong>
           <span>Card padding 12 px; internal gap 8 px; radius 12 px.</span>
-          <span class="spec-helper">Metadata uses DM Sans 12/16.</span>
+          <span class="spec-helper">Metadata uses DM Sans 13/18.</span>
         </article>
         <div class="spec-demo-card">
           <div class="spec-demo-copy">
@@ -884,7 +885,7 @@
       </div>
       <ul class="spec-measure-list">
         <li>Cards: white, radius 8 or 12 px; list cards use a 1 px separator by default.</li>
-        <li>Chips: neutral-200 or semantic tint, radius 8 px, 12/16 type.</li>
+        <li>Chips: neutral-200 or semantic tint, radius 8 px, 13/18 type.</li>
         <li>Badge: 16 × 16 px one digit; 23 × 16 px two digits; 8 × 8 px dot; full radius.</li>
       </ul>
       <span class="spec-trace">Frames 3097:13926 · 10452:33446 · 6726:7931 · 6726:13200 · 6750:11273 · 3097:14271 · 8953:52739</span>
@@ -900,14 +901,14 @@
       <ul class="spec-measure-list">
         <li>Row: minimum 56 px, 12 px horizontal inset, 8 px internal gap.</li>
         <li>Leading icon: 24 px; separator: 1 px neutral-400.</li>
-        <li>Primary label: 14/20 SemiBold; supporting text: 12/16.</li>
+        <li>Primary label: 15/21 SemiBold; supporting text: 13/18.</li>
       </ul>
       <span class="spec-trace">Frames 7490:107756 · 7582:12028 · row geometry aligned with 6281:4792</span>
     </section>
 
     <section class="spec-section" id="availability-matrix">
       <h2>Horizontal availability matrix</h2>
-      <p>Swipe horizontally. The date header and 132 px descriptor column stay sticky.</p>
+      <p>Swipe horizontally. The date header and 138 px descriptor column stay sticky.</p>
       <div class="spec-matrix-viewport" tabindex="0" aria-label="Scrollable availability matrix example">
         <table class="spec-matrix availability">
           <thead>
@@ -920,16 +921,16 @@
         </table>
       </div>
       <ul class="spec-measure-list">
-        <li>Sticky descriptor: 132 px.</li>
-        <li>Day cell: 52 px wide; row: minimum 52 px high.</li>
+        <li>Sticky descriptor: 138 px.</li>
+        <li>Day cell: 54 px wide; row: minimum 56 px high.</li>
         <li>Horizontal overflow remains accessible; never clip the matrix.</li>
       </ul>
-      <span class="spec-trace">SPA source availability-overview/index.less:33–106 · mobile adaptation: 132 px descriptor</span>
+      <span class="spec-trace">SPA source availability-overview/index.less:33–106 · readable mobile adaptation: 138 px descriptor</span>
     </section>
 
     <section class="spec-section" id="rate-matrix">
       <h2>Horizontal rate matrix</h2>
-      <p>Swipe horizontally. The date header and 132 px descriptor column stay sticky.</p>
+      <p>Swipe horizontally. The date header and 138 px descriptor column stay sticky.</p>
       <div class="spec-matrix-viewport" tabindex="0" aria-label="Scrollable rate matrix example">
         <table class="spec-matrix rates">
           <thead>
@@ -942,11 +943,11 @@
         </table>
       </div>
       <ul class="spec-measure-list">
-        <li>Sticky descriptor: 132 px.</li>
+        <li>Sticky descriptor: 138 px.</li>
         <li>Day/value cell: 82 px wide; row: minimum 56 px high.</li>
         <li>Editable value control: 48 px high inside the row.</li>
       </ul>
-      <span class="spec-trace">SPA source rates/accommodation.less:73–146 · mobile adaptation: 132 px descriptor and 56 px row</span>
+      <span class="spec-trace">SPA source rates/accommodation.less:73–146 · readable mobile adaptation: 138 px descriptor and 56 px row</span>
     </section>
 
     <section class="spec-section" id="bottom-sheet">
@@ -982,7 +983,7 @@
   </main>
 
   <footer class="spec-footer">
-    SPA.CZ Partner App · mobile 390 px component reference · source `.fig` files are referenced in place and are not copied into this repository.
+    SPA.CZ Partner App · mobile 390 × 844 component reference · source `.fig` files are referenced in place and are not copied into this repository.
   </footer>
 </body>
 </html>

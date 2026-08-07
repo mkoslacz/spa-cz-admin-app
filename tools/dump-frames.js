@@ -2,10 +2,9 @@
 //
 //   node dump-frames.js [prototype.json] [frame-id ...]
 //
-// Each frame is rendered with `?nopanel=1` appended — export mode: the prototype
-// settings panel is not built and fixed bars join the normal flow. Without it the
-// bars are captured at the bottom edge of the capture window, which lands in the
-// middle of a several-thousand-pixel-tall frame.
+// Each frame is rendered with `?nopanel=1` appended so review chrome is not built.
+// dump-dom.js restores the app's fixed/sticky layout after initialisation and clips
+// the root to the manifest viewport, so a phone frame stays one real screen tall.
 //
 // Pass frame ids to re-dump only those (the slow part is Chrome, ~2-6 s per frame).
 //
@@ -123,8 +122,14 @@ function frameQueue(manifest, root, only, deps) {
         id,
         url: pathToFileURL(page.path).href + page.suffix + separator + 'nopanel=1',
         width: boundedPositiveInteger(
-          frame.width || manifest.width || 1440,
+          frame.width ?? manifest.width ?? 1440,
           'frame width',
+          1,
+          CONVERTER_RESOURCE_BUDGET.maxViewportWidth
+        ),
+        height: boundedPositiveInteger(
+          frame.height ?? manifest.height ?? 1200,
+          'frame height',
           1,
           CONVERTER_RESOURCE_BUDGET.maxViewportWidth
         ),
@@ -188,7 +193,7 @@ function runOne(job, overrides = {}) {
     };
 
     try {
-      child = deps.spawn(deps.execPath, [deps.dumpDomScript, job.url, tmpOut, String(job.width)], {
+      child = deps.spawn(deps.execPath, [deps.dumpDomScript, job.url, tmpOut, String(job.width), String(job.height)], {
         stdio: 'ignore',
       });
     } catch (error) {

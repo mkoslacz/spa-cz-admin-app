@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
-const ASSET_VERSION = '20260807c';
+const ASSET_VERSION = '20260807e';
 const SCREENS = [
   'dashboard',
   'reservations',
@@ -28,22 +28,29 @@ function file(screen, lang) {
 function icon(name, className = '') {
   const paths = {
     dashboard: '<path d="M4 13h6V4H4v9Zm0 7h6v-5H4v5Zm10 0h6v-9h-6v9Zm0-16v5h6V4h-6Z"/>',
-    reservations: '<path d="M6 3h12a2 2 0 0 1 2 2v15l-3-2-3 2-3-2-3 2-3-2-3 2V5a2 2 0 0 1 2-2h2Zm2 5h8V6H8v2Zm0 4h8v-2H8v2Zm0 4h5v-2H8v2Z"/>',
-    availability: '<path d="M5 3h2v2h10V3h2v2h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h1V3Zm15 7H4v10h16V10ZM7 12h3v3H7v-3Zm5 0h3v3h-3v-3Zm5 0h2v3h-2v-3ZM7 17h3v2H7v-2Zm5 0h3v2h-3v-2Z"/>',
+    reservations:
+      '<path d="M6 3h12a2 2 0 0 1 2 2v15l-3-2-3 2-3-2-3 2-3-2-3 2V5a2 2 0 0 1 2-2h2Zm2 5h8V6H8v2Zm0 4h8v-2H8v2Zm0 4h5v-2H8v2Z"/>',
+    availability:
+      '<path d="M5 3h2v2h10V3h2v2h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h1V3Zm15 7H4v10h16V10ZM7 12h3v3H7v-3Zm5 0h3v3h-3v-3Zm5 0h2v3h-2v-3ZM7 17h3v2H7v-2Zm5 0h3v2h-3v-2Z"/>',
     offer: '<path d="m3 12 9-9h7a2 2 0 0 1 2 2v7l-9 9L3 12Zm13-4.5A1.5 1.5 0 1 0 16 4a1.5 1.5 0 0 0 0 3.5Z"/>',
     more: '<path d="M5 10a2 2 0 1 1 0 4 2 2 0 0 1 0-4Zm7 0a2 2 0 1 1 0 4 2 2 0 0 1 0-4Zm7 0a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z"/>',
-    building: '<path d="M4 21V3h11v6h5v12h-7v-4h-2v4H4Zm3-14h2V5H7v2Zm4 0h2V5h-2v2ZM7 11h2V9H7v2Zm4 0h2V9h-2v2Zm-4 4h2v-2H7v2Zm8-2v2h2v-2h-2Zm0 4v2h2v-2h-2Z"/>',
+    building:
+      '<path d="M4 21V3h11v6h5v12h-7v-4h-2v4H4Zm3-14h2V5H7v2Zm4 0h2V5h-2v2ZM7 11h2V9H7v2Zm4 0h2V9h-2v2Zm-4 4h2v-2H7v2Zm8-2v2h2v-2h-2Zm0 4v2h2v-2h-2Z"/>',
     chevron: '<path d="m9 18 6-6-6-6-1.4 1.4 4.6 4.6-4.6 4.6L9 18Z"/>',
     arrowLeft: '<path d="m15 18-6-6 6-6 1.4 1.4-4.6 4.6 4.6 4.6L15 18Z"/>',
     arrowRight: '<path d="m9 18 6-6-6-6 1.4-1.4 7.4 7.4-7.4 7.4L9 18Z"/>',
     bell: '<path d="M18 16v-5a6 6 0 0 0-5-5.9V4a1 1 0 0 0-2 0v1.1A6 6 0 0 0 6 11v5l-2 2h16l-2-2Zm-8 3h4a2 2 0 0 1-4 0Z"/>',
     filter: '<path d="M3 5h18l-7 8v6l-4 2v-8L3 5Z"/>',
-    calendar: '<path d="M5 3h2v2h10V3h2v2h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h1V3Zm15 7H4v10h16V10Z"/>',
-    users: '<path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm6-1a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM9 13c-4 0-7 2-7 5v2h14v-2c0-3-3-5-7-5Zm7 0c-.6 0-1.2.1-1.8.2 2.3 1 3.8 2.7 3.8 4.8v2h4v-2c0-3-2.6-5-6-5Z"/>',
+    calendar:
+      '<path d="M5 3h2v2h10V3h2v2h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h1V3Zm15 7H4v10h16V10Z"/>',
+    users:
+      '<path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm6-1a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM9 13c-4 0-7 2-7 5v2h14v-2c0-3-3-5-7-5Zm7 0c-.6 0-1.2.1-1.8.2 2.3 1 3.8 2.7 3.8 4.8v2h4v-2c0-3-2.6-5-6-5Z"/>',
     bed: '<path d="M3 4h2v8h4V7h6a4 4 0 0 1 4 4v1h2v8h-2v-2H5v2H3V4Zm8 8h6v-1a2 2 0 0 0-2-2h-4v3Z"/>',
-    image: '<path d="M4 3h16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm0 16h16l-5-6-4 4-3-3-4 5Zm11-9a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/>',
+    image:
+      '<path d="M4 3h16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm0 16h16l-5-6-4 4-3-3-4 5Zm11-9a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/>',
     invoice: '<path d="M5 2h14v20l-3-2-2 2-2-2-2 2-2-2-3 2V2Zm4 5h6V5H9v2Zm-1 4h8V9H8v2Zm0 4h8v-2H8v2Z"/>',
-    settings: '<path d="m19.4 13 .1-1-.1-1 2-1.5-2-3.4-2.4 1a8 8 0 0 0-1.7-1L15 3.5h-4l-.4 2.6a8 8 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.5-.1 1 .1 1-2 1.5 2 3.4 2.4-1a8 8 0 0 0 1.7 1l.4 2.6h4l.4-2.6a8 8 0 0 0 1.7-1l2.4 1 2-3.4-2-1.5ZM13 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z"/>',
+    settings:
+      '<path d="m19.4 13 .1-1-.1-1 2-1.5-2-3.4-2.4 1a8 8 0 0 0-1.7-1L15 3.5h-4l-.4 2.6a8 8 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.5-.1 1 .1 1-2 1.5 2 3.4 2.4-1a8 8 0 0 0 1.7 1l.4 2.6h4l.4-2.6a8 8 0 0 0 1.7-1l2.4 1 2-3.4-2-1.5ZM13 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z"/>',
     help: '<path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 17h-2v-2h2v2Zm2.1-7.8-.9.9c-.8.7-1.2 1.3-1.2 2.9h-2v-.5c0-1.1.4-2.1 1.2-2.9l1.2-1.2a2 2 0 1 0-3.4-1.4H8a4 4 0 1 1 7.1 2.2Z"/>',
     link: '<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7 1.4 1.4L15 5a3 3 0 0 1 4.2 4.2l-3 3a3 3 0 0 1-4.2 0L10 13Zm4-2a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7-1.4-1.4L9 19a3 3 0 1 1-4.2-4.2l3-3a3 3 0 0 1 4.2 0L14 11Z"/>',
     edit: '<path d="M4 17.3V21h3.7L18.8 9.9l-3.7-3.7L4 17.3ZM21.7 7a1 1 0 0 0 0-1.4l-3.3-3.3a1 1 0 0 0-1.4 0l-1.8 1.8 3.7 3.7L21.7 7Z"/>',
@@ -62,7 +69,14 @@ function navItem(screen, active, lang, iconName, cs, en, badge) {
 }
 
 function bottomNav(page, lang) {
-  const active = page === 'reservation-detail' ? 'reservations' : page === 'rate-edit' ? 'offer' : page === 'billing' ? 'more' : page;
+  const active =
+    page === 'reservation-detail'
+      ? 'reservations'
+      : page === 'rate-edit'
+        ? 'offer'
+        : page === 'billing'
+          ? 'more'
+          : page;
   return `<nav class="mobile-bottom-nav" aria-label="${tr(lang, 'Hlavní navigace', 'Primary navigation')}">
     ${navItem('dashboard', active === 'dashboard', lang, 'dashboard', 'Přehled', 'Overview')}
     ${navItem('reservations', active === 'reservations', lang, 'reservations', 'Rezervace', 'Reservations', { kind: 'reservation', value: '5' })}
@@ -157,11 +171,56 @@ function reservationCard(lang, rank, id, guest, term, status, statusClass, price
 
 function reservations(lang) {
   const cards = [
-    reservationCard(lang, 1, 'DEMO-10482', 'Jana Nováková', '12.–14. 10. 2026', tr(lang, 'Potvrzeno', 'Confirmed'), 'success', '7 154 Kč'),
-    reservationCard(lang, 2, 'DEMO-10477', 'Petr Dvořák', '16.–19. 10. 2026', tr(lang, 'Nová', 'New'), 'info', '6 240 Kč'),
-    reservationCard(lang, 3, 'DEMO-10463', 'Klára Veselá', '20.–23. 10. 2026', tr(lang, 'Potvrzeno', 'Confirmed'), 'success', '8 120 Kč'),
-    reservationCard(lang, 4, 'DEMO-10451', 'Martin Černý', '27.–29. 10. 2026', tr(lang, 'Čeká na hotel', 'Awaiting hotel'), 'warning', '4 390 Kč'),
-    reservationCard(lang, 5, 'DEMO-10439', 'Eva Horáková', '2.–5. 11. 2026', tr(lang, 'Stornováno', 'Cancelled'), 'danger', '7 030 Kč'),
+    reservationCard(
+      lang,
+      1,
+      'DEMO-10482',
+      'Jana Nováková',
+      '12.–14. 10. 2026',
+      tr(lang, 'Potvrzeno', 'Confirmed'),
+      'success',
+      '7 154 Kč'
+    ),
+    reservationCard(
+      lang,
+      2,
+      'DEMO-10477',
+      'Petr Dvořák',
+      '16.–19. 10. 2026',
+      tr(lang, 'Nová', 'New'),
+      'info',
+      '6 240 Kč'
+    ),
+    reservationCard(
+      lang,
+      3,
+      'DEMO-10463',
+      'Klára Veselá',
+      '20.–23. 10. 2026',
+      tr(lang, 'Potvrzeno', 'Confirmed'),
+      'success',
+      '8 120 Kč'
+    ),
+    reservationCard(
+      lang,
+      4,
+      'DEMO-10451',
+      'Martin Černý',
+      '27.–29. 10. 2026',
+      tr(lang, 'Čeká na hotel', 'Awaiting hotel'),
+      'warning',
+      '4 390 Kč'
+    ),
+    reservationCard(
+      lang,
+      5,
+      'DEMO-10439',
+      'Eva Horáková',
+      '2.–5. 11. 2026',
+      tr(lang, 'Stornováno', 'Cancelled'),
+      'danger',
+      '7 030 Kč'
+    ),
   ].join('\n');
   return `${pageHead(lang, tr(lang, 'Rezervace', 'Reservations'), tr(lang, 'Hustý seznam pro rychlou kontrolu hosta, termínu, stavu a ceny.', 'A dense list for checking guest, stay, status and price at a glance.'), true, `<button class="page-action-icon" type="button" data-open-sheet="filter-sheet" aria-label="${tr(lang, 'Filtrovat', 'Filter')}">${icon('filter')}</button>`)}
     ${stateAlerts(lang)}
@@ -233,10 +292,18 @@ function reservationDetail(lang) {
 
 function availabilityMatrix(lang) {
   const days = [
-    ['12', tr(lang, 'Po', 'Mon'), 'today'], ['13', tr(lang, 'Út', 'Tue'), ''], ['14', tr(lang, 'St', 'Wed'), ''],
-    ['15', tr(lang, 'Čt', 'Thu'), ''], ['16', tr(lang, 'Pá', 'Fri'), ''], ['17', tr(lang, 'So', 'Sat'), 'weekend'],
-    ['18', tr(lang, 'Ne', 'Sun'), 'weekend'], ['19', tr(lang, 'Po', 'Mon'), ''], ['20', tr(lang, 'Út', 'Tue'), ''],
-    ['21', tr(lang, 'St', 'Wed'), ''], ['22', tr(lang, 'Čt', 'Thu'), ''], ['23', tr(lang, 'Pá', 'Fri'), ''],
+    ['12', tr(lang, 'Po', 'Mon'), 'today'],
+    ['13', tr(lang, 'Út', 'Tue'), ''],
+    ['14', tr(lang, 'St', 'Wed'), ''],
+    ['15', tr(lang, 'Čt', 'Thu'), ''],
+    ['16', tr(lang, 'Pá', 'Fri'), ''],
+    ['17', tr(lang, 'So', 'Sat'), 'weekend'],
+    ['18', tr(lang, 'Ne', 'Sun'), 'weekend'],
+    ['19', tr(lang, 'Po', 'Mon'), ''],
+    ['20', tr(lang, 'Út', 'Tue'), ''],
+    ['21', tr(lang, 'St', 'Wed'), ''],
+    ['22', tr(lang, 'Čt', 'Thu'), ''],
+    ['23', tr(lang, 'Pá', 'Fri'), ''],
   ];
   const rows = [
     [1, tr(lang, 'Dvoulůžkový', 'Double'), '2+0', [4, 4, 3, 2, 2, 4, 5, 5, 4, 3, 2, 2]],
@@ -245,12 +312,21 @@ function availabilityMatrix(lang) {
     [4, tr(lang, 'Jednolůžkový', 'Single'), '1+0', [3, 3, 2, 2, 1, 3, 3, 3, 2, 2, 1, 1]],
     [5, tr(lang, 'Rodinný pokoj', 'Family room'), '4+0', [2, 2, 2, 1, 1, 2, 2, 2, 1, 1, 'X', 'X']],
   ];
-  const headers = days.map(([day, weekday, cls]) => `<th class="${cls}">${weekday}<br><strong>${day}</strong></th>`).join('');
-  const body = rows.map(([rank, name, beds, values]) => `<tr data-inventory-rank="${rank}"><td class="sticky-col"><strong>${name}</strong><small>${beds} · ${tr(lang, 'demo', 'demo')}</small></td>${values.map((value, index) => {
-    const stopped = value === 'X';
-    const low = value === 0 || value === 1;
-    return `<td class="availability-cell ${days[index][2]} ${stopped ? 'stop' : ''} ${low ? 'low' : ''}" data-value="${stopped ? 0 : value}">${stopped ? '×' : value}</td>`;
-  }).join('')}</tr>`).join('');
+  const headers = days
+    .map(([day, weekday, cls]) => `<th class="${cls}">${weekday}<br><strong>${day}</strong></th>`)
+    .join('');
+  const body = rows
+    .map(
+      ([rank, name, beds, values]) =>
+        `<tr data-inventory-rank="${rank}"><td class="sticky-col"><strong>${name}</strong><small>${beds} · ${tr(lang, 'demo', 'demo')}</small></td>${values
+          .map((value, index) => {
+            const stopped = value === 'X';
+            const low = value === 0 || value === 1;
+            return `<td class="availability-cell ${days[index][2]} ${stopped ? 'stop' : ''} ${low ? 'low' : ''}" data-value="${stopped ? 0 : value}">${stopped ? '×' : value}</td>`;
+          })
+          .join('')}</tr>`
+    )
+    .join('');
   return `<div class="matrix-wrap inventory-content" aria-label="${tr(lang, 'Ukázková dostupnost pokojů', 'Demo room availability')}"><table class="matrix"><thead><tr><th class="sticky-col">${tr(lang, 'Pokoj / říjen 2026', 'Room / October 2026')}</th>${headers}</tr></thead><tbody>${body}</tbody></table></div>`;
 }
 
@@ -294,7 +370,7 @@ function rateMatrix(lang) {
     [tr(lang, 'Dvoulůžkový deluxe', 'Deluxe double'), '2 os.', [3977, 3977, 4227, 4517, 4517, 3977, 3977]],
     [tr(lang, 'Apartmá', 'Suite'), '2 os.', [4577, 4577, 4827, 5117, 5117, 4577, 4577]],
   ];
-  return `<div class="matrix-wrap"><table class="matrix rate-matrix"><thead><tr><th class="sticky-col">${tr(lang, 'Pokoj / příjezd', 'Room / arrival')}</th>${dates.map((date, i) => `<th class="${i === 0 ? 'today' : i === 5 || i === 6 ? 'weekend' : ''}">${date}</th>`).join('')}</tr></thead><tbody>${rows.map(([name, occupancy, values]) => `<tr><td class="sticky-col"><strong>${name}</strong><small>${occupancy} · demo</small></td>${values.map((value) => `<td><input class="rate-input" type="number" value="${value}" inputmode="numeric" aria-label="${name} ${value} CZK" data-write-action data-chm-write></td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  return `<div class="matrix-wrap"><table class="matrix rate-matrix"><thead><tr><th class="sticky-col">${tr(lang, 'Pokoj / příjezd', 'Room / arrival')}</th>${dates.map((date, i) => `<th class="${i === 0 ? 'today' : i === 5 || i === 6 ? 'weekend' : ''}">${date}</th>`).join('')}</tr></thead><tbody>${rows.map(([name, occupancy, values]) => `<tr><td class="sticky-col"><strong>${name}</strong><small>${occupancy} · demo</small></td>${values.map(value => `<td><input class="rate-input" type="number" value="${value}" inputmode="numeric" aria-label="${name} ${value} CZK" data-write-action data-chm-write></td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
 }
 
 function rateEdit(lang) {
@@ -372,16 +448,39 @@ function sheetShell(id, lang, title, body, actions = '') {
 }
 
 function sheets(page, lang) {
-  const property = sheetShell('property-sheet', lang, tr(lang, 'Vybrat zařízení', 'Select property'), `<button class="button full primary" type="button" data-close-sheet>SPA HOTEL ČAJKOVSKIJ <span class="test-label">TEST</span></button><p class="subtle">${tr(lang, 'Jediné veřejné zařízení použité v prototypu.', 'The only public property used in the prototype.')}</p>`);
+  const property = sheetShell(
+    'property-sheet',
+    lang,
+    tr(lang, 'Vybrat zařízení', 'Select property'),
+    `<button class="button full primary" type="button" data-close-sheet>SPA HOTEL ČAJKOVSKIJ <span class="test-label">TEST</span></button><p class="subtle">${tr(lang, 'Jediné veřejné zařízení použité v prototypu.', 'The only public property used in the prototype.')}</p>`
+  );
   let contextual = '';
   if (page === 'reservations') {
-    contextual = sheetShell('filter-sheet', lang, tr(lang, 'Filtry rezervací', 'Reservation filters'), `<form data-prototype-form data-success="${tr(lang, 'Ukázkové filtry byly použity.', 'Demo filters applied.')}" id="filter-form"><label class="field"><span>${tr(lang, 'Typ data', 'Date type')}</span><select><option>${tr(lang, 'Příjezd', 'Arrival')}</option><option>${tr(lang, 'Odjezd', 'Departure')}</option><option>${tr(lang, 'Vytvořeno', 'Created')}</option></select></label><div class="form-two-col"><label class="field"><span>${tr(lang, 'Od', 'From')}</span><input type="date" value="2026-09-12"></label><label class="field"><span>${tr(lang, 'Do', 'To')}</span><input type="date" value="2026-10-12"></label></div><label class="field"><span>${tr(lang, 'ID nebo host', 'ID or guest')}</span><input value="" placeholder="DEMO-10482"></label></form>`, `<div class="sheet-actions"><button class="button" type="button" data-close-sheet>${tr(lang, 'Zrušit', 'Cancel')}</button><button class="button primary" type="submit" form="filter-form">${tr(lang, 'Použít', 'Apply')}</button></div>`);
+    contextual = sheetShell(
+      'filter-sheet',
+      lang,
+      tr(lang, 'Filtry rezervací', 'Reservation filters'),
+      `<form data-prototype-form data-success="${tr(lang, 'Ukázkové filtry byly použity.', 'Demo filters applied.')}" id="filter-form"><label class="field"><span>${tr(lang, 'Typ data', 'Date type')}</span><select><option>${tr(lang, 'Příjezd', 'Arrival')}</option><option>${tr(lang, 'Odjezd', 'Departure')}</option><option>${tr(lang, 'Vytvořeno', 'Created')}</option></select></label><div class="form-two-col"><label class="field"><span>${tr(lang, 'Od', 'From')}</span><input type="date" value="2026-09-12"></label><label class="field"><span>${tr(lang, 'Do', 'To')}</span><input type="date" value="2026-10-12"></label></div><label class="field"><span>${tr(lang, 'ID nebo host', 'ID or guest')}</span><input value="" placeholder="DEMO-10482"></label></form>`,
+      `<div class="sheet-actions"><button class="button" type="button" data-close-sheet>${tr(lang, 'Zrušit', 'Cancel')}</button><button class="button primary" type="submit" form="filter-form">${tr(lang, 'Použít', 'Apply')}</button></div>`
+    );
   }
   if (page === 'availability') {
-    contextual = sheetShell('availability-sheet', lang, tr(lang, 'Uzavřít termín', 'Close a date range'), `<form data-prototype-form data-success="${tr(lang, 'Ukázkový stop prodej byl nastaven.', 'Demo stop sell set.')}" id="availability-form"><div class="form-two-col"><label class="field"><span>${tr(lang, 'Od', 'From')}</span><input type="date" value="2026-10-16"></label><label class="field"><span>${tr(lang, 'Do', 'To')}</span><input type="date" value="2026-10-17"></label></div><label class="field"><span>${tr(lang, 'Pokoj', 'Room')}</span><select><option>${tr(lang, 'Všechny pokoje', 'All rooms')}</option><option>${tr(lang, 'Dvoulůžkový', 'Double')}</option></select></label></form>`, `<div class="sheet-actions"><button class="button" type="button" data-close-sheet>${tr(lang, 'Zrušit', 'Cancel')}</button><button class="button primary" type="submit" form="availability-form">${tr(lang, 'Nastavit', 'Set')}</button></div>`);
+    contextual = sheetShell(
+      'availability-sheet',
+      lang,
+      tr(lang, 'Uzavřít termín', 'Close a date range'),
+      `<form data-prototype-form data-success="${tr(lang, 'Ukázkový stop prodej byl nastaven.', 'Demo stop sell set.')}" id="availability-form"><div class="form-two-col"><label class="field"><span>${tr(lang, 'Od', 'From')}</span><input type="date" value="2026-10-16"></label><label class="field"><span>${tr(lang, 'Do', 'To')}</span><input type="date" value="2026-10-17"></label></div><label class="field"><span>${tr(lang, 'Pokoj', 'Room')}</span><select><option>${tr(lang, 'Všechny pokoje', 'All rooms')}</option><option>${tr(lang, 'Dvoulůžkový', 'Double')}</option></select></label></form>`,
+      `<div class="sheet-actions"><button class="button" type="button" data-close-sheet>${tr(lang, 'Zrušit', 'Cancel')}</button><button class="button primary" type="submit" form="availability-form">${tr(lang, 'Nastavit', 'Set')}</button></div>`
+    );
   }
   if (page === 'billing') {
-    contextual = sheetShell('dispute-sheet', lang, tr(lang, 'Rozporovat rozúčtování', 'Dispute settlement'), `<form data-prototype-form data-success="${tr(lang, 'Ukázkový rozpor byl odeslán.', 'Demo dispute submitted.')}" id="dispute-form"><div class="alert warning">${tr(lang, 'Všechna pole jsou ukázková.', 'All fields contain demo data.')}</div><label class="field"><span>${tr(lang, 'Důvod', 'Reason')}</span><textarea required>${tr(lang, 'Ukázkový důvod rozporu', 'Demo dispute reason')}</textarea></label><label class="field"><span>${tr(lang, 'Navržená cena', 'Suggested price')}</span><input type="number" min="1" value="3400" required></label></form>`, `<div class="sheet-actions"><button class="button" type="button" data-close-sheet>${tr(lang, 'Zrušit', 'Cancel')}</button><button class="button primary" type="submit" form="dispute-form">${tr(lang, 'Odeslat', 'Submit')}</button></div>`);
+    contextual = sheetShell(
+      'dispute-sheet',
+      lang,
+      tr(lang, 'Rozporovat rozúčtování', 'Dispute settlement'),
+      `<form data-prototype-form data-success="${tr(lang, 'Ukázkový rozpor byl odeslán.', 'Demo dispute submitted.')}" id="dispute-form"><div class="alert warning">${tr(lang, 'Všechna pole jsou ukázková.', 'All fields contain demo data.')}</div><label class="field"><span>${tr(lang, 'Důvod', 'Reason')}</span><textarea required>${tr(lang, 'Ukázkový důvod rozporu', 'Demo dispute reason')}</textarea></label><label class="field"><span>${tr(lang, 'Navržená cena', 'Suggested price')}</span><input type="number" min="1" value="3400" required></label></form>`,
+      `<div class="sheet-actions"><button class="button" type="button" data-close-sheet>${tr(lang, 'Zrušit', 'Cancel')}</button><button class="button primary" type="submit" form="dispute-form">${tr(lang, 'Odeslat', 'Submit')}</button></div>`
+    );
   }
   return property + contextual;
 }
@@ -392,16 +491,29 @@ function walls(lang) {
 }
 
 function contentFor(page, lang) {
-  const renderers = { dashboard, reservations, 'reservation-detail': reservationDetail, availability, offer, 'rate-edit': rateEdit, billing, more };
+  const renderers = {
+    dashboard,
+    reservations,
+    'reservation-detail': reservationDetail,
+    availability,
+    offer,
+    'rate-edit': rateEdit,
+    billing,
+    more,
+  };
   return renderers[page](lang);
 }
 
 function titleFor(page, lang) {
   const titles = {
-    dashboard: ['Přehled', 'Overview'], reservations: ['Rezervace', 'Reservations'],
-    'reservation-detail': ['Detail rezervace', 'Reservation detail'], availability: ['Dostupnost', 'Availability'],
-    offer: ['Nabídka', 'Offer'], 'rate-edit': ['Ceny balíčku', 'Package rates'],
-    billing: ['Rozúčtování', 'Billing'], more: ['Více', 'More'],
+    dashboard: ['Přehled', 'Overview'],
+    reservations: ['Rezervace', 'Reservations'],
+    'reservation-detail': ['Detail rezervace', 'Reservation detail'],
+    availability: ['Dostupnost', 'Availability'],
+    offer: ['Nabídka', 'Offer'],
+    'rate-edit': ['Ceny balíčku', 'Package rates'],
+    billing: ['Rozúčtování', 'Billing'],
+    more: ['Více', 'More'],
   };
   return tr(lang, titles[page][0], titles[page][1]);
 }
@@ -412,7 +524,7 @@ function renderPage(page, lang) {
 <html lang="${lang}">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=390, initial-scale=1, maximum-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light">
   <title>${titleFor(page, lang)} · SPA.CZ partner app prototype</title>
   <link rel="stylesheet" href="tokens-m.css?v=${ASSET_VERSION}">
@@ -423,7 +535,6 @@ function renderPage(page, lang) {
 </head>
 <body data-page="${page}" data-viewport="mobile" data-auth="in" data-access="full" data-connection="manual" data-density="dense" data-inv="many" data-hotel="active">
   <a class="skip-link" href="#main">${tr(lang, 'Přejít na obsah', 'Skip to content')}</a>
-  <div class="prototype-hint">Interactive prototype · public package facts + clearly labelled demo account data</div>
   ${languageSwitch(page, lang)}
   <div class="product-surface">
     <div class="mobile-app">

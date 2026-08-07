@@ -6,13 +6,13 @@ The proposal covers eight app areas in Czech and English, a shared state engine,
 
 ## Open the prototype
 
-For the complete review experience, serve the repository over HTTP:
+Always use the local or published HTTP URL for review. The product screens can still open from `file://`, but the changelog, use-case and comment pages intentionally fetch sibling data and therefore require HTTP:
 
 ```bash
 python3 -m http.server 8000
 ```
 
-Then open `http://localhost:8000/`. Individual `m-*.html` product screens also work from `file://`; the changelog, use-case and comment pages need HTTP because browsers do not fetch their sibling data files from a local-file origin.
+Then open `http://localhost:8000/`. The standard local workshop server for this repository uses `http://127.0.0.1:4173/`.
 
 ## Mobile app map
 
@@ -87,11 +87,12 @@ The app combines the supplied Szallas design-system structure with confirmed SPA
 
 - Type: Outfit for headings; DM Sans for body and UI.
 - SPA.cz primary: `#1174BB`; dark: `#0F5180`; light: `#3EB3FF`; pale: `#B5D3EA`.
-- Background: `#EEF3F5`; line: `#E1EAEF`; ink: `#1C1F21`; neutral: `#576771`.
+- Dominant surface: white `#FFFFFF`; ink: `#111111`; neutral text: `#3F3F3F`–`#5C5C5C`; structural line: `#C9C9C9`.
 - Brand-positive: `#89C02C`; positive action: `#76B82A`; hover: `#5FA013`; error: `#DD1111`.
 - Focus: `#1174BB33` halo with `#1174BBCC` edge.
 - Cards and controls use the design-system radius scale, typically 8–12 px.
-- Layout spacing follows the supplied scale at a 70% rhythm. Type, icons and touch targets are not compressed; controls remain at least 48 px and tap targets at least 44 px.
+- Layout spacing follows the supplied scale at a 70% rhythm. Body text starts at 17 px, supporting text at 15 px and metadata at 13 px. Icons and touch targets are not compressed; controls remain at least 48 px and tap targets at least 44 px.
+- Review captures and editable Figma frames use a real 390 × 844 phone viewport. The HTML application remains vertically scrollable below the fold.
 
 Confirmed design-system frames: color `8778:30914`, semantic color `8922:35914`, spacing `8779:34761`, radius `8779:34779`, shadows `4279:13739`, mobile typography `8778:32941`, buttons `3097:13934`, inputs `4909:20695`, header `6032:15106`, bottom navigation `4176:3888`, sheet `6281:4792`, reservations `6726:7931`.
 
@@ -131,7 +132,11 @@ Or refresh the full chain, including the declared preview script:
 node tools/refresh.js --allow-package-scripts
 ```
 
-`prototype.json` exports 24 editable 390 px frames to `spa-cz-partner-mobile.fig`: 8 Czech screens, 8 English screens and 8 URL-pinned states. The schema donor at `tools/.schema/canvas.fig` is the 28,932-byte schema-only prefix extracted from the supplied `Szallas Design System.fig`; the large source export is not copied into this repository.
+`prototype.json` exports 24 editable 390 × 844 frames to `spa-cz-partner-mobile.fig`: 8 Czech screens, 8 English screens and 8 URL-pinned states. The schema donor at `tools/.schema/canvas.fig` is the 28,932-byte schema-only prefix extracted from the supplied `Szallas Design System.fig`; the large source export is not copied into this repository.
+
+## Workshop round 2 — readability correction
+
+The 7 August 2026 review replaced the pale blue-grey application layer with a white and near-black base, neutral grey boundaries, SPA.cz blue for navigation/actions and SPA green for positive states/actions. It raised the entire mobile type floor, removed the top prototype hint bar, changed review-page navigation into a vertical stack, and fixed every visual deliverable to a 390 × 844 phone viewport instead of exporting the full document height.
 
 ## Stakeholder comments and privacy
 

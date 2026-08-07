@@ -3,13 +3,14 @@
   "fileName": "SPA.cz Partner — Mobile App",
   "canvasName": "SPA.cz Partner — Mobile App",
   "out": "spa-cz-partner-mobile.fig",
-  "background": "#EEF3F5",
+  "background": "#FFFFFF",
   "thumbnail": "preview-m-dashboard.png",
   "pagesDir": ".",
   "assets": "assets",
   "dumpDir": "tools/dumps",
   "schemaFrom": "tools/.schema/canvas.fig",
   "width": 390,
+  "height": 844,
   "jobs": 3,
   "refresh": {
     "previews": {

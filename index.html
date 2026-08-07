@@ -9,12 +9,12 @@
   :root {
     --brand: #1174BB;
     --brand-dark: #0F5180;
-    --brand-pale: #E7F1F8;
+    --brand-pale: #F2F2F2;
     --accent: #76B82A;
-    --ink: #1C1F21;
-    --muted: #576771;
-    --line: #E1EAEF;
-    --canvas: #EEF3F5;
+    --ink: #111111;
+    --muted: #4A4A4A;
+    --line: #D7D7D7;
+    --canvas: #FFFFFF;
     --paper: #FFFFFF;
   }
   * { box-sizing: border-box; }
@@ -31,10 +31,12 @@
     position: relative;
     overflow: hidden;
     padding: 40px;
-    color: #fff;
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-top: 6px solid var(--accent);
     border-radius: 24px;
-    background: linear-gradient(135deg, var(--brand-dark), var(--brand) 62%, #279CEB);
-    box-shadow: 0 18px 44px rgba(15, 81, 128, .18);
+    background: var(--paper);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .07);
   }
   .hero::after {
     content: "";
@@ -44,14 +46,14 @@
     right: -150px;
     top: -190px;
     border-radius: 50%;
-    background: rgba(255,255,255,.1);
+    background: rgba(118,184,42,.13);
   }
-  .eyebrow { margin: 0 0 10px; font-size: 13px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+  .eyebrow { margin: 0 0 10px; color: var(--brand-dark); font-size: 14px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
   h1, h2, h3 { font-family: Outfit, "DM Sans", system-ui, sans-serif; }
   h1 { max-width: 760px; margin: 0; font-size: clamp(34px, 5vw, 56px); line-height: 1.02; letter-spacing: -.035em; }
-  .lede { max-width: 780px; margin: 18px 0 0; font-size: 17px; line-height: 1.65; color: rgba(255,255,255,.88); }
+  .lede { max-width: 780px; margin: 18px 0 0; font-size: 18px; line-height: 1.58; color: var(--muted); }
   .hero-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
-  .hero-tag { padding: 7px 11px; border: 1px solid rgba(255,255,255,.3); border-radius: 999px; background: rgba(255,255,255,.1); font-size: 13px; font-weight: 700; }
+  .hero-tag { padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; background: #F5F5F5; font-size: 14px; font-weight: 750; }
   .proposal {
     display: grid;
     grid-template-columns: 1.15fr .85fr;
@@ -64,8 +66,8 @@
     border-radius: 16px;
     background: var(--paper);
     box-shadow: 0 5px 18px rgba(28,31,33,.05);
-    font-size: 14.5px;
-    line-height: 1.65;
+    font-size: 16px;
+    line-height: 1.58;
   }
   .note h2, .note h3 { margin: 0 0 8px; }
   .note p { margin: 0; }
@@ -85,19 +87,19 @@
     background: var(--paper);
     box-shadow: 0 4px 14px rgba(28,31,33,.05);
   }
-  .screen img { display: block; width: 100%; height: 340px; object-fit: cover; object-position: top; background: #DDE6EB; border-bottom: 1px solid var(--line); }
+  .screen img { display: block; width: 100%; height: auto; aspect-ratio: 390 / 844; object-fit: cover; object-position: top; background: #EEEEEE; border-bottom: 1px solid var(--line); }
   .screen-body { padding: 15px; }
-  .screen-kicker { display: block; margin-bottom: 5px; color: var(--brand); font-size: 11px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
+  .screen-kicker { display: block; margin-bottom: 5px; color: var(--brand); font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
   .screen h3 { margin: 0; font-size: 18px; }
-  .screen p { min-height: 58px; margin: 7px 0 13px; color: var(--muted); font-size: 13px; line-height: 1.48; }
+  .screen p { min-height: 68px; margin: 7px 0 13px; color: var(--muted); font-size: 15px; line-height: 1.5; }
   .actions { display: flex; gap: 7px; }
-  .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 38px; padding: 8px 13px; border-radius: 9px; background: var(--brand); color: #fff; text-decoration: none; font-size: 13px; font-weight: 800; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 9px 14px; border-radius: 9px; background: var(--brand); color: #fff; text-decoration: none; font-size: 15px; font-weight: 800; }
   .btn.alt { color: var(--brand-dark); background: var(--brand-pale); }
   .review-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; }
   .review-card { padding: 20px; border: 1px solid var(--line); border-radius: 16px; background: var(--paper); }
   .review-card h3 { margin: 0; font-size: 19px; }
-  .review-card p { margin: 8px 0 16px; color: var(--muted); font-size: 14px; line-height: 1.55; }
-  .axis-table, .mapping-table { width: 100%; border-collapse: separate; border-spacing: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--paper); font-size: 14px; }
+  .review-card p { margin: 8px 0 16px; color: var(--muted); font-size: 15px; line-height: 1.55; }
+  .axis-table, .mapping-table { width: 100%; border-collapse: separate; border-spacing: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--paper); font-size: 15px; }
   .axis-table th, .mapping-table th { padding: 12px 14px; color: #fff; background: var(--brand-dark); text-align: left; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
   .axis-table td, .mapping-table td { padding: 12px 14px; border-top: 1px solid var(--line); vertical-align: top; line-height: 1.5; }
   .axis-table tbody tr:first-child td, .mapping-table tbody tr:first-child td { border-top: 0; }
@@ -116,7 +118,7 @@
     .wrap { width: min(100% - 20px, 1180px); padding-top: 10px; }
     .hero { padding: 28px 22px; border-radius: 18px; }
     .flow, .review-grid { grid-template-columns: 1fr; }
-    .screen img { height: 420px; }
+    .screen img { height: auto; }
     .axis-table, .mapping-table { display: block; overflow-x: auto; white-space: normal; }
     .section { margin-top: 38px; }
   }
@@ -132,7 +134,7 @@
     </p>
     <div class="hero-tags">
       <span class="hero-tag">8 product areas</span>
-      <span class="hero-tag">390 px mobile app</span>
+      <span class="hero-tag">390 × 844 phone viewport</span>
       <span class="hero-tag">CZ + EN</span>
       <span class="hero-tag">24 editable Figma frames</span>
     </div>
@@ -201,10 +203,10 @@
         <tr><td>Primary brand</td><td>SPA.cz extranet variables and logo</td><td><span class="swatch" style="background:#1174BB"></span><code>#1174BB</code></td><td>Primary actions, links and selected navigation.</td></tr>
         <tr><td>Primary dark</td><td>SPA.cz extranet variables</td><td><span class="swatch" style="background:#0F5180"></span><code>#0F5180</code></td><td>Strong emphasis, headings on color and navigation depth.</td></tr>
         <tr><td>Positive states and actions</td><td>SPA.cz extranet variables</td><td><span class="swatch" style="background:#89C02C"></span><code>#89C02C</code> · <span class="swatch" style="background:#76B82A"></span><code>#76B82A</code></td><td>Brand-positive status and positive operational actions; action hover uses <code>#5FA013</code>.</td></tr>
-        <tr><td>Canvas and line</td><td>SPA.cz extranet variables</td><td><span class="swatch" style="background:#EEF3F5"></span><code>#EEF3F5</code> · <span class="swatch" style="background:#E1EAEF"></span><code>#E1EAEF</code></td><td>Quiet operational surface with explicit boundaries.</td></tr>
+        <tr><td>Canvas and line</td><td>Workshop decision</td><td><span class="swatch" style="background:#FFFFFF"></span><code>#FFFFFF</code> · <span class="swatch" style="background:#D7D7D7"></span><code>#D7D7D7</code></td><td>White is the dominant application surface; neutral grey provides boundaries without a blue cast.</td></tr>
         <tr><td>Keyboard focus</td><td>SPA.cz semantic skin</td><td><code>#1174BB33</code> halo · <code>#1174BBCC</code> edge</td><td>Visible focus treatment remains part of the app contract.</td></tr>
         <tr><td>Type</td><td>Szallas design-system typography</td><td>Outfit headings · DM Sans body/UI</td><td>Kept from the supplied mobile design system.</td></tr>
-        <tr><td>Shape and rhythm</td><td>Szallas radius and spacing frames</td><td>8–12 px cards/controls; 70% layout rhythm</td><td>Compact spacing without shrinking type, icons or 44 px minimum tap targets.</td></tr>
+        <tr><td>Shape and rhythm</td><td>Szallas radius and spacing frames</td><td>Compact cards and controls; 390 × 844 review frame</td><td>Dense information remains readable; type and touch targets are not compressed.</td></tr>
       </tbody>
     </table>
     <p class="muted" style="font-size:13px;line-height:1.55">Design-system evidence frames: color <code>8778:30914</code>, semantic color <code>8922:35914</code>, spacing <code>8779:34761</code>, radius <code>8779:34779</code>, shadows <code>4279:13739</code>, mobile typography <code>8778:32941</code>, buttons <code>3097:13934</code>, inputs <code>4909:20695</code>, header <code>6032:15106</code>, bottom navigation <code>4176:3888</code>, sheet <code>6281:4792</code>, reservations <code>6726:7931</code>.</p>
@@ -233,7 +235,7 @@
   <section class="section" aria-labelledby="handoff-title">
     <div class="section-head"><div><h2 id="handoff-title">Handoff</h2></div></div>
     <div class="note handoff">
-      <p><strong>Design:</strong> <a href="spa-cz-partner-mobile.fig"><code>spa-cz-partner-mobile.fig</code></a> contains 24 editable mobile frames: 8 Czech, 8 English and 8 declared states, all at 390 px. Drag it onto the Figma home screen; reload once if the first import remains on its loading bar.</p>
+      <p><strong>Design:</strong> <a href="spa-cz-partner-mobile.fig"><code>spa-cz-partner-mobile.fig</code></a> contains 24 editable mobile frames: 8 Czech, 8 English and 8 declared states, all at a 390 × 844 phone viewport. The HTML screens remain scrollable below the fold. Drag the file onto the Figma home screen; reload once if the first import remains on its loading bar.</p>
       <p><strong>Development:</strong> <code>tokens-m.css</code> and <code>app-m.css</code> are the mobile visual source of truth, <code>specs.html</code> documents the reusable patterns, and the screens are plain HTML/CSS/JS. <code>proto-m.js</code> and the <code>proto-*</code> files are prototype scaffolding, not production application code.</p>
     </div>
   </section>

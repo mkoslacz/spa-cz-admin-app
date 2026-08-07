@@ -38,20 +38,21 @@
   /* SPA.CZ brand skin supplied for this prototype. */
   --brand-500: #1174bb;
   --brand-700: #0f5180;
-  --accent-500: #89c02c;
-  --surface-tint: #eef3f5;
+  --accent-400: #89c02c;
+  --accent-500: #76b82a;
+  --surface-tint: #f3f3f3;
 
   /* Design-system neutrals. */
   --white: #ffffff;
-  --ink-950: #17212b;
-  --ink-800: #2f3a45;
-  --ink-650: #52616f;
-  --ink-500: #71808d;
-  --line-300: #d8e0e5;
-  --line-200: #e5ebee;
-  --surface-100: #f7f9fa;
-  --surface-200: #f2f5f6;
-  --success-700: #34760e;
+  --ink-950: #111111;
+  --ink-800: #242424;
+  --ink-650: #3f3f3f;
+  --ink-500: #5c5c5c;
+  --line-300: #c9c9c9;
+  --line-200: #e2e2e2;
+  --surface-100: #ffffff;
+  --surface-200: #f5f5f5;
+  --success-700: #2f6b0b;
   --success-100: #edf7e4;
   --warning-700: #805b00;
   --warning-100: #fff5d6;
@@ -65,20 +66,20 @@
   --h1-line: 40px;
   --h2-size: 32px;
   --h2-line: 36px;
-  --h3-size: 24px;
-  --h3-line: 28px;
-  --h4-size: 22px;
-  --h4-line: 26px;
-  --h5-size: 20px;
-  --h5-line: 24px;
-  --h6-size: 18px;
-  --h6-line: 22px;
-  --body-size: 16px;
-  --body-line: 22px;
-  --small-size: 14px;
-  --small-line: 20px;
-  --meta-size: 12px;
-  --meta-line: 16px;
+  --h3-size: 26px;
+  --h3-line: 31px;
+  --h4-size: 24px;
+  --h4-line: 29px;
+  --h5-size: 22px;
+  --h5-line: 27px;
+  --h6-size: 19px;
+  --h6-line: 24px;
+  --body-size: 17px;
+  --body-line: 24px;
+  --small-size: 15px;
+  --small-line: 21px;
+  --meta-size: 13px;
+  --meta-line: 18px;
 
   /* One global 0.70 compression applies to spacing only. */
   --space-compression: 0.7;
@@ -118,9 +119,9 @@
   --shadow-bottom: 0 -2px 12px rgba(0, 0, 0, 0.16);
 
   --mobile-width: 390px;
-  --matrix-label-width: 132px;
-  --availability-day-width: 52px;
-  --availability-row-height: 52px;
+  --matrix-label-width: 138px;
+  --availability-day-width: 54px;
+  --availability-row-height: 56px;
   --rate-day-width: 82px;
   --rate-row-height: 56px;
   --motion-fast: 140ms;

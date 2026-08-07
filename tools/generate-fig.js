@@ -58,6 +58,21 @@ function run(bin, args, opts, deps) {
   return deps.execFileSync(bin, args, { stdio: ['ignore', 'ignore', 'inherit'], ...opts });
 }
 
+function positiveDimension(value, label) {
+  const number = Number(value);
+  if (!Number.isSafeInteger(number) || number < 1) {
+    throw new GenerateFigError(label + ' must be a positive integer');
+  }
+  return number;
+}
+
+function frameDimensions(frame, manifest, dumpRect) {
+  return {
+    width: positiveDimension(frame.width ?? manifest.width ?? Math.round(dumpRect.w), 'frame width'),
+    height: positiveDimension(frame.height ?? manifest.height ?? Math.round(dumpRect.h), 'frame height'),
+  };
+}
+
 function main(argv, overrides = {}) {
   const deps = createDependencies(overrides);
   const { compileSchema, crypto, decodeBinarySchema, fs, os, pako, path, zlib } = deps;
@@ -285,9 +300,24 @@ function main(argv, overrides = {}) {
           continue;
         }
         const r = frameBox(file);
-        pages.push({ file, name: fr.name || fr.id, ox, oy });
-        ox += r.w + GAP_X;
-        if (r.h > rowH) rowH = r.h;
+        const dimensions = frameDimensions(fr, M, r);
+        if (Math.abs(r.w - dimensions.width) > 0.5 || Math.abs(r.h - dimensions.height) > 0.5) {
+          throw new GenerateFigError(
+            path.basename(file) +
+              ' is ' +
+              Math.round(r.w) +
+              '×' +
+              Math.round(r.h) +
+              ', but its manifest viewport is ' +
+              dimensions.width +
+              '×' +
+              dimensions.height +
+              ' — run dump-frames.js before generate-fig.js'
+          );
+        }
+        pages.push({ file, name: fr.name || fr.id, ox, oy, ...dimensions });
+        ox += dimensions.width + GAP_X;
+        if (dimensions.height > rowH) rowH = dimensions.height;
         if (ox - GAP_X > canvasExtent.w) canvasExtent.w = ox - GAP_X;
       }
       deps.log((row.label || 'row') + ' → ' + (ox ? Math.round(ox / 1000) + 'k px wide' : 'empty'));
@@ -361,7 +391,10 @@ function main(argv, overrides = {}) {
         visible: true,
         opacity: n.opacity != null && !isRoot ? n.opacity : 1,
         transform: { ...IDENT, m02: relX, m12: relY },
-        size: { x: Math.max(1, n.rect.w), y: Math.max(1, n.rect.h) },
+        size: {
+          x: Math.max(1, isRoot ? page.width : n.rect.w),
+          y: Math.max(1, isRoot ? page.height : n.rect.h),
+        },
         strokeWeight: 0,
         strokeAlign: 'INSIDE',
         strokeJoin: 'MITER',
@@ -431,7 +464,7 @@ function main(argv, overrides = {}) {
       // box → FRAME
       node.type = 'FRAME';
       node.name = isRoot ? page.name : (n.name || 'div').slice(0, 40);
-      if (!n.clips) node.frameMaskDisabled = true;
+      if (!isRoot && !n.clips) node.frameMaskDisabled = true;
       const fills = [];
       if (n.bg) fills.push(solid(n.bg));
       if (n.gradient && n.gradient.stops.length >= 2) fills.push(gradientPaint(n.gradient));
@@ -612,5 +645,7 @@ if (require.main === module) {
 module.exports = {
   GenerateFigError,
   createDependencies,
+  frameDimensions,
   main,
+  positiveDimension,
 };

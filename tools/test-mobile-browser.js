@@ -82,6 +82,35 @@ async function main() {
       assert.doesNotMatch(result.panelText, /Desktop|View/);
     }
 
+    await open(page, 'm-dashboard.html', '?nopanel=1');
+    const exportViewport = await page.evaluate(async () => {
+      const hadExportLayout = document.body.dataset.export === '1';
+      delete document.body.dataset.export;
+      await new Promise(resolve => window.requestAnimationFrame(() => window.requestAnimationFrame(resolve)));
+      const navigation = document.querySelector('.mobile-bottom-nav').getBoundingClientRect();
+      return {
+        hadExportLayout,
+        hasPanel: Boolean(document.querySelector('.proto-tools')),
+        viewportHeight: window.innerHeight,
+        scrollHeight: document.documentElement.scrollHeight,
+        navigationBottom: Math.round(navigation.bottom),
+      };
+    });
+    assert.deepStrictEqual(
+      {
+        hadExportLayout: exportViewport.hadExportLayout,
+        hasPanel: exportViewport.hasPanel,
+        viewportHeight: exportViewport.viewportHeight,
+        navigationBottom: exportViewport.navigationBottom,
+      },
+      { hadExportLayout: true, hasPanel: false, viewportHeight: 844, navigationBottom: 844 },
+      'capture mode must hide tooling while restoring app chrome to the real phone viewport'
+    );
+    assert(
+      exportViewport.scrollHeight > 844,
+      'the HTML page must remain naturally scrollable below the captured viewport'
+    );
+
     await open(page, 'm-reservations.html', '?inv=none');
     assert.deepStrictEqual(
       await page.evaluate(() => ({
@@ -96,7 +125,9 @@ async function main() {
     assert.deepStrictEqual(
       await page.evaluate(() => ({
         count: document.querySelector('[data-result-count]').textContent.trim(),
-        visible: [...document.querySelectorAll('.reservation-card')].filter(card => getComputedStyle(card).display !== 'none').length,
+        visible: [...document.querySelectorAll('.reservation-card')].filter(
+          card => getComputedStyle(card).display !== 'none'
+        ).length,
       })),
       { count: '3 ukázkové rezervace', visible: 3 }
     );
@@ -116,7 +147,9 @@ async function main() {
     const chm = await page.evaluate(() => ({
       disabled: document.querySelector('[data-write-action]').disabled,
       badgeRight: Math.round(document.querySelector('.connection-pill').getBoundingClientRect().right),
-      notificationRight: Math.round(document.querySelector('.mobile-header .header-button').getBoundingClientRect().right),
+      notificationRight: Math.round(
+        document.querySelector('.mobile-header .header-button').getBoundingClientRect().right
+      ),
     }));
     assert.strictEqual(chm.disabled, true);
     assert(chm.badgeRight < chm.notificationRight, 'CHM badge must not cover the notification action');
@@ -128,7 +161,10 @@ async function main() {
     });
     await new Promise(resolve => setTimeout(resolve, 200));
     assert.deepStrictEqual(
-      await page.evaluate(() => ({ access: document.body.dataset.access, disabled: document.querySelector('[data-write-action]').disabled })),
+      await page.evaluate(() => ({
+        access: document.body.dataset.access,
+        disabled: document.querySelector('[data-write-action]').disabled,
+      })),
       { access: 'read', disabled: true }
     );
 

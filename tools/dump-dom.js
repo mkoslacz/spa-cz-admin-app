@@ -1,6 +1,7 @@
 // Dump absolute-positioned visual tree of a page via puppeteer-core
-// usage: node dump-dom.js <fileUrl> <out.json> [viewportWidth]
-// viewportWidth defaults to 1440 (desktop); pass the phone width (e.g. 430) for mobile screens.
+// usage: node dump-dom.js <fileUrl> <out.json> [viewportWidth] [viewportHeight]
+// Defaults to 1440×1200. Pass both dimensions from the prototype manifest so fixed
+// app chrome is measured in the same real viewport that the exported frame uses.
 // Chrome binary: $CHROME_PATH, else the macOS default below.
 const puppeteer = require('puppeteer-core');
 const fs = require('fs');
@@ -73,17 +74,27 @@ function normalizedViewportWidth(value) {
   return width;
 }
 
+function normalizedViewportHeight(value) {
+  const height = Number(value == null ? 1200 : value);
+  if (!Number.isSafeInteger(height) || height < 1) {
+    throw domError('DOM_VIEWPORT_INVALID', 'viewport height must be a positive integer');
+  }
+  assertWithinBudget(height, 'maxViewportWidth', 'viewport height');
+  return height;
+}
+
 function browserBudgetError(error) {
   const match = error && /CONVERTER_BUDGET_EXCEEDED: (max[A-Za-z]+)/.exec(error.message);
   if (!match) return error;
   return new ConverterPolicyError('CONVERTER_BUDGET_EXCEEDED', 'browser DOM traversal exceeded ' + match[1]);
 }
 
-async function dumpDom(url, output, viewportWidth, overrides = {}) {
+async function dumpDom(url, output, viewportWidth, viewportHeight, overrides = {}) {
   const deps = createDependencies(overrides);
   if (typeof url !== 'string' || !url) throw domError('DOM_URL_INVALID', 'a page URL is required');
   if (typeof output !== 'string' || !output) throw domError('DOM_OUTPUT_INVALID', 'an output path is required');
   const width = normalizedViewportWidth(viewportWidth);
+  const height = normalizedViewportHeight(viewportHeight);
   const chrome = deps.env.CHROME_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
   if (!deps.fs.existsSync(chrome)) {
     throw domError(
@@ -115,7 +126,7 @@ async function dumpDom(url, output, viewportWidth, overrides = {}) {
       deps
     );
     await waitFor(
-      () => page.setViewport({ width, height: 1200 }),
+      () => page.setViewport({ width, height }),
       'viewport setup',
       remainingDeadline('viewport setup', deadline, deps),
       deps
@@ -134,15 +145,28 @@ async function dumpDom(url, output, viewportWidth, overrides = {}) {
       deps
     );
     await waitFor(
+      () =>
+        page.evaluate(() => {
+          // `nopanel=1` keeps all review tooling out of the capture. The prototype
+          // initially marks that mode as a full-page export; remove only that layout
+          // marker so fixed headers, actions and bottom navigation return to their
+          // real positions inside the declared viewport.
+          delete document.body.dataset.export;
+        }),
+      'interactive layout restoration',
+      remainingDeadline('interactive layout restoration', deadline, deps),
+      deps
+    );
+    await waitFor(
       () => new Promise(resolve => deps.setTimeout(resolve, 400)),
-      'post-font settle',
-      remainingDeadline('post-font settle', deadline, deps),
+      'post-layout settle',
+      remainingDeadline('post-layout settle', deadline, deps),
       deps
     );
     let captured;
     try {
       captured = await waitFor(
-        () => page.evaluate(captureDom, CONVERTER_RESOURCE_BUDGET),
+        () => page.evaluate(captureDom, CONVERTER_RESOURCE_BUDGET, { width, height }),
         'DOM evaluation',
         remainingDeadline('DOM evaluation', deadline, deps),
         deps
@@ -165,10 +189,11 @@ async function dumpDom(url, output, viewportWidth, overrides = {}) {
 }
 
 async function main(argv = process.argv.slice(2), overrides = {}) {
-  return dumpDom(argv[0], argv[1], argv[2], overrides);
+  return dumpDom(argv[0], argv[1], argv[2], argv[3], overrides);
 }
 
-async function captureDom(budget) {
+async function captureDom(budget, viewport) {
+  const captureViewport = viewport || { width: window.innerWidth, height: window.innerHeight };
   const sx = () => window.scrollX,
     sy = () => window.scrollY;
 
@@ -255,6 +280,9 @@ async function captureDom(budget) {
     return getComputedStyle(el);
   }
   function rectOf(el) {
+    if (el === document.body) {
+      return { x: sx(), y: sy(), w: captureViewport.width, h: captureViewport.height };
+    }
     const r = el.getBoundingClientRect();
     return { x: r.x + sx(), y: r.y + sy(), w: r.width, h: r.height };
   }
@@ -419,7 +447,10 @@ async function captureDom(budget) {
     };
     node.shadows = parseShadows(st.boxShadow);
     node.opacity = parseFloat(st.opacity);
-    node.clips = ['hidden', 'clip', 'auto', 'scroll'].includes(st.overflow) || st.overflow.includes('hidden');
+    node.clips =
+      el === document.body ||
+      ['hidden', 'clip', 'auto', 'scroll'].includes(st.overflow) ||
+      st.overflow.includes('hidden');
     emit(node);
 
     // pseudo-elements (overlays, generated content)
@@ -577,5 +608,6 @@ module.exports = {
   dumpDom,
   main,
   normalizedViewportWidth,
+  normalizedViewportHeight,
   waitFor,
 };
