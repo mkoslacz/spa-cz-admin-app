@@ -1,27 +1,40 @@
 {
-  "generatedAt": "2026-08-07T00:00:00.000Z",
-  "repository": null,
-  "limited": false,
+  "generatedAt": "2026-08-07T15:43:20.564Z",
+  "repository": "https://github.com/mkoslacz/spa-cz-admin-app",
+  "limited": true,
   "limit": 50,
   "entries": [
     {
-      "sha": "proposal-a",
-      "short": "snapshot",
+      "sha": "b29c71cd4a4d33aa9b20ce81b393d3306c48e2bc",
+      "short": "b29c71c",
       "date": "2026-08-07",
-      "subject": "Create the mobile-only SPA.cz partner app proposal",
-      "body": "Established the eight-area Czech and English app flow from the existing SPA.cz partner-panel functionality, mapped it to the supplied Szallas design system and SPA.cz brand, and added reproducible review, state, comment and Figma-export tooling. This bootstrap entry is replaced by commit-derived history when the repository workflow runs.",
+      "subject": "feat: add SPA.CZ partner mobile prototype",
+      "body": "",
       "screens": [
-        "m-dashboard.html",
-        "m-reservations.html",
-        "m-reservation-detail.html",
+        "changelog.html",
+        "comments.html",
+        "index.html",
+        "m-availability-en.html",
         "m-availability.html",
-        "m-offer.html",
-        "m-rate-edit.html",
+        "m-billing-en.html",
         "m-billing.html",
-        "m-more.html"
+        "m-dashboard-en.html",
+        "m-dashboard.html",
+        "m-more-en.html",
+        "m-more.html",
+        "m-offer-en.html",
+        "m-offer.html",
+        "m-rate-edit-en.html",
+        "m-rate-edit.html",
+        "m-reservation-detail-en.html",
+        "m-reservation-detail.html",
+        "m-reservations-en.html",
+        "m-reservations.html",
+        "specs.html",
+        "usecases.html"
       ],
-      "round": "Proposal A",
-      "url": null
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/b29c71cd4a4d33aa9b20ce81b393d3306c48e2bc"
     }
   ]
 }
