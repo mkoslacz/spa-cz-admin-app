@@ -1,9 +1,19 @@
 {
-  "generatedAt": "2026-08-07T18:36:38.582Z",
+  "generatedAt": "2026-08-07T18:43:46.455Z",
   "repository": "https://github.com/mkoslacz/spa-cz-admin-app",
   "limited": true,
   "limit": 50,
   "entries": [
+    {
+      "sha": "b16ed04cb602c5537af8a0846d0db98e41b95369",
+      "short": "b16ed04",
+      "date": "2026-08-07",
+      "subject": "feat: inject live comments config on deploy",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/b16ed04cb602c5537af8a0846d0db98e41b95369"
+    },
     {
       "sha": "683f433f215f93fa9d5c89f9b3b1412fce797b02",
       "short": "683f433",
