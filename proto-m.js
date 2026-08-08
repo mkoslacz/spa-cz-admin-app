@@ -949,6 +949,32 @@
     error.hidden = !message;
   }
 
+  function availabilityDateAxis() {
+    const dateIds = new Set();
+    document.querySelectorAll(".availability-cell").forEach((cell) => {
+      const dateId = cell.dataset.dateId || "";
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dateId)) dateIds.add(dateId);
+    });
+    return [...dateIds].sort();
+  }
+
+  function nextAvailabilityDateId(dateId) {
+    const date = new Date(`${dateId}T00:00:00Z`);
+    if (
+      Number.isNaN(date.getTime()) ||
+      date.toISOString().slice(0, 10) !== dateId
+    )
+      return "";
+    date.setUTCDate(date.getUTCDate() + 1);
+    return date.toISOString().slice(0, 10);
+  }
+
+  function availabilityPeriodError() {
+    return language() === "cs"
+      ? "Vyberte datum od i do v dostupném období."
+      : "Select both dates within the available period.";
+  }
+
   function availabilityBulkSelection(form) {
     const from = form.querySelector("[data-availability-bulk-from]").value;
     const to = form.querySelector("[data-availability-bulk-to]").value;
@@ -964,6 +990,12 @@
             : "Select valid from and to dates.",
       };
     }
+    const dateAxis = availabilityDateAxis();
+    const fromIndex = dateAxis.indexOf(from);
+    const toIndex = dateAxis.indexOf(to);
+    if (fromIndex < 0 || toIndex < 0) {
+      return { cells: [], error: availabilityPeriodError() };
+    }
     if (from > to) {
       return {
         cells: [],
@@ -973,10 +1005,19 @@
             : "The from date cannot be after the to date.",
       };
     }
+    const selectedDateIds = dateAxis.slice(fromIndex, toIndex + 1);
+    const continuous = selectedDateIds.every(
+      (dateId, index) =>
+        index === 0 ||
+        nextAvailabilityDateId(selectedDateIds[index - 1]) === dateId,
+    );
+    if (!continuous) {
+      return { cells: [], error: availabilityPeriodError() };
+    }
+    const selectedDates = new Set(selectedDateIds);
     const cells = [...document.querySelectorAll(".availability-cell")].filter(
       (cell) =>
-        cell.dataset.dateId >= from &&
-        cell.dataset.dateId <= to &&
+        selectedDates.has(cell.dataset.dateId) &&
         (roomTypeId === "all" || cell.dataset.roomTypeId === roomTypeId),
     );
     if (!cells.length) {

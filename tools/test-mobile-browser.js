@@ -793,6 +793,20 @@ async function availabilitySnapshots(page, availabilityIds) {
   );
 }
 
+async function availabilityGridSnapshot(page) {
+  return page.$$eval('.availability-cell', cells =>
+    Object.fromEntries(
+      cells.map(cell => [
+        cell.dataset.availabilityId,
+        {
+          text: cell.querySelector('[data-availability-control]').textContent.trim(),
+          stopped: cell.classList.contains('stop'),
+        },
+      ])
+    )
+  );
+}
+
 async function setBulkDate(page, selector, value) {
   await page.$eval(
     selector,
@@ -843,6 +857,57 @@ async function openAvailabilityBulkEditor(page) {
   await page.waitForFunction(() => document.querySelector('#availability-sheet').classList.contains('open'), {
     timeout: 5000,
   });
+}
+
+async function assertInvalidBulkPeriod(page, lang, from, to, label) {
+  const stateBefore = await availabilityMutationState(page);
+  const gridBefore = await availabilityGridSnapshot(page);
+  await setBulkDate(page, '[data-availability-bulk-from]', from);
+  await setBulkDate(page, '[data-availability-bulk-to]', to);
+  assert.strictEqual(
+    await page.$eval('[data-availability-bulk-count]', node => node.textContent.trim()),
+    '0',
+    `${lang}: ${label} previews zero cells`
+  );
+  const validation = await page.$eval('[data-availability-bulk-form]', form => ({
+    error: form.querySelector('[data-availability-bulk-error]').textContent.trim(),
+    errorVisible: !form.querySelector('[data-availability-bulk-error]').hidden,
+    novalidate: form.hasAttribute('novalidate'),
+  }));
+  assert.strictEqual(validation.errorVisible, true, `${lang}: ${label} shows a period error`);
+  assert.match(
+    validation.error,
+    lang === 'en' ? /available period/i : /dostupném období/i,
+    `${lang}: ${label} period error is localized`
+  );
+  assert.strictEqual(validation.novalidate, true, `${lang}: ${label} exercises runtime validation`);
+  await page.click('[form="availability-form"]');
+  assert.strictEqual(
+    await page.$eval('#availability-sheet', sheet => sheet.classList.contains('open')),
+    true,
+    `${lang}: ${label} keeps the bulk editor open`
+  );
+  assert.deepStrictEqual(
+    await availabilityMutationState(page),
+    stateBefore,
+    `${lang}: ${label} cannot persist a mutation`
+  );
+  assert.deepStrictEqual(
+    await availabilityGridSnapshot(page),
+    gridBefore,
+    `${lang}: ${label} cannot change a rendered cell`
+  );
+  await page.reload({ waitUntil: 'networkidle0' });
+  assert.deepStrictEqual(
+    await availabilityMutationState(page),
+    stateBefore,
+    `${lang}: ${label} remains non-mutating after reload`
+  );
+  assert.deepStrictEqual(
+    await availabilityGridSnapshot(page),
+    gridBefore,
+    `${lang}: ${label} leaves every cell unchanged after reload`
+  );
 }
 
 async function assertRestrictedAvailability(page, origin, screen, overrides, label) {
@@ -923,6 +988,71 @@ async function assertBulkAvailabilityFlow(page, origin, lang) {
   assert(labels.rooms.includes(lang === 'en' ? 'Double' : 'Dvoulůžkový'));
   assert.strictEqual(labels.count, '2', `${lang}: default Double inclusive count`);
   assert.strictEqual(labels.unitsHidden, false, `${lang}: numeric action shows numeric input`);
+
+  await assertInvalidBulkPeriod(page, lang, '2026-10-10', '2026-10-17', 'below-minimum range');
+  await openAvailabilityBulkEditor(page);
+  await assertInvalidBulkPeriod(page, lang, '2026-10-18', '2026-10-25', 'above-maximum range');
+
+  await openAvailabilityBulkEditor(page);
+  await page.select('[data-availability-bulk-action]', 'units');
+  await page.select('[data-availability-bulk-room]', 'double');
+  await setBulkDate(page, '[data-availability-bulk-from]', '2026-10-12');
+  await setBulkDate(page, '[data-availability-bulk-to]', '2026-10-23');
+  await page.$eval('[data-availability-bulk-units]', input => {
+    input.value = '7';
+  });
+  assert.strictEqual(
+    await page.$eval('[data-availability-bulk-count]', node => node.textContent.trim()),
+    '12',
+    `${lang}: exact full boundary previews all twelve Double cells`
+  );
+  assert.strictEqual(
+    await page.$eval('[data-availability-bulk-error]', node => node.hidden),
+    true,
+    `${lang}: exact full boundary is valid`
+  );
+  const boundaryIds = await page.$$eval('.availability-cell[data-room-type-id="double"]', cells =>
+    cells.map(cell => cell.dataset.availabilityId)
+  );
+  const boundaryUnselectedBefore = await availabilitySnapshot(page, 'suite:2026-10-12');
+  await page.click('[form="availability-form"]');
+  await page.waitForFunction(
+    () => document.querySelector('#availability-sheet').getAttribute('aria-hidden') === 'true'
+  );
+  assert.strictEqual(boundaryIds.length, 12, `${lang}: exact boundary contains twelve canonical dates`);
+  for (const availabilityId of boundaryIds) {
+    assert.deepStrictEqual(
+      await availabilitySnapshot(page, availabilityId),
+      { text: '7', stopped: false },
+      `${lang}: exact boundary changes ${availabilityId}`
+    );
+  }
+  assert.deepStrictEqual(
+    Object.keys(await availabilityMutationState(page)).sort(),
+    boundaryIds.slice().sort(),
+    `${lang}: exact boundary writes exactly twelve Double keys`
+  );
+  assert.deepStrictEqual(
+    await availabilitySnapshot(page, 'suite:2026-10-12'),
+    boundaryUnselectedBefore,
+    `${lang}: exact boundary leaves other room types unchanged`
+  );
+  await page.reload({ waitUntil: 'networkidle0' });
+  for (const availabilityId of boundaryIds) {
+    assert.deepStrictEqual(
+      await availabilitySnapshot(page, availabilityId),
+      { text: '7', stopped: false },
+      `${lang}: exact boundary survives reload for ${availabilityId}`
+    );
+  }
+  await page.evaluate(() => globalThis.localStorage.clear());
+  await page.reload({ waitUntil: 'networkidle0' });
+  assert.deepStrictEqual(
+    await availabilitySnapshots(page, numericIds),
+    numericBefore,
+    `${lang}: boundary setup is cleared before existing bulk regressions`
+  );
+  await openAvailabilityBulkEditor(page);
 
   await setBulkDate(page, '[data-availability-bulk-from]', '2026-10-18');
   await setBulkDate(page, '[data-availability-bulk-to]', '2026-10-17');
