@@ -14,20 +14,86 @@ const { ArtifactIntegrityError, artifactInventory, validateReceipt, validateRefr
 
 const root = path.resolve(__dirname, '..');
 
-function copyFilter(source) {
-  const relative = path.relative(root, source);
-  const ignored = [path.join('tools', 'node_modules')];
-  return !ignored.some(entry => relative === entry || relative.startsWith(`${entry}${path.sep}`));
+function copyFilter(sourceRoot) {
+  return source => {
+    const relative = path.relative(sourceRoot, source);
+    const ignored = [path.join('tools', 'node_modules')];
+    return !ignored.some(entry => relative === entry || relative.startsWith(`${entry}${path.sep}`));
+  };
 }
 
-function withTemporaryRepository(callback) {
+function resetIndex(repository) {
+  childProcess.execFileSync('git', ['reset', '--mixed', 'HEAD'], { cwd: repository, stdio: 'ignore' });
+}
+
+function writeStagedBlob(repository, relative, contents) {
+  const object = childProcess
+    .execFileSync('git', ['hash-object', '-w', '--stdin'], { cwd: repository, encoding: 'utf8', input: contents })
+    .trim();
+  childProcess.execFileSync('git', ['update-index', '--add', '--cacheinfo', `100644,${object},${relative}`], {
+    cwd: repository,
+    stdio: 'ignore',
+  });
+}
+
+function withTemporaryRepository(source, expectedInherited, callback) {
   const temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'spa-cz-artifact-integrity-'));
   try {
-    fs.cpSync(root, temporary, { filter: copyFilter, recursive: true });
+    fs.cpSync(source, temporary, { filter: copyFilter(source), recursive: true });
+    assert.deepStrictEqual(
+      stagedPaths(temporary),
+      expectedInherited,
+      'temporary fixture must inherit the controlled staged caller index before isolation'
+    );
+    resetIndex(temporary);
+    assert.deepStrictEqual(
+      stagedPaths(temporary),
+      [],
+      'temporary fixture must reset only its copied Git index before any probe'
+    );
     callback(temporary);
   } finally {
     fs.rmSync(temporary, { force: true, recursive: true });
   }
+}
+
+function withStagedCaller(callback) {
+  const caller = fs.mkdtempSync(path.join(os.tmpdir(), 'spa-cz-artifact-integrity-caller-'));
+  const staged = ['docs/impl-guides/receipt-staged-caller-probe.md', 'tools/dumps/receipt-staged-caller-probe.json'];
+  try {
+    fs.cpSync(root, caller, { filter: copyFilter(root), recursive: true });
+    resetIndex(caller);
+    assert.deepStrictEqual(stagedPaths(caller), [], 'outer caller fixture must begin with an empty index');
+    writeStagedBlob(caller, staged[0], '# Staged caller lifecycle probe\n');
+    writeStagedBlob(caller, staged[1], '{"probe":"staged caller generated artifact"}\n');
+    assert.deepStrictEqual(stagedPaths(caller), staged, 'outer caller fixture must stage the controlled probe entries');
+    withTemporaryRepository(caller, staged, callback);
+    assert.deepStrictEqual(
+      stagedPaths(caller),
+      staged,
+      'temporary fixture isolation must not alter the outer caller index'
+    );
+  } finally {
+    fs.rmSync(caller, { force: true, recursive: true });
+  }
+}
+
+function stagedPaths(repository) {
+  return childProcess
+    .execFileSync('git', ['diff', '--cached', '--name-only', '-z'], { cwd: repository })
+    .toString('utf8')
+    .split('\0')
+    .filter(Boolean)
+    .sort();
+}
+
+function committedPaths(repository) {
+  return childProcess
+    .execFileSync('git', ['diff-tree', '--no-commit-id', '--name-only', '-r', '-z', 'HEAD'], { cwd: repository })
+    .toString('utf8')
+    .split('\0')
+    .filter(Boolean)
+    .sort();
 }
 
 function expectIntegrityError(run, pattern, message) {
@@ -79,7 +145,7 @@ function commit(repository, paths, message) {
   );
 }
 
-withTemporaryRepository(repository => {
+withStagedCaller(repository => {
   assert.strictEqual(
     artifactIntegrity.writeReceipt,
     undefined,
@@ -262,23 +328,26 @@ withTemporaryRepository(repository => {
   validateReceipt(repository);
 
   const generatedOnly = 'tools/dumps/receipt-history-probe.txt';
+  assert.deepStrictEqual(stagedPaths(repository), [], 'generated-only probe must start from an empty fixture index');
   fs.writeFileSync(path.join(repository, generatedOnly), 'generated history probe\n');
   commit(repository, [generatedOnly], 'test: generated artifact history probe');
+  assert.deepStrictEqual(
+    committedPaths(repository),
+    [generatedOnly],
+    'generated-only probe commit must contain exactly its declared sentinel path'
+  );
   validateReceipt(repository);
 
-  childProcess.execFileSync(
-    'git',
-    [
-      '-c',
-      'user.name=Artifact integrity test',
-      '-c',
-      'user.email=artifact-integrity@test.invalid',
-      'commit',
-      '--allow-empty',
-      '-m',
-      'test: source history probe',
-    ],
-    { cwd: repository, stdio: 'ignore' }
+  const sourceOnly = 'tools/receipt-history-source-probe.js';
+  fs.writeFileSync(
+    path.join(repository, sourceOnly),
+    "'use strict';\n\n// Deliberately non-generated history probe.\n"
+  );
+  commit(repository, [sourceOnly], 'test: source history probe');
+  assert.deepStrictEqual(
+    committedPaths(repository),
+    [sourceOnly],
+    'source-history probe commit must remain a deliberate non-generated change'
   );
   expectIntegrityError(
     () => validateReceipt(repository),
