@@ -4,7 +4,14 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
-const { AVAILABILITY_DATES, OFFERS, RESERVATIONS, ROOM_TYPES, outcomeAttributes } = require('./build-screens.js');
+const {
+  AVAILABILITY_DATES,
+  OFFERS,
+  PACKAGE_DRAFT_TEMPLATE,
+  RESERVATIONS,
+  ROOM_TYPES,
+  outcomeAttributes,
+} = require('./build-screens.js');
 
 const root = path.resolve(__dirname, '..');
 const screens = fs
@@ -85,6 +92,17 @@ OFFERS.forEach(offer => {
   });
 });
 assert.deepStrictEqual([...coveredRoomTypeIds].sort(), [...roomTypeIds].sort(), 'package coverage spans room types');
+assert.strictEqual(PACKAGE_DRAFT_TEMPLATE.active, false, 'new packages start as drafts');
+assert.strictEqual(PACKAGE_DRAFT_TEMPLATE.spa, false, 'new packages do not inherit SPA.CZ classification');
+assert.deepStrictEqual(
+  PACKAGE_DRAFT_TEMPLATE.roomPrices.map(relation => relation.roomTypeId),
+  ['double'],
+  'draft template references the shared room-type model'
+);
+assert(
+  PACKAGE_DRAFT_TEMPLATE.roomPrices.every(relation => roomTypeIds.includes(relation.roomTypeId)),
+  'draft template room-price references resolve'
+);
 assert.strictEqual(new Set(RESERVATIONS.map(reservation => reservation.id)).size, RESERVATIONS.length);
 RESERVATIONS.forEach(reservation => assert.match(reservation.id, /^RSV-[0-9]+$/, 'neutral reservation id'));
 
@@ -155,6 +173,7 @@ for (const lang of ['', '-en']) {
   }
   const offers = read(`m-offer${lang}.html`);
   assert.strictEqual((offers.match(/offer=[a-z0-9-]+/g) || []).length, 4, 'four exact offer routes');
+  assert.match(offers, lang ? />Add package<\/button>/ : />Přidat balíček<\/button>/, 'visible package action');
 
   const availability = read(`m-availability${lang}.html`);
   assert.strictEqual(
@@ -164,6 +183,8 @@ for (const lang of ['', '-en']) {
   );
   const rates = read(`m-rate-edit${lang}.html`);
   assert.match(rates, /Package prices by room type|Ceny balíčku podle typu pokoje/);
+  assert.match(rates, /data-package-editor-surface hidden/, 'package editor is a distinct route surface');
+  assert.match(rates, /data-package-rates-surface/, 'package rates remain a distinct route surface');
   roomTypeIds.forEach(id => assert.match(rates, new RegExp(`data-room-type-id="${id}"`), `${id}: rate row`));
 }
 

@@ -56,6 +56,7 @@
     to: "2026-10-12",
     section: "",
     availabilityMutations: Object.freeze({}),
+    packageDrafts: Object.freeze({}),
   });
   let state = readState();
   let toastTimer = 0;
@@ -91,6 +92,7 @@
     next.availabilityMutations = normalizeAvailabilityMutations(
       next.availabilityMutations,
     );
+    next.packageDrafts = normalizePackageDrafts(next.packageDrafts);
     return next;
   }
 
@@ -112,6 +114,26 @@
           return [[key, { type: "units", value: mutation.value }]];
         }
         return [];
+      }),
+    );
+  }
+
+  function normalizePackageDrafts(value) {
+    if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+    return Object.fromEntries(
+      Object.entries(value).flatMap(([id, draft]) => {
+        if (!/^local-package-[1-9]\d*$/.test(id)) return [];
+        if (!draft || typeof draft !== "object" || Array.isArray(draft))
+          return [];
+        const title = typeof draft.title === "string" ? draft.title.trim() : "";
+        if (!title || title.length > 160) return [];
+        if (
+          !Number.isInteger(draft.nights) ||
+          draft.nights < 1 ||
+          draft.nights > 365
+        )
+          return [];
+        return [[id, { title, nights: draft.nights }]];
       }),
     );
   }
@@ -172,6 +194,140 @@
     } catch (error) {
       return [];
     }
+  }
+
+  function packageDuration(nights) {
+    const days = nights + 1;
+    if (language() === "cs") {
+      const dayLabel = days === 1 ? "den" : days <= 4 ? "dny" : "dní";
+      const nightLabel = nights === 1 ? "noc" : nights <= 4 ? "noci" : "nocí";
+      return `${days} ${dayLabel} / ${nights} ${nightLabel}`;
+    }
+    return `${days} ${days === 1 ? "day" : "days"} / ${nights} ${nights === 1 ? "night" : "nights"}`;
+  }
+
+  function packageDraftTemplate() {
+    return fixtures("package-draft-fixture")[0] || null;
+  }
+
+  function packageFromDraft(id, draft) {
+    const template = packageDraftTemplate();
+    if (!template) return null;
+    const sequence = Number(id.slice("local-package-".length));
+    return {
+      ...template,
+      id,
+      rank: 4 + sequence,
+      title: draft.title,
+      duration: packageDuration(draft.nights),
+      nights: draft.nights,
+    };
+  }
+
+  function resolvedOffers() {
+    const base = fixtures("offer-fixtures");
+    const drafts = Object.entries(state.packageDrafts)
+      .map(([id, draft]) => packageFromDraft(id, draft))
+      .filter(Boolean);
+    return base.concat(drafts);
+  }
+
+  function packageEditorHref(offerId, section) {
+    const page = `m-rate-edit${language() === "cs" ? "" : "-en"}.html`;
+    const query = new URLSearchParams({ offer: offerId, section });
+    return withState(`${page}?${query.toString()}`);
+  }
+
+  function renderCreatedOffers() {
+    const list = document.querySelector(".offer-list");
+    const template = document.getElementById("created-offer-template");
+    if (!list || !template) return;
+    list.querySelectorAll("[data-created-package]").forEach((node) =>
+      node.remove(),
+    );
+    Object.entries(state.packageDrafts).forEach(([id, draft]) => {
+      const offer = packageFromDraft(id, draft);
+      if (!offer) return;
+      const card = template.content.firstElementChild.cloneNode(true);
+      card.dataset.inventoryRank = String(offer.rank);
+      card.dataset.offerId = offer.id;
+      card.querySelector("[data-created-offer-title]").textContent = offer.title;
+      card.querySelector("[data-created-offer-duration]").textContent =
+        offer.duration;
+      card.querySelector("[data-created-offer-meal]").textContent = offer.meal;
+      card.querySelector("[data-created-offer-edit]").href = packageEditorHref(
+        offer.id,
+        "package",
+      );
+      card.querySelector("[data-created-offer-rates]").href = packageEditorHref(
+        offer.id,
+        "rates",
+      );
+      list.append(card);
+    });
+  }
+
+  function syncPackageSurface(offer) {
+    const editor = document.querySelector("[data-package-editor-surface]");
+    const rates = document.querySelector("[data-package-rates-surface]");
+    if (!editor || !rates) return;
+    const editing = state.section === "package";
+    editor.hidden = !editing;
+    rates.hidden = editing;
+    document.querySelectorAll("[data-offer-route]").forEach((link) => {
+      link.href = packageEditorHref(offer.id, link.dataset.offerRoute);
+    });
+  }
+
+  function setPackageCreateError(form, message) {
+    const error = form.querySelector("[data-package-create-error]");
+    if (!error) return;
+    error.textContent = message || "";
+    error.hidden = !message;
+  }
+
+  function nextPackageId() {
+    const used = new Set(
+      resolvedOffers()
+        .map((offer) => offer.id)
+        .filter(Boolean),
+    );
+    let sequence = 1;
+    while (used.has(`local-package-${sequence}`)) sequence += 1;
+    return `local-package-${sequence}`;
+  }
+
+  function createPackageDraft(form) {
+    if (state.access !== "full") return false;
+    const title = form.querySelector("[data-package-create-title]").value.trim();
+    const nights = Number(
+      form.querySelector("[data-package-create-nights]").value,
+    );
+    if (!title || title.length > 160) {
+      setPackageCreateError(
+        form,
+        language() === "cs"
+          ? "Zadejte název balíčku."
+          : "Enter a package name.",
+      );
+      return false;
+    }
+    if (!Number.isInteger(nights) || nights < 1 || nights > 365) {
+      setPackageCreateError(
+        form,
+        language() === "cs"
+          ? "Počet nocí musí být celé číslo od 1 do 365."
+          : "Number of nights must be a whole number from 1 to 365.",
+      );
+      return false;
+    }
+    const id = nextPackageId();
+    state.packageDrafts[id] = { title, nights };
+    state.offer = id;
+    state.section = "package";
+    persistState();
+    location.assign(packageEditorHref(id, "package"));
+    return true;
   }
 
   function canWriteAvailability() {
@@ -517,15 +673,28 @@
   }
 
   function hydrateOffer() {
-    const list = fixtures("offer-fixtures");
+    const list = resolvedOffers();
     if (!list.length) return;
     const offer = list.find((entry) => entry.id === state.offer);
     setIdentity(Boolean(offer));
     if (!offer) return;
+    setText('[data-offer-field="id"]', offer.id);
     setText('[data-offer-field="title"]', offer.title);
     setText('[data-offer-field="duration"]', offer.duration);
     setText('[data-offer-field="meal"]', offer.meal);
     setText('[data-offer-field="price"]', formatCurrency(offer.price));
+    document
+      .querySelectorAll('[data-offer-field="publication"]')
+      .forEach((node) => {
+        node.className = `status ${offer.active ? "success" : "warning"}`;
+        node.textContent = offer.active
+          ? language() === "cs"
+            ? "Aktivní"
+            : "Active"
+          : language() === "cs"
+            ? "Koncept"
+            : "Draft";
+      });
     document.querySelectorAll('[data-offer-input="title"]').forEach((input) => {
       input.value = offer.title;
     });
@@ -560,6 +729,7 @@
           );
         });
       });
+    syncPackageSurface(offer);
   }
 
   function inventoryAllows(node) {
@@ -619,6 +789,15 @@
       card.hidden = !show;
       if (show) visible += 1;
     });
+    const filterCounts = {
+      all: cards.length,
+      active: cards.filter((card) => matches.active(card)).length,
+      spa: cards.filter((card) => matches.spa(card)).length,
+      missing: cards.filter((card) => matches.missing(card)).length,
+    };
+    Object.entries(filterCounts).forEach(([filter, count]) =>
+      setText(`[data-offer-filter-count="${filter}"]`, String(count)),
+    );
     setText("[data-offer-count]", String(visible));
     const empty = document.querySelector("[data-offer-empty]");
     if (empty) empty.hidden = visible !== 0 || state.inv === "none";
@@ -684,6 +863,7 @@
             : "countNone";
       if (node.dataset[countKey]) node.textContent = node.dataset[countKey];
     });
+    renderCreatedOffers();
     hydrateReservation();
     hydrateOffer();
     renderAvailability();
@@ -952,6 +1132,14 @@
     });
 
     document.addEventListener("submit", (event) => {
+      const packageCreateForm = event.target.closest(
+        "[data-package-create-form]",
+      );
+      if (packageCreateForm) {
+        event.preventDefault();
+        createPackageDraft(packageCreateForm);
+        return;
+      }
       const availabilityForm = event.target.closest(
         "[data-availability-cell-form]",
       );

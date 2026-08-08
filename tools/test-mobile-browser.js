@@ -107,6 +107,159 @@ async function currentRoute(page) {
   }));
 }
 
+async function prototypeDomainState(page) {
+  return page.evaluate(() => JSON.parse(globalThis.localStorage.getItem('spa-cz-admin-prototype') || '{}'));
+}
+
+async function assertPackageDraftFlow(page, origin, languageCode) {
+  const suffix = languageCode === 'en' ? '-en' : '';
+  const oppositeSuffix = languageCode === 'en' ? '' : '-en';
+  const oppositeLanguage = languageCode === 'en' ? 'cs' : 'en';
+  const screen = `m-offer${suffix}.html`;
+  const title = `Autumn reset ${languageCode.toUpperCase()}`;
+
+  await open(page, origin, screen);
+  await page.evaluate(() => globalThis.localStorage.clear());
+  await open(page, origin, screen);
+  const availabilityBefore = (await prototypeDomainState(page)).availabilityMutations || {};
+  assert.strictEqual(
+    await page.$eval('[data-open-sheet="new-package-sheet"]', node => node.textContent.trim()),
+    languageCode === 'en' ? 'Add package' : 'Přidat balíček',
+    `${languageCode}: package creation has a visible label`
+  );
+
+  await page.click('[data-open-sheet="new-package-sheet"]');
+  await page.click('[form="new-package-sheet-form"]');
+  assert.strictEqual(
+    await page.$eval('[data-package-create-form]', form => form.checkValidity()),
+    false,
+    `${languageCode}: an empty required name is invalid`
+  );
+  assert.deepStrictEqual(
+    (await prototypeDomainState(page)).packageDrafts || {},
+    {},
+    `${languageCode}: invalid creation cannot persist a partial draft`
+  );
+  await page.$eval(
+    '[data-package-create-title]',
+    (input, value) => {
+      input.value = value;
+      input.dispatchEvent(new globalThis.Event('input', { bubbles: true }));
+    },
+    title
+  );
+  await page.$eval('[data-package-create-nights]', input => {
+    input.value = '3';
+    input.dispatchEvent(new globalThis.Event('input', { bubbles: true }));
+  });
+  assert.strictEqual(
+    await page.$eval('[data-package-create-title]', input => input.value),
+    title,
+    `${languageCode}: complete package name is entered before submit`
+  );
+  await Promise.all([
+    page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 30000 }),
+    page.click('[form="new-package-sheet-form"]'),
+  ]);
+
+  const createdRoute = await currentRoute(page);
+  assert.strictEqual(createdRoute.page, `m-rate-edit${suffix}.html`, `${languageCode}: draft editor route`);
+  assert.strictEqual(createdRoute.query.section, 'package', `${languageCode}: distinct package editor section`);
+  assert.match(createdRoute.query.offer, /^local-package-[1-9]\d*$/, `${languageCode}: stable local identity`);
+  const offerId = createdRoute.query.offer;
+  assert.deepStrictEqual(
+    await page.evaluate(() => ({
+      identity: document.body.dataset.identityStatus,
+      editorHidden: document.querySelector('[data-package-editor-surface]').hidden,
+      ratesHidden: document.querySelector('[data-package-rates-surface]').hidden,
+      id: document.querySelector('[data-offer-field="id"]').textContent.trim(),
+      title: document.querySelector('[data-offer-field="title"]').textContent.trim(),
+      status: document.querySelector('[data-offer-field="publication"]').textContent.trim(),
+    })),
+    {
+      identity: 'found',
+      editorHidden: false,
+      ratesHidden: true,
+      id: offerId,
+      title,
+      status: languageCode === 'en' ? 'Draft' : 'Koncept',
+    },
+    `${languageCode}: created record resolves in its own editor without fixture fallback`
+  );
+
+  let stored = await prototypeDomainState(page);
+  assert.deepStrictEqual(
+    stored.packageDrafts,
+    { [offerId]: { title, nights: 3 } },
+    `${languageCode}: normalized packageDrafts overlay`
+  );
+  assert.deepStrictEqual(
+    stored.availabilityMutations || {},
+    availabilityBefore,
+    `${languageCode}: package creation does not mutate room availability`
+  );
+
+  await page.reload({ waitUntil: 'networkidle0' });
+  assert.deepStrictEqual(
+    await page.evaluate(() => ({
+      identity: document.body.dataset.identityStatus,
+      id: document.querySelector('[data-offer-field="id"]').textContent.trim(),
+      title: document.querySelector('[data-offer-field="title"]').textContent.trim(),
+      editorHidden: document.querySelector('[data-package-editor-surface]').hidden,
+    })),
+    { identity: 'found', id: offerId, title, editorHidden: false },
+    `${languageCode}: draft identity survives reload`
+  );
+
+  await clickRoute(page, `.langswitch a[data-lang="${oppositeLanguage}"]`);
+  const translatedRoute = await currentRoute(page);
+  assert.strictEqual(translatedRoute.page, `m-rate-edit${oppositeSuffix}.html`, `${languageCode}: language route`);
+  assert.strictEqual(translatedRoute.query.offer, offerId, `${languageCode}: identity survives language switch`);
+  assert.strictEqual(translatedRoute.query.section, 'package', `${languageCode}: editor survives language switch`);
+  assert.strictEqual(
+    await page.$eval('[data-offer-field="title"]', node => node.textContent.trim()),
+    title,
+    `${languageCode}: neutral draft title survives language switch`
+  );
+  assert.strictEqual(
+    await page.$eval('[data-offer-field="id"]', node => node.textContent.trim()),
+    offerId,
+    `${languageCode}: selected ID survives language switch`
+  );
+
+  await clickRoute(page, 'a.back-link');
+  assert.strictEqual(
+    (await currentRoute(page)).page,
+    `m-offer${oppositeSuffix}.html`,
+    `${languageCode}: return to list`
+  );
+  assert.strictEqual(
+    await page.$eval(`[data-offer-id="${offerId}"] h2`, node => node.textContent.trim()),
+    title,
+    `${languageCode}: created card survives return to list`
+  );
+  assert.strictEqual(
+    await page.$eval('[data-offer-filter-count="all"]', node => node.textContent.trim()),
+    '5',
+    `${languageCode}: list count includes created draft`
+  );
+  assert.strictEqual(
+    await page.$eval('[data-offer-filter-count="missing"]', node => node.textContent.trim()),
+    '2',
+    `${languageCode}: draft remains visible in missing-rates filter`
+  );
+  await clickRoute(page, `[data-offer-id="${offerId}"] [data-created-offer-edit]`);
+  assert.strictEqual((await currentRoute(page)).query.offer, offerId, `${languageCode}: card reopens exact draft`);
+  assert.strictEqual(
+    await page.$eval('[data-offer-field="title"]', node => node.textContent.trim()),
+    title,
+    `${languageCode}: reopened editor never falls back to first fixture`
+  );
+
+  stored = await prototypeDomainState(page);
+  assert.deepStrictEqual(stored.availabilityMutations || {}, availabilityBefore);
+}
+
 async function waitForCount(page, selector, count) {
   await page.waitForFunction(
     (target, expected) => document.querySelector(target)?.textContent.trim() === String(expected),
@@ -825,9 +978,17 @@ async function main() {
           expectedTitle
         );
       }
-      await open(page, origin, `m-rate-edit${lang}.html`, { offer: 'spa-week' });
+      await open(page, origin, `m-rate-edit${lang}.html`, { offer: 'spa-week', section: 'rates' });
+      assert.deepStrictEqual(
+        await page.evaluate(() => ({
+          editorHidden: document.querySelector('[data-package-editor-surface]').hidden,
+          ratesHidden: document.querySelector('[data-package-rates-surface]').hidden,
+        })),
+        { editorHidden: true, ratesHidden: false },
+        `${lang || 'cs'}: rates route keeps the package editor surface hidden`
+      );
       assert.strictEqual(
-        await page.$eval('.section-head h2', nodes => nodes.textContent.trim()),
+        await page.$eval('[data-package-rates-surface] .section-head h2', node => node.textContent.trim()),
         lang ? 'Package prices by room type' : 'Ceny balíčku podle typu pokoje',
         `${lang || 'cs'}: package price heading`
       );
@@ -859,13 +1020,7 @@ async function main() {
         'unknown offer is explicit'
       );
 
-      await open(page, origin, offers);
-      await page.click('[data-open-sheet="new-package-sheet"]');
-      await page.click('[form="new-package-sheet-form"]');
-      await page.waitForFunction(
-        () => document.querySelector('#new-package-sheet').getAttribute('aria-hidden') === 'true'
-      );
-      assert(await page.$eval('.toast', node => node.classList.contains('show') && node.textContent.length > 20));
+      await assertPackageDraftFlow(page, origin, lang ? 'en' : 'cs');
 
       const billing = `m-billing${lang}.html`;
       const billingCounts = { pending: 3, approved: 1, disputed: 1 };

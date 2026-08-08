@@ -211,6 +211,13 @@ const OFFERS = [
   },
 ];
 
+const PACKAGE_DRAFT_TEMPLATE = {
+  meal: { cs: 'Bez stravy', en: 'No meal' },
+  active: false,
+  spa: false,
+  roomPrices: [roomPrice('double', null, [0, 0, 0, 0, 0, 0, 0])],
+};
+
 function packageStartingPrice(offer) {
   const prices = offer.roomPrices.flatMap(row => Object.values(row.prices)).filter(Number.isFinite);
   return prices.length ? Math.min(...prices) : null;
@@ -249,6 +256,10 @@ function fixturePayload(fixtures, lang) {
       status: localized(fixture.status, lang),
     }))
   ).replace(/</g, '\\u003c');
+}
+
+function packageDraftTemplatePayload(lang) {
+  return fixturePayload([PACKAGE_DRAFT_TEMPLATE], lang);
 }
 
 function outcomeAttributes(outcome) {
@@ -401,7 +412,7 @@ function dashboard(lang) {
     <article class="offer-card">
       <div class="offer-visual"><div><small>SPA HOTEL ČAJKOVSKIJ</small><strong>${tr(lang, '3 dny / 2 noci', '3 days / 2 nights')}</strong></div></div>
       <div class="offer-copy"><h2>${tr(lang, 'Pobyt na SPA.CZ', 'Stay on SPA.CZ')}</h2><p>${tr(lang, 'Pobytový balíček se snídaní.', 'Stay package with breakfast.')}</p></div>
-      <div class="offer-price"><div><small>${tr(lang, 'cena od', 'price from')}</small><strong>3 577 Kč</strong></div><a class="button primary dashboard-action" data-dashboard-action="offer-package" ${outcomeAttributes({ route: route('rate-edit', lang, { offer: 'cajkovskij-stay' }) })}>${tr(lang, 'Ceny', 'Rates')}</a></div>
+      <div class="offer-price"><div><small>${tr(lang, 'cena od', 'price from')}</small><strong>3 577 Kč</strong></div><a class="button primary dashboard-action" data-dashboard-action="offer-package" ${outcomeAttributes({ route: route('rate-edit', lang, { offer: 'cajkovskij-stay', section: 'rates' }) })}>${tr(lang, 'Ceny', 'Rates')}</a></div>
     </article>`;
 }
 
@@ -532,12 +543,20 @@ function offerCard(lang, offer) {
   return `<article class="offer-card ${offer.rank === 1 ? 'featured' : 'compact'}" data-inventory-rank="${offer.rank}" data-offer-id="${offer.id}" data-offer-active="${offer.active}" data-offer-spa="${offer.spa}" data-offer-has-rates="${hasRates}">
     <div class="offer-visual"><div><small>${offer.rank === 1 ? 'SPA HOTEL ČAJKOVSKIJ' : tr(lang, 'POBYTOVÁ NABÍDKA', 'STAY OFFER')}</small><strong>${localized(offer.duration, lang)}</strong></div></div>
     <div class="offer-copy"><div class="card-line"><h2>${localized(offer.title, lang)}</h2></div><p>${localized(offer.meal, lang)}</p><div class="offer-meta"><span class="status ${offer.active ? 'success' : 'warning'}">${offer.active ? tr(lang, 'Aktivní', 'Active') : tr(lang, 'Koncept', 'Draft')}</span>${offer.spa ? '<span class="status info">SPA.CZ</span>' : ''}</div></div>
-    <div class="offer-price"><div><small>${hasRates ? tr(lang, 'cena od', 'price from') : tr(lang, 'bez cen', 'missing rates')}</small><strong>${formatPrice(startingPrice)}</strong></div><a class="button primary" href="${route('rate-edit', lang, { offer: offer.id })}" data-carry-state>${tr(lang, 'Ceny', 'Rates')}</a></div>
+    <div class="offer-price"><div><small>${hasRates ? tr(lang, 'cena od', 'price from') : tr(lang, 'bez cen', 'missing rates')}</small><strong>${formatPrice(startingPrice)}</strong></div><a class="button primary" href="${route('rate-edit', lang, { offer: offer.id, section: 'rates' })}" data-carry-state>${tr(lang, 'Ceny', 'Rates')}</a></div>
   </article>`;
 }
 
+function createdOfferTemplate(lang) {
+  return `<template id="created-offer-template"><article class="offer-card compact" data-inventory-rank="0" data-offer-id="local-package-template" data-offer-active="false" data-offer-spa="false" data-offer-has-rates="false" data-created-package>
+    <div class="offer-visual"><div><small>${tr(lang, 'POBYTOVÁ NABÍDKA', 'STAY OFFER')}</small><strong data-created-offer-duration></strong></div></div>
+    <div class="offer-copy"><div class="card-line"><h2 data-created-offer-title></h2></div><p data-created-offer-meal></p><div class="offer-meta"><span class="status warning">${tr(lang, 'Koncept', 'Draft')}</span></div></div>
+    <div class="offer-price"><div><small>${tr(lang, 'bez cen', 'missing rates')}</small><strong>—</strong></div><div class="inline-actions"><a class="button" href="${file('rate-edit', lang)}" data-created-offer-edit data-carry-state data-outcome="route">${tr(lang, 'Upravit balíček', 'Edit package')}</a><a class="button primary" href="${file('rate-edit', lang)}" data-created-offer-rates data-carry-state data-outcome="route">${tr(lang, 'Ceny', 'Rates')}</a></div></div>
+  </article></template>`;
+}
+
 function offer(lang) {
-  return `${pageHead(lang, tr(lang, 'Nabídka', 'Offer'), tr(lang, 'Pobytové balíčky, jejich publikace a cenová připravenost.', 'Stay packages, publication status and pricing readiness.'), false, `<button class="page-action-icon" type="button" data-open-sheet="new-package-sheet" aria-label="${tr(lang, 'Nový balíček', 'New package')}">${icon('edit')}</button>`)}
+  return `${pageHead(lang, tr(lang, 'Nabídka', 'Offer'), tr(lang, 'Pobytové balíčky, jejich publikace a cenová připravenost.', 'Stay packages, publication status and pricing readiness.'), false, `<button class="button primary" type="button" data-open-sheet="new-package-sheet" data-write-action>${tr(lang, 'Přidat balíček', 'Add package')}</button>`)}
     ${stateAlerts(lang)}
     <div class="filter-scroll"><button class="chip" type="button" data-offer-filter="all" aria-pressed="false">${tr(lang, 'Všechny', 'All')} <span data-offer-filter-count="all">4</span></button><button class="chip" type="button" data-offer-filter="active" aria-pressed="false">${tr(lang, 'Aktivní', 'Active')} <span data-offer-filter-count="active">3</span></button><button class="chip" type="button" data-offer-filter="spa" aria-pressed="false">SPA.CZ <span data-offer-filter-count="spa">2</span></button><button class="chip" type="button" data-offer-filter="missing" aria-pressed="false">${tr(lang, 'Bez cen', 'Missing rates')} <span data-offer-filter-count="missing">1</span></button></div>
     <div class="section-head"><h2><span data-offer-count>4</span> ${tr(lang, 'balíčky', 'packages')}</h2></div>
@@ -545,7 +564,9 @@ function offer(lang) {
       ${OFFERS.map(offer => offerCard(lang, offer)).join('')}
     </div>
     <div class="filter-empty" data-offer-empty hidden>${emptyState(lang, 'Žádné balíčky', 'No packages', 'Tomuto filtru neodpovídá žádný balíček.', 'No package matches this filter.')}</div>
-    ${emptyState(lang, 'Žádné balíčky', 'No packages', 'V tomto stavu nejsou žádné nabídky.', 'There are no offers in this state.')}`;
+    ${emptyState(lang, 'Žádné balíčky', 'No packages', 'V tomto stavu nejsou žádné nabídky.', 'There are no offers in this state.')}
+    ${createdOfferTemplate(lang)}
+    <script id="package-draft-fixture" type="application/json">${packageDraftTemplatePayload(lang)}</script>`;
 }
 
 function rateMatrix(lang, offer) {
@@ -573,6 +594,16 @@ function rateEdit(lang) {
     <div class="identity-found">
     ${pageHead(lang, `<span data-offer-field="title">${localized(OFFERS[0].title, lang)}</span>`, `SPA HOTEL ČAJKOVSKIJ · <span data-offer-field="duration">${localized(OFFERS[0].duration, lang)}</span>`, false)}
     ${stateAlerts(lang, true)}
+    <div data-package-editor-surface hidden>
+      <div class="section-head"><h2>${tr(lang, 'Upravit balíček', 'Edit package')}</h2></div>
+      <section class="card">
+        <div class="card-line"><span><small>${tr(lang, 'ID balíčku', 'Package ID')}</small><br><strong data-offer-field="id">${OFFERS[0].id}</strong></span><span class="status success" data-offer-field="publication">${tr(lang, 'Aktivní', 'Active')}</span></div>
+        <div class="card-line secondary"><span data-offer-field="duration">${localized(OFFERS[0].duration, lang)}</span><span data-offer-field="meal">${localized(OFFERS[0].meal, lang)}</span></div>
+        <p class="subtle">${tr(lang, 'Tento editor patří vybranému balíčku. Dostupnost pokojů se zde nemění.', 'This editor belongs to the selected package. Room inventory is not changed here.')}</p>
+        <a class="button primary full" href="${route('rate-edit', lang, { offer: OFFERS[0].id, section: 'rates' })}" data-offer-route="rates" data-carry-state>${tr(lang, 'Otevřít ceny', 'Open rates')}</a>
+      </section>
+    </div>
+    <div data-package-rates-surface>
     <div class="alert info" data-package-inventory-note><strong>${tr(lang, 'Dostupnost a obsah balíčku jsou oddělené.', 'Inventory and package content are separate.')}</strong>&nbsp;${tr(lang, 'Obsah balíčku nemění dostupnost pokojů. Dostupnost každého typu pokoje omezuje prodej propojených balíčků.', 'Package content does not change room inventory. Inventory for each room type limits sales of linked packages.')}</div>
     <div class="tabs"><span class="active" aria-current="page">${tr(lang, 'Termíny a ceny', 'Dates & rates')}</span><button type="button" data-open-sheet="package-basics-sheet">${tr(lang, 'Základní údaje', 'Basics')}</button><button type="button" data-open-sheet="package-settings-sheet">${tr(lang, 'Nastavení', 'Settings')}</button></div>
     <section class="card">
@@ -583,8 +614,10 @@ function rateEdit(lang) {
     ${rateMatrix(lang, OFFERS[0])}
     <div class="sticky-action-bar"><span><small>${tr(lang, 'Cena od', 'Price from')}</small><strong data-offer-field="price">3 577 Kč</strong></span><button class="button primary" type="button" data-save-rates data-success="${tr(lang, 'Ceny balíčku byly uloženy.', 'Package prices were saved.')}" data-write-action data-chm-write>${tr(lang, 'Uložit', 'Save')}</button></div>
     </div>
+    </div>
     <section class="identity-missing card" hidden><h1>${tr(lang, 'Balíček nebyl nalezen', 'Package not found')}</h1><p>${tr(lang, 'Požadované ID balíčku není dostupné.', 'The requested package ID is unavailable.')}</p><a class="button primary" href="${file('offer', lang)}" data-carry-state>${tr(lang, 'Zpět na nabídku', 'Back to offer')}</a></section>
-    <script id="offer-fixtures" type="application/json">${fixturePayload(OFFERS, lang)}</script>`;
+    <script id="offer-fixtures" type="application/json">${fixturePayload(OFFERS, lang)}</script>
+    <script id="package-draft-fixture" type="application/json">${packageDraftTemplatePayload(lang)}</script>`;
 }
 
 function billingCard(lang, rank, id, term, statusKey, status, statusClass, price) {
@@ -811,14 +844,12 @@ function sheets(page, lang) {
     );
   }
   if (page === 'offer') {
-    contextual = formSheet(
+    contextual = sheetShell(
       'new-package-sheet',
       lang,
       tr(lang, 'Nový balíček', 'New package'),
-      `<label class="field"><span>${tr(lang, 'Název', 'Name')}</span><input value="${tr(lang, 'Nový balíček', 'New package')}" required></label><label class="field"><span>${tr(lang, 'Počet nocí', 'Number of nights')}</span><input type="number" min="1" value="2" required></label>`,
-      tr(lang, 'Nový balíček byl vytvořen jako koncept.', 'A new package was created as a draft.'),
-      'Vytvořit',
-      'Create'
+      `<form data-package-create-form id="new-package-sheet-form"><label class="field"><span>${tr(lang, 'Název', 'Name')}</span><input data-package-create-title maxlength="160" required></label><label class="field"><span>${tr(lang, 'Počet nocí', 'Number of nights')}</span><input data-package-create-nights type="number" min="1" max="365" value="2" required></label><p class="field-error" data-package-create-error hidden></p></form>`,
+      `<div class="sheet-actions"><button class="button" type="button" data-close-sheet>${tr(lang, 'Zrušit', 'Cancel')}</button><button class="button primary" type="submit" form="new-package-sheet-form" data-write-action>${tr(lang, 'Vytvořit', 'Create')}</button></div>`
     );
   }
   if (page === 'rate-edit') {
@@ -935,6 +966,14 @@ function generateScreens() {
   process.stdout.write(`Generated ${written.length} mobile screens:\n${written.join('\n')}\n`);
 }
 
-module.exports = { AVAILABILITY_DATES, OFFERS, RESERVATIONS, ROOM_TYPES, outcomeAttributes, renderPage };
+module.exports = {
+  AVAILABILITY_DATES,
+  OFFERS,
+  PACKAGE_DRAFT_TEMPLATE,
+  RESERVATIONS,
+  ROOM_TYPES,
+  outcomeAttributes,
+  renderPage,
+};
 
 if (require.main === module) generateScreens();
