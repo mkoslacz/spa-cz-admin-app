@@ -47,7 +47,9 @@ const {
   executionOptInGranted,
   resolveContainedPath,
 } = require('./converter-policy.js');
-const { prepareReceipt, writeAtomically } = require('./artifact-integrity.js');
+const { RECEIPT_VERSION, canonicalInputPaths, validateRefreshedArtifacts } = require('./artifact-integrity.js');
+const { writeAtomically } = require('./atomic-write.js');
+const { changelogSourceDigest } = require('./build-changelog.js');
 
 class RefreshError extends Error {}
 
@@ -448,9 +450,23 @@ async function refreshFig(options, summary, manifest) {
 }
 
 function writeReceiptAfterCompleteRefresh(root = ROOT) {
-  const result = prepareReceipt(root);
-  writeAtomically(path.join(root, result.inventory.receipt), `${JSON.stringify(result.receipt, null, 2)}\n`);
-  return result;
+  const inventory = validateRefreshedArtifacts(root);
+  const hash = relative => {
+    const file = path.join(root, relative);
+    if (!fs.existsSync(file) || !fs.statSync(file).isFile()) {
+      throw new RefreshError(`artifact receipt input is missing: ${relative}`);
+    }
+    return crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+  };
+  const hashFiles = files => Object.fromEntries([...files].sort().map(relative => [relative, hash(relative)]));
+  const receipt = {
+    version: RECEIPT_VERSION,
+    changelogSourceDigest: changelogSourceDigest(root),
+    inputs: hashFiles(canonicalInputPaths(root, inventory)),
+    outputs: hashFiles(inventory.outputs),
+  };
+  writeAtomically(path.join(root, inventory.receipt), `${JSON.stringify(receipt, null, 2)}\n`);
+  return { inventory, receipt };
 }
 
 async function refreshIntegrity(options, summary) {

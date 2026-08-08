@@ -7,10 +7,10 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const artifactIntegrity = require('./artifact-integrity.js');
+const { writeAtomically } = require('./atomic-write.js');
 const { ToolError, changelogSource } = require('./build-changelog.js');
 const refresh = require('./refresh.js');
-const { ArtifactIntegrityError, artifactInventory, prepareReceipt, validateReceipt, writeAtomically } =
-  artifactIntegrity;
+const { ArtifactIntegrityError, artifactInventory, validateReceipt, validateRefreshedArtifacts } = artifactIntegrity;
 
 const root = path.resolve(__dirname, '..');
 
@@ -86,6 +86,16 @@ withTemporaryRepository(repository => {
     'artifact contract must not expose a direct receipt-promotion API'
   );
   assert.strictEqual(
+    artifactIntegrity.prepareReceipt,
+    undefined,
+    'artifact contract must not expose receipt preparation outside the refresh orchestrator'
+  );
+  assert.strictEqual(
+    artifactIntegrity.receiptPayload,
+    undefined,
+    'artifact contract must not expose receipt content for direct promotion'
+  );
+  assert.strictEqual(
     refresh.refreshIntegrity,
     undefined,
     'refresh must not expose receipt promotion without its completed orchestration path'
@@ -128,6 +138,18 @@ withTemporaryRepository(repository => {
         () => validateReceipt(repository),
         /inputs are stale/,
         'changed declared generator must invalidate its derived output receipt'
+      )
+  );
+
+  withMutatedFile(
+    repository,
+    'tools/atomic-write.js',
+    file => fs.appendFileSync(file, '\n// stale receipt-promotion input probe\n'),
+    () =>
+      expectIntegrityError(
+        () => validateReceipt(repository),
+        /inputs are stale/,
+        'changed receipt-promotion implementation must invalidate its receipt'
       )
   );
 
@@ -196,7 +218,7 @@ withTemporaryRepository(repository => {
     },
     () => {
       expectIntegrityError(
-        () => prepareReceipt(repository),
+        () => validateRefreshedArtifacts(repository),
         /derived DOM dumps contain forbidden product markers/,
         'product marker in a derived dump must block receipt promotion'
       );

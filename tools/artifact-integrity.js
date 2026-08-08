@@ -148,6 +148,7 @@ function canonicalInputPaths(root, inventory = artifactInventory(root)) {
     .sort();
   const toolFiles = [
     'tools/artifact-integrity.js',
+    'tools/atomic-write.js',
     'tools/build-changelog.js',
     'tools/build-screens.js',
     'tools/build-usecases.js',
@@ -277,28 +278,15 @@ function receiptPayload(root = ROOT) {
   };
 }
 
-function writeAtomically(file, contents, fileSystem = fs) {
-  fileSystem.mkdirSync(path.dirname(file), { recursive: true });
-  const temporary = `${file}.tmp-${process.pid}`;
-  try {
-    fileSystem.writeFileSync(temporary, contents, 'utf8');
-    fileSystem.renameSync(temporary, file);
-  } finally {
-    if (fileSystem.existsSync(temporary)) fileSystem.unlinkSync(temporary);
-  }
-}
-
-function prepareReceipt(root = ROOT) {
+function validateRefreshedArtifacts(root = ROOT) {
   const inventory = artifactInventory(root);
   assertOutputInventory(root, inventory);
   assertNoForbiddenDumpMarkers(root, inventory);
-  const receipt = receiptPayload(root);
-  return { inventory, receipt };
+  return inventory;
 }
 
 function validateReceipt(root = ROOT) {
-  const inventory = artifactInventory(root);
-  assertOutputInventory(root, inventory);
+  const inventory = validateRefreshedArtifacts(root);
   const receipt = readReceipt(root, inventory);
   const expected = receiptPayload(root);
   if (receipt.changelogSourceDigest !== expected.changelogSourceDigest) {
@@ -337,12 +325,11 @@ if (require.main === module) {
 
 module.exports = {
   ArtifactIntegrityError,
+  RECEIPT_VERSION,
   artifactInventory,
   canonicalInputPaths,
   forbiddenDumpMarkers,
-  prepareReceipt,
   previewFrameIds,
-  receiptPayload,
   validateReceipt,
-  writeAtomically,
+  validateRefreshedArtifacts,
 };
