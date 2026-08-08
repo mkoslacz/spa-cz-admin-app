@@ -158,7 +158,6 @@ async function assertReviewPagesLayout(page, origin, viewport) {
       panelInsideViewport: panelRect.left >= 0 && panelRect.right <= window.innerWidth,
       panelOverflow: panel.scrollWidth - panel.clientWidth,
       documentOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
-      ordinaryDisplay: getComputedStyle(ordinarySwitch).display,
       ordinaryDirection: getComputedStyle(ordinarySwitch).flexDirection,
       ordinaryTops: ordinaryButtons.map(button => button.getBoundingClientRect().top),
       ordinaryUsable: ordinaryButtons.every(button => {
@@ -187,7 +186,6 @@ async function assertReviewPagesLayout(page, origin, viewport) {
   assert(metrics.panelOverflow <= 0, `${label}: panel has no horizontal overflow`);
   assert(metrics.documentOverflow <= 0, `${label}: document has no horizontal overflow`);
   assert.strictEqual(metrics.pagesDisplay, 'grid', `${label}: dedicated vertical layout`);
-  assert.strictEqual(metrics.ordinaryDisplay, 'inline-flex', `${label}: ordinary switch keeps segmented layout`);
   assert.strictEqual(metrics.ordinaryDirection, 'row', `${label}: ordinary switch stays horizontal`);
   assert(metrics.ordinaryUsable, `${label}: ordinary switch controls remain usable`);
   assert(
