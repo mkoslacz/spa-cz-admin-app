@@ -13,6 +13,7 @@
 - `usecases.json` is the canonical published scenario matrix. `tools/build-usecases.js` generates `usecases.built.json`, `docs/usecases.md`, and captures under `docs/usecases/`.
 - `tokens-m.css` and `app-m.css` are the mobile visual source of truth. `proto-m.js`, `proto-tools.*`, `proto-comments.*`, and `proto-discussion.*` are review scaffolding, not production application code.
 - `prototype.json` controls previews, DOM dumps, and the editable Figma export. Keep every product/export frame mobile-only and 390 × 844.
+- `tools/artifact-integrity.json` is emitted only by the complete refresh. After any source/history commit (including lifecycle reports or `CLAUDE.md`), commit that source first, run `node tools/refresh.js --allow-package-scripts`, then commit only the declared generated outputs; `node tools/artifact-integrity.js --check` must pass after the generated-only commit.
 - Room types, availability and package prices share one canonical fixture model. Persist only normalized overlays keyed by stable room/date or package IDs; never use list position or a first fixture as identity.
 - Package editing is distinct from the read-only rates view. Use existing gallery fixture IDs only, and make package writes atomic: if durable local state cannot be stored, retain the form, explain the failure, and do not claim success.
 
@@ -46,6 +47,7 @@ Then decode/check the `.fig`, confirm all 24 top-level frames are 390 × 844, an
 
 - `comments.config.json` may be absent (comments disabled) or locally present after explicit setup. When present, it must remain ignored, absent from the Git index/status and schema-valid; tests must inspect only those properties and never print its contents. Reviewer exports, credentials and one-time auth codes are also private.
 - Root `firebase.json` is the only Firebase CLI authority. It serves emulator tests and live rules deployment; never add a second nested Firebase config or a `.firebaserc` alias.
+- The Firestore emulator requires a Java Runtime. If it is unavailable, record the environmental block after running the command; never skip or weaken the comments-rules test.
 - Run `node tools/test-firebase-deploy-config.js` from the repository root before emulator or deployment work. It rejects escaped, missing, non-file or symlinked rules paths, public emulator hosts and a second Firebase config.
 - Use the pinned CLI in `tools/node_modules/.bin/firebase` and the one-session procedure in `docs/firebase-comments-setup.md`. Every Firebase command must pass `--config firebase.json`; every live resource command must also pass the exact `--project`.
 - Create `(default)` explicitly in `europe-west3` and assert its exact name, `FIRESTORE_NATIVE` type, `STANDARD` edition and location from `firestore:databases:get --json` before any rules dry run or deployment. A deploy command must never become database creation.
