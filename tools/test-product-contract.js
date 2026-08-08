@@ -8,6 +8,8 @@ const {
   AVAILABILITY_DATES,
   OFFERS,
   PACKAGE_DRAFT_TEMPLATE,
+  PACKAGE_GALLERY_IMAGES,
+  PACKAGE_SETTING_IDS,
   RESERVATIONS,
   ROOM_TYPES,
   outcomeAttributes,
@@ -28,7 +30,6 @@ const outcomeSignals = [
   'data-offer-filter',
   'data-billing-filter',
   'data-approval',
-  'data-save-rates',
 ];
 
 function read(relative) {
@@ -59,6 +60,7 @@ const forbiddenProductMarker = /demo|ukáz|DEMO-/i;
 const roomTypeIds = ROOM_TYPES.map(roomType => roomType.id);
 const dateIds = AVAILABILITY_DATES.map(date => date.id);
 const rateDateIds = dateIds.slice(0, 7);
+const packageGalleryIds = PACKAGE_GALLERY_IMAGES.map(image => image.id);
 assert.strictEqual(new Set(roomTypeIds).size, ROOM_TYPES.length, 'room type ids are unique');
 assert.strictEqual(new Set(dateIds).size, AVAILABILITY_DATES.length, 'availability date ids are unique');
 ROOM_TYPES.forEach(roomType => {
@@ -71,6 +73,21 @@ ROOM_TYPES.forEach(roomType => {
 
 const coveredRoomTypeIds = new Set();
 OFFERS.forEach(offer => {
+  assert(offer.description.cs && offer.description.en, `${offer.id}: localized description`);
+  assert(Number.isInteger(offer.nights) && offer.nights >= 1, `${offer.id}: valid nights`);
+  assert(offer.inclusions.cs.length && offer.inclusions.en.length, `${offer.id}: inclusions`);
+  assert(offer.procedures.cs.length && offer.procedures.en.length, `${offer.id}: procedures`);
+  assert(offer.galleryImageIds.length > 0, `${offer.id}: gallery selection`);
+  assert.strictEqual(
+    new Set(offer.galleryImageIds).size,
+    offer.galleryImageIds.length,
+    `${offer.id}: unique gallery references`
+  );
+  offer.galleryImageIds.forEach(id =>
+    assert(packageGalleryIds.includes(id), `${offer.id}: known gallery reference ${id}`)
+  );
+  assert.deepStrictEqual(Object.keys(offer.settings).sort(), [...PACKAGE_SETTING_IDS].sort());
+  Object.values(offer.settings).forEach(value => assert.strictEqual(typeof value, 'boolean'));
   assert(offer.roomPrices.length > 0, `${offer.id}: explicit room-price eligibility`);
   assert.strictEqual(
     new Set(offer.roomPrices.map(relation => relation.roomTypeId)).size,
@@ -86,7 +103,10 @@ OFFERS.forEach(offer => {
       `${offer.id}/${relation.roomTypeId}: date price coverage`
     );
     Object.values(relation.prices).forEach(value => {
-      assert(value == null || Number.isInteger(value), `${offer.id}/${relation.roomTypeId}: numeric or missing price`);
+      assert(
+        value == null || (Number.isInteger(value) && value >= 0),
+        `${offer.id}/${relation.roomTypeId}: non-negative integer or missing price`
+      );
     });
     coveredRoomTypeIds.add(relation.roomTypeId);
   });
@@ -103,6 +123,14 @@ assert(
   PACKAGE_DRAFT_TEMPLATE.roomPrices.every(relation => roomTypeIds.includes(relation.roomTypeId)),
   'draft template room-price references resolve'
 );
+assert.deepStrictEqual(
+  Object.keys(PACKAGE_DRAFT_TEMPLATE.settings).sort(),
+  [...PACKAGE_SETTING_IDS].sort(),
+  'draft settings use canonical IDs'
+);
+PACKAGE_DRAFT_TEMPLATE.galleryImageIds.forEach(id =>
+  assert(packageGalleryIds.includes(id), `draft template uses known gallery image ${id}`)
+);
 assert.strictEqual(new Set(RESERVATIONS.map(reservation => reservation.id)).size, RESERVATIONS.length);
 RESERVATIONS.forEach(reservation => assert.match(reservation.id, /^RSV-[0-9]+$/, 'neutral reservation id'));
 
@@ -112,6 +140,13 @@ for (const screen of screens) {
   assert.doesNotMatch(html, /data-toast/i, `${screen}: generic toast hooks are forbidden`);
   assert.doesNotMatch(html, /\bIn prototype\b|\bV prototypu\b/i, `${screen}: placeholder prototype copy is forbidden`);
   assert.doesNotMatch(html, forbiddenProductMarker, `${screen}: no prototype-framing markers`);
+  assert.match(html, /id="offer-fixtures"/, `${screen}: package fixtures are globally available for normalization`);
+  assert.match(html, /id="package-editor-model"/, `${screen}: package editor model is globally available`);
+  assert.match(
+    html,
+    /id="package-draft-fixture"/,
+    `${screen}: package draft migration defaults are globally available`
+  );
   assert.doesNotMatch(
     html,
     /Public offer fact|Public fact|publicly verified|Verified pricing|Public baseline|Veřejná nabídka|Veřejný fakt|veřejně ověř|Ověřený cen|Veřejný základ/i,
@@ -172,8 +207,31 @@ for (const lang of ['', '-en']) {
     assert.match(reservations, new RegExp(`reservation=${reservation.id}`), `${reservation.id}: exact route`);
   }
   const offers = read(`m-offer${lang}.html`);
-  assert.strictEqual((offers.match(/offer=[a-z0-9-]+/g) || []).length, 4, 'four exact offer routes');
+  assert.strictEqual((offers.match(/section=package/g) || []).length, 4, 'every fixture has an edit route');
+  assert.strictEqual((offers.match(/section=rates/g) || []).length, 4, 'every fixture has a rates route');
+  assert.strictEqual(
+    (offers.match(/data-offer-card-edit/g) || []).length,
+    5,
+    'fixture and draft template edit controls'
+  );
+  assert.strictEqual(
+    (offers.match(/data-offer-card-rates/g) || []).length,
+    5,
+    'fixture and draft template rates controls'
+  );
   assert.match(offers, lang ? />Add package<\/button>/ : />Přidat balíček<\/button>/, 'visible package action');
+  OFFERS.forEach(offer => {
+    assert.match(
+      offers,
+      new RegExp(`offer=${offer.id}(?:&amp;|&)section=package|offer=${offer.id}[^\"]*section=package`),
+      `${offer.id}: exact edit route`
+    );
+    assert.match(
+      offers,
+      new RegExp(`offer=${offer.id}(?:&amp;|&)section=rates|offer=${offer.id}[^\"]*section=rates`),
+      `${offer.id}: exact rates route`
+    );
+  });
 
   const availability = read(`m-availability${lang}.html`);
   assert.strictEqual(
@@ -185,6 +243,12 @@ for (const lang of ['', '-en']) {
   assert.match(rates, /Package prices by room type|Ceny balíčku podle typu pokoje/);
   assert.match(rates, /data-package-editor-surface hidden/, 'package editor is a distinct route surface');
   assert.match(rates, /data-package-rates-surface/, 'package rates remain a distinct route surface');
+  assert.doesNotMatch(rates, /data-save-rates/, 'read-only rates surface has no fake save action');
+  assert.match(rates, /data-rate-edit-link/, 'read-only rates surface names the package editor destination');
+  assert.match(rates, /data-package-editor-form/, 'package-specific editor form');
+  assert.doesNotMatch(rates, /type="file"|upload/i, 'package editor selects existing images without upload');
+  packageGalleryIds.forEach(id => assert.match(rates, new RegExp(`data-package-gallery-id="${id}"`)));
+  PACKAGE_SETTING_IDS.forEach(id => assert.match(rates, new RegExp(`data-package-setting-id="${id}"`)));
   roomTypeIds.forEach(id => assert.match(rates, new RegExp(`data-room-type-id="${id}"`), `${id}: rate row`));
 }
 
@@ -204,12 +268,25 @@ const availabilitySource = generatorSource.slice(
 );
 const rateSource = generatorSource.slice(
   generatorSource.indexOf('function rateMatrix'),
-  generatorSource.indexOf('function rateEdit')
+  generatorSource.indexOf('function packageEditorForm')
+);
+const rateEditSource = generatorSource.slice(
+  generatorSource.indexOf('function rateEdit'),
+  generatorSource.indexOf('function billingCard')
 );
 assert.match(availabilitySource, /ROOM_TYPES/);
 assert.match(rateSource, /ROOM_TYPES/);
+assert.match(rateSource, /readonly aria-readonly="true"/, 'rate values are explicitly read-only');
+assert.doesNotMatch(rateSource, /data-write-action|data-chm-write/, 'rate display exposes no write controls');
 assert.doesNotMatch(availabilitySource, /const\s+(?:rows|days)\s*=/, 'no parallel availability rows');
 assert.doesNotMatch(rateSource, /const\s+rows\s*=\s*\[/, 'no parallel rate rows');
+assert.doesNotMatch(rateEditSource, /OFFERS\[0\]/, 'selected-package surfaces cannot hydrate from first fixture');
+assert.doesNotMatch(rateEditSource, /data-save-rates/, 'selected-package rates cannot pretend to save');
+assert.doesNotMatch(
+  read('proto-m.js'),
+  /(?:resolvedOffers\(\)|fixtures\("offer-fixtures"\))\s*\[0\]/,
+  'runtime never falls back to the first package fixture'
+);
 
 process.stdout.write(
   `product-contract-qa: ${screens.length} screens, vocabulary, room types, identities, filters and 14 More outcomes — OK\n`

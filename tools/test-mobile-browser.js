@@ -111,14 +111,80 @@ async function prototypeDomainState(page) {
   return page.evaluate(() => JSON.parse(globalThis.localStorage.getItem('spa-cz-admin-prototype') || '{}'));
 }
 
+async function rejectLocalStorageWrites(page) {
+  await page.evaluate(() => {
+    globalThis.__prototypeOriginalSetItem = globalThis.Storage.prototype.setItem;
+    globalThis.Storage.prototype.setItem = function rejectPrototypeWrite() {
+      throw new globalThis.DOMException('Storage disabled by browser test', 'QuotaExceededError');
+    };
+  });
+}
+
+async function restoreLocalStorageWrites(page) {
+  await page.evaluate(() => {
+    globalThis.Storage.prototype.setItem = globalThis.__prototypeOriginalSetItem;
+    delete globalThis.__prototypeOriginalSetItem;
+  });
+}
+
 async function assertPackageDraftFlow(page, origin, languageCode) {
   const suffix = languageCode === 'en' ? '-en' : '';
   const oppositeSuffix = languageCode === 'en' ? '' : '-en';
   const oppositeLanguage = languageCode === 'en' ? 'cs' : 'en';
   const screen = `m-offer${suffix}.html`;
   const title = `Autumn reset ${languageCode.toUpperCase()}`;
+  const legacyId = 'local-package-1';
 
   await open(page, origin, screen);
+  await page.evaluate(() => globalThis.localStorage.clear());
+  await page.evaluate(() => {
+    globalThis.localStorage.setItem(
+      'spa-cz-admin-prototype',
+      JSON.stringify({
+        availabilityMutations: {},
+        packageDrafts: { 'local-package-1': { title: 'Legacy package', nights: 4 } },
+      })
+    );
+  });
+  await open(page, origin, `m-dashboard${suffix}.html`);
+  await page.reload({ waitUntil: 'networkidle0' });
+  let migratedState = await prototypeDomainState(page);
+  assert(migratedState.packageDrafts[legacyId], `${languageCode}: non-package reload preserves legacy draft identity`);
+  assert.deepStrictEqual(
+    migratedState.availabilityMutations || {},
+    {},
+    `${languageCode}: legacy draft migration does not mutate availability`
+  );
+  await open(page, origin, `m-rate-edit${suffix}.html`, { offer: legacyId, section: 'package' });
+  migratedState = await prototypeDomainState(page);
+  const migratedLegacy = migratedState.packageDrafts[legacyId];
+  assert.strictEqual(migratedLegacy.title, 'Legacy package', `${languageCode}: legacy draft title migrates`);
+  assert.strictEqual(migratedLegacy.nights, 4, `${languageCode}: legacy draft nights migrate`);
+  assert(migratedLegacy.description, `${languageCode}: legacy draft receives package content defaults`);
+  assert(migratedLegacy.galleryImageIds.length, `${languageCode}: legacy draft receives gallery defaults`);
+  assert(migratedLegacy.inclusions.length, `${languageCode}: legacy draft receives inclusion defaults`);
+  assert(migratedLegacy.procedures.length, `${languageCode}: legacy draft receives procedure defaults`);
+  assert.deepStrictEqual(
+    Object.keys(migratedLegacy.settings).sort(),
+    ['flexible-cancellation', 'late-arrival'],
+    `${languageCode}: legacy draft receives safe setting defaults`
+  );
+  assert.strictEqual(migratedLegacy.roomPrices.length, 1, `${languageCode}: legacy draft receives room prices`);
+  assert.strictEqual(
+    Object.keys(migratedLegacy.roomPrices[0].prices).length,
+    7,
+    `${languageCode}: legacy draft receives seven canonical date prices`
+  );
+  assert.deepStrictEqual(
+    await page.evaluate(() => ({
+      id: document.querySelector('[data-offer-field="id"]').textContent.trim(),
+      title: document.querySelector('[data-package-field="title"]').value,
+      nights: document.querySelector('[data-package-field="nights"]').value,
+    })),
+    { id: legacyId, title: 'Legacy package', nights: '4' },
+    `${languageCode}: migrated legacy draft returns to its own complete editor`
+  );
+  assert.deepStrictEqual(migratedState.availabilityMutations || {}, {});
   await page.evaluate(() => globalThis.localStorage.clear());
   await open(page, origin, screen);
   const availabilityBefore = (await prototypeDomainState(page)).availabilityMutations || {};
@@ -157,6 +223,32 @@ async function assertPackageDraftFlow(page, origin, languageCode) {
     title,
     `${languageCode}: complete package name is entered before submit`
   );
+  await rejectLocalStorageWrites(page);
+  await page.click('[form="new-package-sheet-form"]');
+  assert.deepStrictEqual(
+    await page.evaluate(() => ({
+      page: globalThis.location.pathname.split('/').pop(),
+      sheetOpen: document.querySelector('#new-package-sheet').classList.contains('open'),
+      title: document.querySelector('[data-package-create-title]').value,
+      nights: document.querySelector('[data-package-create-nights]').value,
+      error: document.querySelector('[data-package-create-error]').textContent.trim(),
+      toast: document.querySelector('.toast').classList.contains('show'),
+    })),
+    {
+      page: screen,
+      sheetOpen: true,
+      title,
+      nights: '3',
+      error:
+        languageCode === 'en'
+          ? 'The draft could not be stored. The form remains open; try again.'
+          : 'Koncept se nepodařilo trvale uložit. Formulář zůstává otevřený; zkuste to znovu.',
+      toast: false,
+    },
+    `${languageCode}: failed draft persistence rolls back without navigation or false success`
+  );
+  assert.deepStrictEqual((await prototypeDomainState(page)).packageDrafts || {}, {});
+  await restoreLocalStorageWrites(page);
   await Promise.all([
     page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 30000 }),
     page.click('[form="new-package-sheet-form"]'),
@@ -188,11 +280,11 @@ async function assertPackageDraftFlow(page, origin, languageCode) {
   );
 
   let stored = await prototypeDomainState(page);
-  assert.deepStrictEqual(
-    stored.packageDrafts,
-    { [offerId]: { title, nights: 3 } },
-    `${languageCode}: normalized packageDrafts overlay`
-  );
+  assert.deepStrictEqual(Object.keys(stored.packageDrafts), [offerId], `${languageCode}: one normalized draft`);
+  assert.strictEqual(stored.packageDrafts[offerId].title, title, `${languageCode}: normalized draft title`);
+  assert.strictEqual(stored.packageDrafts[offerId].nights, 3, `${languageCode}: normalized draft nights`);
+  assert(stored.packageDrafts[offerId].description, `${languageCode}: complete draft content`);
+  assert.strictEqual(stored.packageDrafts[offerId].roomPrices.length, 1, `${languageCode}: draft room coverage`);
   assert.deepStrictEqual(
     stored.availabilityMutations || {},
     availabilityBefore,
@@ -258,6 +350,397 @@ async function assertPackageDraftFlow(page, origin, languageCode) {
 
   stored = await prototypeDomainState(page);
   assert.deepStrictEqual(stored.availabilityMutations || {}, availabilityBefore);
+}
+
+async function assertPackageEditorFlow(page, origin, languageCode) {
+  const suffix = languageCode === 'en' ? '-en' : '';
+  const oppositeSuffix = languageCode === 'en' ? '' : '-en';
+  const oppositeLanguage = languageCode === 'en' ? 'cs' : 'en';
+  const listScreen = `m-offer${suffix}.html`;
+  const editorScreen = `m-rate-edit${suffix}.html`;
+  const packageId = 'spa-week';
+  const firstPackageId = 'cajkovskij-stay';
+  const edited = {
+    title: `Restored spa week ${languageCode.toUpperCase()}`,
+    description: `Selected package description ${languageCode.toUpperCase()}`,
+    inclusions: [`Full board ${languageCode.toUpperCase()}`, `Daily pool ${languageCode.toUpperCase()}`],
+    nights: 8,
+    meal: `Full board ${languageCode.toUpperCase()}`,
+    procedures: [`Mineral bath ${languageCode.toUpperCase()}`, `Massage ${languageCode.toUpperCase()}`],
+  };
+  const dates = ['2026-10-12', '2026-10-13', '2026-10-14', '2026-10-15', '2026-10-16', '2026-10-17', '2026-10-18'];
+  const expectedPrices = {
+    double: Object.fromEntries(dates.map((date, index) => [date, 21000 + index * 100])),
+    suite: Object.fromEntries(dates.map((date, index) => [date, 23000 + index * 100])),
+  };
+
+  await open(page, origin, listScreen);
+  await page.evaluate(() => globalThis.localStorage.clear());
+  await open(page, origin, listScreen);
+  const firstBefore = await page.$eval(`[data-offer-id="${firstPackageId}"]`, card => ({
+    title: card.querySelector('[data-offer-card-title]').textContent.trim(),
+    meal: card.querySelector('[data-offer-card-meal]').textContent.trim(),
+    publication: card.querySelector('[data-offer-card-publication]').textContent.trim(),
+  }));
+  const availabilityBefore = (await prototypeDomainState(page)).availabilityMutations || {};
+  const packageActions = await page.$eval(`[data-offer-id="${packageId}"]`, card => ({
+    edit: card.querySelector('[data-offer-card-edit]').textContent.trim(),
+    rates: card.querySelector('[data-offer-card-rates]').textContent.trim(),
+    distinct: card.querySelector('[data-offer-card-edit]') !== card.querySelector('[data-offer-card-rates]'),
+    editHref: card.querySelector('[data-offer-card-edit]').href,
+    ratesHref: card.querySelector('[data-offer-card-rates]').href,
+  }));
+  assert.deepStrictEqual(
+    { edit: packageActions.edit, rates: packageActions.rates, distinct: packageActions.distinct },
+    {
+      edit: languageCode === 'en' ? 'Edit package' : 'Upravit balíček',
+      rates: languageCode === 'en' ? 'Rates' : 'Ceny',
+      distinct: true,
+    },
+    `${languageCode}: fixture card has separate named actions`
+  );
+  assert.strictEqual(new URL(packageActions.editHref).searchParams.get('offer'), packageId);
+  assert.strictEqual(new URL(packageActions.editHref).searchParams.get('section'), 'package');
+  assert.strictEqual(new URL(packageActions.ratesHref).searchParams.get('offer'), packageId);
+  assert.strictEqual(new URL(packageActions.ratesHref).searchParams.get('section'), 'rates');
+
+  await clickRoute(page, `[data-offer-id="${packageId}"] [data-offer-card-edit]`);
+  const selectedRoute = await currentRoute(page);
+  assert.strictEqual(selectedRoute.page, editorScreen, `${languageCode}: edit screen`);
+  assert.strictEqual(selectedRoute.query.offer, packageId, `${languageCode}: edit route selected ID`);
+  assert.strictEqual(selectedRoute.query.section, 'package', `${languageCode}: editor section`);
+  assert.strictEqual(await page.$eval('[data-offer-field="id"]', node => node.textContent.trim()), packageId);
+  assert.strictEqual(
+    await page.$eval('[data-package-field="title"]', input => input.value),
+    languageCode === 'en' ? 'Spa week' : 'Lázeňský týden',
+    `${languageCode}: editor hydrates the selected fixture rather than the first fixture`
+  );
+  const mediaContract = await page.$eval('[data-package-editor-surface]', editor => ({
+    fileInputs: editor.querySelectorAll('input[type="file"]').length,
+    copy: editor.textContent,
+  }));
+  assert.strictEqual(mediaContract.fileInputs, 0, `${languageCode}: no simulated upload control`);
+  assert.doesNotMatch(mediaContract.copy, /upload|nahrát/i, `${languageCode}: existing-gallery selection only`);
+
+  const beforeInvalid = (await prototypeDomainState(page)).packageMutations || {};
+  await page.$eval('[data-package-field="title"]', input => {
+    input.value = '';
+  });
+  await page.$eval('[data-package-room-price][data-room-type-id="double"][data-rate-date-id="2026-10-12"]', input => {
+    input.value = '';
+  });
+  assert.strictEqual(
+    await page.$eval('[data-package-editor-form]', form => form.checkValidity()),
+    false,
+    `${languageCode}: native form validation rejects incomplete package data`
+  );
+  await page.click('[data-package-save]');
+  assert.deepStrictEqual(
+    (await prototypeDomainState(page)).packageMutations || {},
+    beforeInvalid,
+    `${languageCode}: native validation prevents an invalid click save`
+  );
+  await page.$eval('[data-package-editor-form]', form =>
+    form.dispatchEvent(new globalThis.Event('submit', { bubbles: true, cancelable: true }))
+  );
+  await page.waitForFunction(() => document.querySelector('[data-package-editor-error]').hidden === false);
+  assert.deepStrictEqual(
+    (await prototypeDomainState(page)).packageMutations || {},
+    beforeInvalid,
+    `${languageCode}: invalid save is atomic in storage`
+  );
+  assert.strictEqual(
+    await page.$eval('[data-offer-field="title"]', node => node.textContent.trim()),
+    languageCode === 'en' ? 'Spa week' : 'Lázeňský týden',
+    `${languageCode}: invalid save does not change rendered package`
+  );
+
+  await page.evaluate(
+    ({ next, prices }) => {
+      const form = document.querySelector('[data-package-editor-form]');
+      form.querySelector('[data-package-field="title"]').value = next.title;
+      form.querySelector('[data-package-field="description"]').value = next.description;
+      form.querySelector('[data-package-field="inclusions"]').value = next.inclusions.join('\n');
+      form.querySelector('[data-package-field="nights"]').value = String(next.nights);
+      form.querySelector('[data-package-field="meal"]').value = next.meal;
+      form.querySelector('[data-package-field="publication"]').value = 'draft';
+      form.querySelector('[data-package-field="procedures"]').value = next.procedures.join('\n');
+      form.querySelectorAll('[data-package-gallery-id]').forEach(control => {
+        control.checked = ['spa-pool', 'treatment-room'].includes(control.dataset.packageGalleryId);
+      });
+      form.querySelectorAll('[data-package-setting-id]').forEach(control => {
+        control.checked = control.dataset.packageSettingId === 'flexible-cancellation';
+      });
+      form.querySelectorAll('[data-package-room-coverage]').forEach(control => {
+        control.checked = ['double', 'suite'].includes(control.dataset.packageRoomCoverage);
+      });
+      form.querySelectorAll('[data-package-room-price]').forEach(input => {
+        const roomPrices = prices[input.dataset.roomTypeId];
+        input.value = roomPrices ? String(roomPrices[input.dataset.rateDateId]) : '';
+      });
+    },
+    { next: edited, prices: expectedPrices }
+  );
+  const validForm = await page.$eval('[data-package-editor-form]', form => ({
+    valid: form.checkValidity(),
+    invalid: [...form.elements]
+      .filter(control => typeof control.checkValidity === 'function' && !control.checkValidity())
+      .map(control => ({
+        field: control.dataset.packageField || control.dataset.roomTypeId || control.dataset.packageGalleryId,
+        date: control.dataset.rateDateId || '',
+        message: control.validationMessage,
+        value: control.value,
+      })),
+  }));
+  assert.deepStrictEqual(validForm, { valid: true, invalid: [] }, `${languageCode}: complete editor is natively valid`);
+  const saveTarget = await page.$eval('[data-package-save]', button => {
+    button.scrollIntoView({ block: 'center', inline: 'center' });
+    const rect = button.getBoundingClientRect();
+    const top = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    return {
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+      hit: Boolean(top?.closest('[data-package-save]')),
+    };
+  });
+  assert(saveTarget.hit, `${languageCode}: package save has a visible clickable point`);
+  await page.mouse.click(saveTarget.x, saveTarget.y);
+  const postSave = await page.evaluate(() => {
+    const state = JSON.parse(globalThis.localStorage.getItem('spa-cz-admin-prototype') || '{}');
+    const error = document.querySelector('[data-package-editor-error]');
+    return {
+      title: state.packageMutations?.['spa-week']?.title || '',
+      errorHidden: error.hidden,
+      error: error.textContent.trim(),
+      access: document.body.dataset.access,
+      connection: document.body.dataset.connection,
+    };
+  });
+  assert.strictEqual(
+    postSave.title,
+    edited.title,
+    `${languageCode}: real click save failed: ${JSON.stringify(postSave)}`
+  );
+
+  let stored = await prototypeDomainState(page);
+  const mutation = stored.packageMutations[packageId];
+  assert.deepStrictEqual(
+    {
+      title: mutation.title,
+      description: mutation.description,
+      galleryImageIds: mutation.galleryImageIds,
+      inclusions: mutation.inclusions,
+      nights: mutation.nights,
+      meal: mutation.meal,
+      active: mutation.active,
+      procedures: mutation.procedures,
+      settings: mutation.settings,
+    },
+    {
+      ...edited,
+      galleryImageIds: ['spa-pool', 'treatment-room'],
+      active: false,
+      settings: { 'flexible-cancellation': true, 'late-arrival': false },
+    },
+    `${languageCode}: selected fixture persists all content and settings`
+  );
+  assert.deepStrictEqual(
+    mutation.roomPrices,
+    [
+      { roomTypeId: 'double', eligible: true, prices: expectedPrices.double },
+      { roomTypeId: 'suite', eligible: true, prices: expectedPrices.suite },
+    ],
+    `${languageCode}: coverage rebuild removes orphan prices and keeps exact date keys`
+  );
+  assert.strictEqual(stored.packageMutations[firstPackageId], undefined, `${languageCode}: first fixture unchanged`);
+  assert.deepStrictEqual(
+    stored.availabilityMutations || {},
+    availabilityBefore,
+    `${languageCode}: package save cannot mutate availability`
+  );
+  assert.strictEqual(await page.$eval('[data-offer-field="title"]', node => node.textContent.trim()), edited.title);
+
+  await page.waitForFunction(() => !document.querySelector('.toast').classList.contains('show'));
+  const failedTitle = `UNSTORED ${languageCode.toUpperCase()}`;
+  await page.$eval(
+    '[data-package-field="title"]',
+    (input, value) => {
+      input.value = value;
+    },
+    failedTitle
+  );
+  await rejectLocalStorageWrites(page);
+  const failedSaveTarget = await page.$eval('[data-package-save]', button => {
+    button.scrollIntoView({ block: 'center', inline: 'center' });
+    const rect = button.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    return { x, y, hit: Boolean(document.elementFromPoint(x, y)?.closest('[data-package-save]')) };
+  });
+  assert(failedSaveTarget.hit, `${languageCode}: failed-save test uses a visible package action`);
+  await page.mouse.click(failedSaveTarget.x, failedSaveTarget.y);
+  assert.deepStrictEqual(
+    await page.evaluate(() => {
+      const state = JSON.parse(globalThis.localStorage.getItem('spa-cz-admin-prototype') || '{}');
+      return {
+        storedTitle: state.packageMutations['spa-week'].title,
+        renderedTitle: document.querySelector('[data-offer-field="title"]').textContent.trim(),
+        formTitle: document.querySelector('[data-package-field="title"]').value,
+        error: document.querySelector('[data-package-editor-error]').textContent.trim(),
+        toast: document.querySelector('.toast').classList.contains('show'),
+      };
+    }),
+    {
+      storedTitle: edited.title,
+      renderedTitle: edited.title,
+      formTitle: failedTitle,
+      error:
+        languageCode === 'en'
+          ? 'Changes could not be stored. The form remains open; try again.'
+          : 'Změny se nepodařilo trvale uložit. Formulář zůstává otevřený; zkuste to znovu.',
+      toast: false,
+    },
+    `${languageCode}: package persistence failure rolls back without false success`
+  );
+  await restoreLocalStorageWrites(page);
+  await page.reload({ waitUntil: 'networkidle0' });
+  assert.strictEqual((await prototypeDomainState(page)).packageMutations[packageId].title, edited.title);
+  assert.strictEqual(
+    await page.$eval('[data-package-field="title"]', input => input.value),
+    edited.title,
+    `${languageCode}: reload restores the last durable package value after failed save`
+  );
+
+  await clickRoute(page, '[data-offer-route="rates"]');
+  assert.strictEqual((await currentRoute(page)).query.offer, packageId, `${languageCode}: own rates route`);
+  assert.deepStrictEqual(
+    await page.$$eval('.rate-matrix tbody tr', rows => ({
+      roomTypeIds: rows.filter(row => !row.hidden).map(row => row.dataset.roomTypeId),
+      firstPrices: Object.fromEntries(
+        rows
+          .filter(row => !row.hidden)
+          .map(row => [row.dataset.roomTypeId, row.querySelector('[data-rate-date-id="2026-10-12"]').value])
+      ),
+      readOnly: rows
+        .filter(row => !row.hidden)
+        .every(row => [...row.querySelectorAll('input')].every(input => input.readOnly)),
+    })),
+    { roomTypeIds: ['double', 'suite'], firstPrices: { double: '21000', suite: '23000' }, readOnly: true },
+    `${languageCode}: selected package rates render its saved coverage and prices`
+  );
+  assert.strictEqual(await page.$('[data-save-rates]'), null, `${languageCode}: rates expose no fake save action`);
+  assert.strictEqual(
+    await page.$eval('[data-rate-edit-link]', link => new URL(link.href).searchParams.get('offer')),
+    packageId,
+    `${languageCode}: read-only rates link to the selected package editor`
+  );
+  await page.reload({ waitUntil: 'networkidle0' });
+  assert.strictEqual(await page.$eval('[data-offer-field="title"]', node => node.textContent.trim()), edited.title);
+  await clickRoute(page, '[data-rate-edit-link]');
+  assert.strictEqual((await currentRoute(page)).query.offer, packageId);
+  assert.strictEqual((await currentRoute(page)).query.section, 'package');
+
+  await open(page, origin, `m-dashboard${suffix}.html`);
+  await page.reload({ waitUntil: 'networkidle0' });
+  assert.strictEqual(
+    (await prototypeDomainState(page)).packageMutations[packageId].title,
+    edited.title,
+    `${languageCode}: unrelated screen and reload preserve package overlays`
+  );
+  await open(page, origin, editorScreen, { offer: packageId, section: 'rates' });
+  assert.strictEqual(await page.$eval('[data-offer-field="title"]', node => node.textContent.trim()), edited.title);
+  await clickRoute(page, 'a.back-link');
+  assert.deepStrictEqual(
+    await page.$eval(`[data-offer-id="${packageId}"]`, card => ({
+      title: card.querySelector('[data-offer-card-title]').textContent.trim(),
+      meal: card.querySelector('[data-offer-card-meal]').textContent.trim(),
+      publication: card.querySelector('[data-offer-card-publication]').textContent.trim(),
+    })),
+    { title: edited.title, meal: edited.meal, publication: languageCode === 'en' ? 'Draft' : 'Koncept' },
+    `${languageCode}: own card renders saved package values`
+  );
+  assert.deepStrictEqual(
+    await page.$eval(`[data-offer-id="${firstPackageId}"]`, card => ({
+      title: card.querySelector('[data-offer-card-title]').textContent.trim(),
+      meal: card.querySelector('[data-offer-card-meal]').textContent.trim(),
+      publication: card.querySelector('[data-offer-card-publication]').textContent.trim(),
+    })),
+    firstBefore,
+    `${languageCode}: first package card remains byte-for-byte unchanged`
+  );
+  assert.strictEqual(await page.$eval('[data-offer-filter-count="active"]', node => node.textContent.trim()), '2');
+
+  await clickRoute(page, `[data-offer-id="${packageId}"] [data-offer-card-edit]`);
+  await clickRoute(page, `.langswitch a[data-lang="${oppositeLanguage}"]`);
+  const translated = await currentRoute(page);
+  assert.strictEqual(translated.page, `m-rate-edit${oppositeSuffix}.html`);
+  assert.strictEqual(translated.query.offer, packageId);
+  assert.strictEqual(translated.query.section, 'package');
+  assert.strictEqual(await page.$eval('[data-package-field="title"]', input => input.value), edited.title);
+
+  const mutationBeforeRestrictions = (await prototypeDomainState(page)).packageMutations[packageId];
+  for (const restricted of [
+    { access: 'read', connection: 'manual', label: 'read only' },
+    { access: 'full', connection: 'chm', label: 'Channel Manager' },
+  ]) {
+    await open(page, origin, `m-rate-edit${oppositeSuffix}.html`, {
+      offer: packageId,
+      section: 'package',
+      access: restricted.access,
+      connection: restricted.connection,
+    });
+    assert.strictEqual(await page.$eval('[data-package-save]', button => button.disabled), true);
+    assert.strictEqual(await page.$eval('[data-package-field="title"]', input => input.disabled), true);
+    await page.evaluate(() => {
+      const form = document.querySelector('[data-package-editor-form]');
+      const title = form.querySelector('[data-package-field="title"]');
+      title.disabled = false;
+      title.value = 'FORBIDDEN PACKAGE WRITE';
+      form.dispatchEvent(new globalThis.Event('submit', { bubbles: true, cancelable: true }));
+    });
+    assert.deepStrictEqual(
+      (await prototypeDomainState(page)).packageMutations[packageId],
+      mutationBeforeRestrictions,
+      `${languageCode}: ${restricted.label} runtime rejects package writes`
+    );
+  }
+  stored = await prototypeDomainState(page);
+  assert.deepStrictEqual(stored.availabilityMutations || {}, availabilityBefore);
+
+  const corruptedState = JSON.parse(JSON.stringify(stored));
+  corruptedState.access = 'full';
+  corruptedState.connection = 'manual';
+  corruptedState.packageMutations[packageId] = {
+    ...mutationBeforeRestrictions,
+    galleryImageIds: ['spa-pool', 'spa-pool'],
+    roomPrices: [
+      {
+        roomTypeId: 'unknown-room',
+        eligible: true,
+        prices: Object.fromEntries(dates.map(date => [date, -1])),
+      },
+    ],
+  };
+  await page.evaluate(nextState => {
+    globalThis.localStorage.setItem('spa-cz-admin-prototype', JSON.stringify(nextState));
+  }, corruptedState);
+  await open(page, origin, `m-rate-edit${oppositeSuffix}.html`, {
+    offer: packageId,
+    section: 'package',
+    access: 'full',
+    connection: 'manual',
+  });
+  assert.strictEqual(
+    (await prototypeDomainState(page)).packageMutations[packageId],
+    undefined,
+    `${languageCode}: duplicate gallery IDs, unknown room refs and negative prices are rejected`
+  );
+  assert.strictEqual(
+    await page.$eval('[data-package-field="title"]', input => input.value),
+    oppositeLanguage === 'en' ? 'Spa week' : 'Lázeňský týden',
+    `${languageCode}: rejected overlay restores the exact fixture instead of another record`
+  );
+  assert.deepStrictEqual((await prototypeDomainState(page)).availabilityMutations || {}, availabilityBefore);
 }
 
 async function waitForCount(page, selector, count) {
@@ -415,6 +898,7 @@ async function assertBulkAvailabilityFlow(page, origin, lang) {
   await open(page, origin, screen);
   await page.evaluate(() => globalThis.localStorage.clear());
   await open(page, origin, screen);
+  const numericBefore = await availabilitySnapshots(page, numericIds);
   const numericUnselectedBefore = await availabilitySnapshots(page, numericUnselectedIds);
 
   await openAvailabilityBulkEditor(page);
@@ -476,6 +960,45 @@ async function assertBulkAvailabilityFlow(page, origin, lang) {
     '2',
     `${lang}: Double 16–17 preview count`
   );
+  await rejectLocalStorageWrites(page);
+  await page.click('[form="availability-form"]');
+  assert.strictEqual(
+    await page.$eval('#availability-sheet', sheet => sheet.classList.contains('open')),
+    true,
+    `${lang}: failed bulk persistence keeps the editor open`
+  );
+  assert.strictEqual(
+    await page.$eval('[data-availability-bulk-error]', node => !node.hidden && node.textContent.trim().length > 0),
+    true,
+    `${lang}: failed bulk persistence shows a concrete error`
+  );
+  assert.strictEqual(await page.$eval('.toast', node => node.classList.contains('show')), false);
+  assert.deepStrictEqual(
+    await availabilityMutationState(page),
+    {},
+    `${lang}: failed bulk persistence rolls back state`
+  );
+  assert.deepStrictEqual(
+    await availabilitySnapshots(page, numericIds),
+    numericBefore,
+    `${lang}: failed bulk persistence does not change rendered cells`
+  );
+  await restoreLocalStorageWrites(page);
+  await page.reload({ waitUntil: 'networkidle0' });
+  assert.deepStrictEqual(
+    await availabilityMutationState(page),
+    {},
+    `${lang}: failed bulk write stays absent after reload`
+  );
+  assert.deepStrictEqual(await availabilitySnapshots(page, numericIds), numericBefore);
+  await openAvailabilityBulkEditor(page);
+  await page.select('[data-availability-bulk-action]', 'units');
+  await page.select('[data-availability-bulk-room]', 'double');
+  await setBulkDate(page, '[data-availability-bulk-from]', '2026-10-16');
+  await setBulkDate(page, '[data-availability-bulk-to]', '2026-10-17');
+  await page.$eval('[data-availability-bulk-units]', input => {
+    input.value = '3';
+  });
   await page.click('[form="availability-form"]');
   await page.waitForFunction(
     () => document.querySelector('#availability-sheet').getAttribute('aria-hidden') === 'true'
@@ -637,6 +1160,41 @@ async function assertSingleAvailabilityFlow(page, origin, lang) {
     `${lang}: invalid value preserves state`
   );
 
+  await page.$eval('[data-availability-cell-units]', input => {
+    input.value = '3';
+  });
+  await rejectLocalStorageWrites(page);
+  await page.click('[form="availability-cell-form"]');
+  assert.strictEqual(
+    await page.$eval('#availability-cell-sheet', sheet => sheet.classList.contains('open')),
+    true,
+    `${lang}: failed cell persistence keeps the editor open`
+  );
+  assert.strictEqual(
+    await page.$eval('[data-availability-cell-error]', node => !node.hidden && node.textContent.trim().length > 0),
+    true,
+    `${lang}: failed cell persistence shows a concrete error`
+  );
+  assert.strictEqual(await page.$eval('.toast', node => node.classList.contains('show')), false);
+  assert.deepStrictEqual(
+    await availabilityMutationState(page),
+    {},
+    `${lang}: failed cell persistence rolls back state`
+  );
+  assert.deepStrictEqual(
+    await availabilitySnapshot(page, availabilityId),
+    { text: '4', stopped: false },
+    `${lang}: failed cell persistence does not change the matrix`
+  );
+  await restoreLocalStorageWrites(page);
+  await page.reload({ waitUntil: 'networkidle0' });
+  assert.deepStrictEqual(
+    await availabilityMutationState(page),
+    {},
+    `${lang}: failed cell write stays absent after reload`
+  );
+  assert.deepStrictEqual(await availabilitySnapshot(page, availabilityId), { text: '4', stopped: false });
+  await openAvailabilityEditor(page, availabilityId);
   await page.$eval('[data-availability-cell-units]', input => {
     input.value = '3';
   });
@@ -995,6 +1553,9 @@ async function main() {
       const rateRelation = await page.$$eval('.rate-matrix tbody tr', rows => ({
         visibleRoomTypeIds: rows.filter(row => !row.hidden).map(row => row.dataset.roomTypeId),
         firstValues: rows.filter(row => !row.hidden).map(row => row.querySelector('input').value),
+        readOnly: rows
+          .filter(row => !row.hidden)
+          .every(row => [...row.querySelectorAll('input')].every(input => input.readOnly)),
       }));
       assert.deepStrictEqual(
         rateRelation.visibleRoomTypeIds,
@@ -1005,6 +1566,13 @@ async function main() {
         rateRelation.firstValues,
         ['14200', '14900', '16100', '13600', '17400'],
         `${lang || 'cs'}: selected package prices by room type`
+      );
+      assert.strictEqual(rateRelation.readOnly, true, `${lang || 'cs'}: package rates are read-only`);
+      assert.strictEqual(await page.$('[data-save-rates]'), null, `${lang || 'cs'}: no pretend rate save`);
+      assert.strictEqual(
+        await page.$eval('[data-rate-edit-link]', link => new URL(link.href).searchParams.get('offer')),
+        'spa-week',
+        `${lang || 'cs'}: rates route returns to the exact package editor`
       );
       assert.match(
         await page.$eval('[data-package-inventory-note]', node => node.textContent),
@@ -1021,6 +1589,7 @@ async function main() {
       );
 
       await assertPackageDraftFlow(page, origin, lang ? 'en' : 'cs');
+      await assertPackageEditorFlow(page, origin, lang ? 'en' : 'cs');
 
       const billing = `m-billing${lang}.html`;
       const billingCounts = { pending: 3, approved: 1, disputed: 1 };

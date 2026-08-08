@@ -56,6 +56,7 @@
     to: "2026-10-12",
     section: "",
     availabilityMutations: Object.freeze({}),
+    packageMutations: Object.freeze({}),
     packageDrafts: Object.freeze({}),
   });
   let state = readState();
@@ -92,6 +93,7 @@
     next.availabilityMutations = normalizeAvailabilityMutations(
       next.availabilityMutations,
     );
+    next.packageMutations = normalizePackageMutations(next.packageMutations);
     next.packageDrafts = normalizePackageDrafts(next.packageDrafts);
     return next;
   }
@@ -118,22 +120,171 @@
     );
   }
 
+  function packageEditorModel() {
+    const model = fixtures("package-editor-model")[0];
+    return model && typeof model === "object"
+      ? model
+      : { galleryImages: [], roomTypeIds: [], rateDateIds: [], settingIds: [] };
+  }
+
+  function uniqueNormalizedStrings(value, fallback) {
+    const source = value === undefined ? fallback : value;
+    if (!Array.isArray(source) || !source.length) return null;
+    const normalized = source.map((item) =>
+      typeof item === "string" ? item.trim() : "",
+    );
+    if (
+      normalized.some((item) => !item || item.length > 240) ||
+      new Set(normalized).size !== normalized.length
+    )
+      return null;
+    return normalized;
+  }
+
+  function uniqueKnownIds(value, fallback, knownIds) {
+    const source = value === undefined ? fallback : value;
+    if (!Array.isArray(source) || !source.length) return null;
+    if (
+      source.some((id) => typeof id !== "string" || !knownIds.includes(id)) ||
+      new Set(source).size !== source.length
+    )
+      return null;
+    return source.slice();
+  }
+
+  function normalizePackageRecord(value, fallback) {
+    if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+    const base = fallback && typeof fallback === "object" ? fallback : {};
+    const model = packageEditorModel();
+    const galleryIds = model.galleryImages.map((image) => image.id);
+    const roomTypeIds = model.roomTypeIds;
+    const rateDateIds = model.rateDateIds;
+    const settingIds = model.settingIds;
+    const title = typeof value.title === "string" ? value.title.trim() : "";
+    const descriptionSource = value.description ?? base.description;
+    const description =
+      typeof descriptionSource === "string" ? descriptionSource.trim() : "";
+    const mealSource = value.meal ?? base.meal;
+    const meal = typeof mealSource === "string" ? mealSource.trim() : "";
+    const nights = value.nights ?? base.nights;
+    const galleryImageIds = uniqueKnownIds(
+      value.galleryImageIds,
+      base.galleryImageIds,
+      galleryIds,
+    );
+    const inclusions = uniqueNormalizedStrings(
+      value.inclusions,
+      base.inclusions,
+    );
+    const procedures = uniqueNormalizedStrings(
+      value.procedures,
+      base.procedures,
+    );
+    if (
+      !title ||
+      title.length > 160 ||
+      !description ||
+      description.length > 1200 ||
+      !meal ||
+      meal.length > 160 ||
+      !Number.isInteger(nights) ||
+      nights < 1 ||
+      nights > 365 ||
+      !galleryImageIds ||
+      !inclusions ||
+      !procedures
+    )
+      return null;
+
+    const roomPriceSource = value.roomPrices ?? base.roomPrices;
+    if (!Array.isArray(roomPriceSource) || !roomPriceSource.length) return null;
+    const seenRoomTypes = new Set();
+    const roomPrices = [];
+    for (const relation of roomPriceSource) {
+      if (
+        !relation ||
+        typeof relation !== "object" ||
+        Array.isArray(relation) ||
+        !roomTypeIds.includes(relation.roomTypeId) ||
+        seenRoomTypes.has(relation.roomTypeId) ||
+        relation.eligible !== true ||
+        !relation.prices ||
+        typeof relation.prices !== "object" ||
+        Array.isArray(relation.prices)
+      )
+        return null;
+      const priceKeys = Object.keys(relation.prices);
+      if (
+        priceKeys.length !== rateDateIds.length ||
+        priceKeys.some((id) => !rateDateIds.includes(id))
+      )
+        return null;
+      const prices = {};
+      for (const dateId of rateDateIds) {
+        const price = relation.prices[dateId];
+        if (
+          price !== null &&
+          (!Number.isInteger(price) || price < 0 || price > 1000000)
+        )
+          return null;
+        prices[dateId] = price;
+      }
+      seenRoomTypes.add(relation.roomTypeId);
+      roomPrices.push({ roomTypeId: relation.roomTypeId, eligible: true, prices });
+    }
+
+    const settingsSource = value.settings ?? base.settings;
+    if (
+      !settingsSource ||
+      typeof settingsSource !== "object" ||
+      Array.isArray(settingsSource) ||
+      Object.keys(settingsSource).some((id) => !settingIds.includes(id))
+    )
+      return null;
+    const settings = {};
+    for (const id of settingIds) {
+      const setting = settingsSource[id];
+      if (typeof setting !== "boolean") return null;
+      settings[id] = setting;
+    }
+    const active = value.active ?? base.active;
+    if (typeof active !== "boolean") return null;
+    return {
+      title,
+      description,
+      galleryImageIds,
+      inclusions,
+      nights,
+      meal,
+      roomPrices,
+      active,
+      procedures,
+      settings,
+    };
+  }
+
+  function normalizePackageMutations(value) {
+    if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+    const baseOffers = fixtures("offer-fixtures");
+    return Object.fromEntries(
+      Object.entries(value).flatMap(([id, mutation]) => {
+        const base = baseOffers.find((offer) => offer.id === id);
+        if (!base) return [];
+        const normalized = normalizePackageRecord(mutation, base);
+        return normalized ? [[id, normalized]] : [];
+      }),
+    );
+  }
+
   function normalizePackageDrafts(value) {
     if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+    const template = packageDraftTemplate();
+    if (!template) return {};
     return Object.fromEntries(
       Object.entries(value).flatMap(([id, draft]) => {
         if (!/^local-package-[1-9]\d*$/.test(id)) return [];
-        if (!draft || typeof draft !== "object" || Array.isArray(draft))
-          return [];
-        const title = typeof draft.title === "string" ? draft.title.trim() : "";
-        if (!title || title.length > 160) return [];
-        if (
-          !Number.isInteger(draft.nights) ||
-          draft.nights < 1 ||
-          draft.nights > 365
-        )
-          return [];
-        return [[id, { title, nights: draft.nights }]];
+        const normalized = normalizePackageRecord(draft, template);
+        return normalized ? [[id, normalized]] : [];
       }),
     );
   }
@@ -141,8 +292,9 @@
   function persistState() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      return true;
     } catch (error) {
-      // The shareable URL is authoritative.
+      return false;
     }
   }
 
@@ -210,22 +362,45 @@
     return fixtures("package-draft-fixture")[0] || null;
   }
 
+  function packageStartingPrice(offer) {
+    const prices = (offer.roomPrices || [])
+      .flatMap((relation) => Object.values(relation.prices || {}))
+      .filter(Number.isFinite);
+    return prices.length ? Math.min(...prices) : null;
+  }
+
+  function withPackageDerivedFields(offer) {
+    const price = packageStartingPrice(offer);
+    return {
+      ...offer,
+      duration: packageDuration(offer.nights),
+      price,
+      hasRates: price !== null,
+    };
+  }
+
   function packageFromDraft(id, draft) {
     const template = packageDraftTemplate();
     if (!template) return null;
     const sequence = Number(id.slice("local-package-".length));
-    return {
+    return withPackageDerivedFields({
       ...template,
+      ...draft,
       id,
       rank: 4 + sequence,
-      title: draft.title,
-      duration: packageDuration(draft.nights),
-      nights: draft.nights,
-    };
+    });
   }
 
   function resolvedOffers() {
-    const base = fixtures("offer-fixtures");
+    const base = fixtures("offer-fixtures").map((offer) =>
+      withPackageDerivedFields({
+        ...offer,
+        ...(state.packageMutations[offer.id] || {}),
+        id: offer.id,
+        rank: offer.rank,
+        spa: offer.spa,
+      }),
+    );
     const drafts = Object.entries(state.packageDrafts)
       .map(([id, draft]) => packageFromDraft(id, draft))
       .filter(Boolean);
@@ -267,6 +442,49 @@
     });
   }
 
+  function renderOfferCards() {
+    const offers = resolvedOffers();
+    offers.forEach((offer) => {
+      const card = document.querySelector(`[data-offer-id="${offer.id}"]`);
+      if (!card) return;
+      card.dataset.offerActive = String(offer.active);
+      card.dataset.offerSpa = String(offer.spa);
+      card.dataset.offerHasRates = String(offer.hasRates);
+      const title = card.querySelector("[data-offer-card-title]");
+      const duration = card.querySelector("[data-offer-card-duration]");
+      const meal = card.querySelector("[data-offer-card-meal]");
+      const publication = card.querySelector("[data-offer-card-publication]");
+      const price = card.querySelector("[data-offer-card-price]");
+      const priceLabel = card.querySelector("[data-offer-card-price-label]");
+      if (title) title.textContent = offer.title;
+      if (duration) duration.textContent = offer.duration;
+      if (meal) meal.textContent = offer.meal;
+      if (publication) {
+        publication.className = `status ${offer.active ? "success" : "warning"}`;
+        publication.textContent = offer.active
+          ? language() === "cs"
+            ? "Aktivní"
+            : "Active"
+          : language() === "cs"
+            ? "Koncept"
+            : "Draft";
+      }
+      if (price) price.textContent = formatCurrency(offer.price);
+      if (priceLabel)
+        priceLabel.textContent = offer.hasRates
+          ? language() === "cs"
+            ? "cena od"
+            : "price from"
+          : language() === "cs"
+            ? "bez cen"
+            : "missing rates";
+      const edit = card.querySelector("[data-offer-card-edit]");
+      const rates = card.querySelector("[data-offer-card-rates]");
+      if (edit) edit.href = packageEditorHref(offer.id, "package");
+      if (rates) rates.href = packageEditorHref(offer.id, "rates");
+    });
+  }
+
   function syncPackageSurface(offer) {
     const editor = document.querySelector("[data-package-editor-surface]");
     const rates = document.querySelector("[data-package-rates-surface]");
@@ -277,6 +495,237 @@
     document.querySelectorAll("[data-offer-route]").forEach((link) => {
       link.href = packageEditorHref(offer.id, link.dataset.offerRoute);
     });
+  }
+
+  function setPackageEditorError(form, message) {
+    const error = form.querySelector("[data-package-editor-error]");
+    if (!error) return;
+    error.textContent = message || "";
+    error.hidden = !message;
+  }
+
+  function hydratePackageEditor(offer) {
+    const form = document.querySelector("[data-package-editor-form]");
+    if (!form) return;
+    form.querySelector('[data-package-field="title"]').value = offer.title;
+    form.querySelector('[data-package-field="description"]').value =
+      offer.description;
+    form.querySelector('[data-package-field="inclusions"]').value =
+      offer.inclusions.join("\n");
+    form.querySelector('[data-package-field="nights"]').value = String(
+      offer.nights,
+    );
+    form.querySelector('[data-package-field="meal"]').value = offer.meal;
+    form.querySelector('[data-package-field="publication"]').value =
+      offer.active ? "active" : "draft";
+    form.querySelector('[data-package-field="procedures"]').value =
+      offer.procedures.join("\n");
+    const selectedImages = new Set(offer.galleryImageIds);
+    form.querySelectorAll("[data-package-gallery-id]").forEach((control) => {
+      control.checked = selectedImages.has(control.dataset.packageGalleryId);
+    });
+    const selectedSettings = offer.settings || {};
+    form.querySelectorAll("[data-package-setting-id]").forEach((control) => {
+      control.checked = selectedSettings[control.dataset.packageSettingId] === true;
+    });
+    const relations = new Map(
+      (offer.roomPrices || []).map((relation) => [
+        relation.roomTypeId,
+        relation,
+      ]),
+    );
+    form.querySelectorAll("[data-package-room-coverage]").forEach((control) => {
+      control.checked = relations.has(control.dataset.packageRoomCoverage);
+    });
+    form.querySelectorAll("[data-package-room-price]").forEach((input) => {
+      const relation = relations.get(input.dataset.roomTypeId);
+      const value = relation?.prices?.[input.dataset.rateDateId];
+      input.value = value == null ? "" : String(value);
+    });
+    setPackageEditorError(form, "");
+  }
+
+  function normalizedEditorLines(raw) {
+    const lines = String(raw)
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean);
+    if (
+      !lines.length ||
+      lines.some((line) => line.length > 240) ||
+      new Set(lines).size !== lines.length
+    )
+      return null;
+    return lines;
+  }
+
+  function parsePackagePrice(raw) {
+    const normalized = String(raw).trim();
+    if (!/^\d+$/.test(normalized)) return null;
+    const value = Number(normalized);
+    return Number.isInteger(value) && value >= 0 && value <= 1000000
+      ? value
+      : null;
+  }
+
+  function packageEditorCandidate(form, offer) {
+    const model = packageEditorModel();
+    const title = form
+      .querySelector('[data-package-field="title"]')
+      .value.trim();
+    const description = form
+      .querySelector('[data-package-field="description"]')
+      .value.trim();
+    const inclusions = normalizedEditorLines(
+      form.querySelector('[data-package-field="inclusions"]').value,
+    );
+    const nightsRaw = form
+      .querySelector('[data-package-field="nights"]')
+      .value.trim();
+    const nights = Number(nightsRaw);
+    const meal = form
+      .querySelector('[data-package-field="meal"]')
+      .value.trim();
+    const procedures = normalizedEditorLines(
+      form.querySelector('[data-package-field="procedures"]').value,
+    );
+    const galleryImageIds = [
+      ...form.querySelectorAll("[data-package-gallery-id]:checked"),
+    ].map((control) => control.dataset.packageGalleryId);
+    const coveredRoomTypeIds = [
+      ...form.querySelectorAll("[data-package-room-coverage]:checked"),
+    ].map((control) => control.dataset.packageRoomCoverage);
+    const publication = form.querySelector(
+      '[data-package-field="publication"]',
+    ).value;
+    const knownGalleryIds = model.galleryImages.map((image) => image.id);
+    if (
+      !title ||
+      title.length > 160 ||
+      !description ||
+      description.length > 1200 ||
+      !/^\d+$/.test(nightsRaw) ||
+      !Number.isInteger(nights) ||
+      nights < 1 ||
+      nights > 365 ||
+      !meal ||
+      meal.length > 160 ||
+      !inclusions ||
+      !procedures ||
+      !galleryImageIds.length ||
+      galleryImageIds.some((id) => !knownGalleryIds.includes(id)) ||
+      new Set(galleryImageIds).size !== galleryImageIds.length ||
+      !coveredRoomTypeIds.length ||
+      coveredRoomTypeIds.some((id) => !model.roomTypeIds.includes(id)) ||
+      new Set(coveredRoomTypeIds).size !== coveredRoomTypeIds.length ||
+      !["active", "draft"].includes(publication)
+    )
+      return null;
+
+    const roomPrices = [];
+    for (const roomTypeId of coveredRoomTypeIds) {
+      const controls = [
+        ...form.querySelectorAll(
+          `[data-package-room-price][data-room-type-id="${roomTypeId}"]`,
+        ),
+      ];
+      const dates = controls.map((input) => input.dataset.rateDateId);
+      if (
+        controls.length !== model.rateDateIds.length ||
+        new Set(dates).size !== dates.length ||
+        dates.some((id) => !model.rateDateIds.includes(id))
+      )
+        return null;
+      const prices = {};
+      for (const dateId of model.rateDateIds) {
+        const control = controls.find(
+          (input) => input.dataset.rateDateId === dateId,
+        );
+        const price = control && parsePackagePrice(control.value);
+        if (price === null) return null;
+        prices[dateId] = price;
+      }
+      roomPrices.push({ roomTypeId, eligible: true, prices });
+    }
+    const settings = {};
+    const settingControls = [
+      ...form.querySelectorAll("[data-package-setting-id]"),
+    ];
+    const settingIds = settingControls.map(
+      (control) => control.dataset.packageSettingId,
+    );
+    if (
+      settingControls.length !== model.settingIds.length ||
+      new Set(settingIds).size !== settingIds.length ||
+      settingIds.some((id) => !model.settingIds.includes(id))
+    )
+      return null;
+    settingControls.forEach((control) => {
+      settings[control.dataset.packageSettingId] = control.checked;
+    });
+    return normalizePackageRecord(
+      {
+        title,
+        description,
+        galleryImageIds,
+        inclusions,
+        nights,
+        meal,
+        roomPrices,
+        active: publication === "active",
+        procedures,
+        settings,
+      },
+      offer,
+    );
+  }
+
+  function savePackageEditor(form) {
+    if (state.access !== "full" || state.connection !== "manual") return false;
+    const offer = resolvedOffers().find((entry) => entry.id === state.offer);
+    if (!offer) return false;
+    const candidate = packageEditorCandidate(form, offer);
+    if (!candidate) {
+      setPackageEditorError(
+        form,
+        language() === "cs"
+          ? "Zkontrolujte povinná pole, výběry a ceny pro každý termín. Změny nebyly uloženy."
+          : "Check required fields, selections and every date price. No changes were saved.",
+      );
+      return false;
+    }
+    const isDraft = Object.prototype.hasOwnProperty.call(
+      state.packageDrafts,
+      offer.id,
+    );
+    const target = isDraft ? state.packageDrafts : state.packageMutations;
+    const hadPrevious = Object.prototype.hasOwnProperty.call(target, offer.id);
+    const previous = target[offer.id];
+    if (isDraft) {
+      state.packageDrafts[offer.id] = candidate;
+    } else if (fixtures("offer-fixtures").some((entry) => entry.id === offer.id)) {
+      state.packageMutations[offer.id] = candidate;
+    } else {
+      return false;
+    }
+    if (!persistState()) {
+      if (hadPrevious) target[offer.id] = previous;
+      else delete target[offer.id];
+      setPackageEditorError(
+        form,
+        language() === "cs"
+          ? "Změny se nepodařilo trvale uložit. Formulář zůstává otevřený; zkuste to znovu."
+          : "Changes could not be stored. The form remains open; try again.",
+      );
+      return false;
+    }
+    hydrateOffer();
+    showToast(
+      language() === "cs"
+        ? "Vybraný balíček byl uložen."
+        : "The selected package was saved.",
+    );
+    return true;
   }
 
   function setPackageCreateError(form, message) {
@@ -322,10 +771,36 @@
       return false;
     }
     const id = nextPackageId();
-    state.packageDrafts[id] = { title, nights };
+    const draft = normalizePackageRecord(
+      { ...packageDraftTemplate(), title, nights },
+      packageDraftTemplate(),
+    );
+    if (!draft) {
+      setPackageCreateError(
+        form,
+        language() === "cs"
+          ? "Koncept balíčku se nepodařilo vytvořit."
+          : "The package draft could not be created.",
+      );
+      return false;
+    }
+    const previousOffer = state.offer;
+    const previousSection = state.section;
+    state.packageDrafts[id] = draft;
     state.offer = id;
     state.section = "package";
-    persistState();
+    if (!persistState()) {
+      delete state.packageDrafts[id];
+      state.offer = previousOffer;
+      state.section = previousSection;
+      setPackageCreateError(
+        form,
+        language() === "cs"
+          ? "Koncept se nepodařilo trvale uložit. Formulář zůstává otevřený; zkuste to znovu."
+          : "The draft could not be stored. The form remains open; try again.",
+      );
+      return false;
+    }
     location.assign(packageEditorHref(id, "package"));
     return true;
   }
@@ -423,8 +898,13 @@
 
   function saveAvailabilityCells(cells, value) {
     if (!canWriteAvailability() || !cells.length) return false;
+    const previous = state.availabilityMutations;
+    state.availabilityMutations = { ...previous };
     cells.forEach((cell) => setAvailabilityMutation(cell, value));
-    persistState();
+    if (!persistState()) {
+      state.availabilityMutations = previous;
+      return false;
+    }
     renderAvailability();
     return true;
   }
@@ -577,7 +1057,15 @@
       }
       next = { type: "units", value };
     }
-    if (!saveAvailabilityCell(cell, next)) return false;
+    if (!saveAvailabilityCell(cell, next)) {
+      setAvailabilityError(
+        form,
+        language() === "cs"
+          ? "Dostupnost se nepodařilo trvale uložit. Editor zůstává otevřený; zkuste to znovu."
+          : "Availability could not be stored. The editor remains open; try again.",
+      );
+      return false;
+    }
     closeSheet(form.closest(".modal-backdrop"));
     showToast(
       language() === "cs"
@@ -610,7 +1098,15 @@
     } else if (action !== "stopSell") {
       return false;
     }
-    if (!saveAvailabilityCells(selection.cells, next)) return false;
+    if (!saveAvailabilityCells(selection.cells, next)) {
+      setAvailabilityBulkError(
+        form,
+        language() === "cs"
+          ? "Hromadnou změnu se nepodařilo trvale uložit. Editor zůstává otevřený; zkuste to znovu."
+          : "The bulk change could not be stored. The editor remains open; try again.",
+      );
+      return false;
+    }
     closeSheet(form.closest(".modal-backdrop"));
     showToast(
       language() === "cs"
@@ -673,6 +1169,7 @@
   }
 
   function hydrateOffer() {
+    if (!document.querySelector('[data-offer-field="id"]')) return;
     const list = resolvedOffers();
     if (!list.length) return;
     const offer = list.find((entry) => entry.id === state.offer);
@@ -694,15 +1191,8 @@
           : language() === "cs"
             ? "Koncept"
             : "Draft";
-      });
-    document.querySelectorAll('[data-offer-input="title"]').forEach((input) => {
-      input.value = offer.title;
     });
-    document
-      .querySelectorAll('[data-offer-input="duration"]')
-      .forEach((input) => {
-        input.value = offer.duration;
-      });
+    hydratePackageEditor(offer);
     const relationByRoomType = new Map(
       (offer.roomPrices || []).map((relation) => [
         relation.roomTypeId,
@@ -864,6 +1354,7 @@
       if (node.dataset[countKey]) node.textContent = node.dataset[countKey];
     });
     renderCreatedOffers();
+    renderOfferCards();
     hydrateReservation();
     hydrateOffer();
     renderAvailability();
@@ -1125,13 +1616,17 @@
         return;
       }
 
-      const saveRates = event.target.closest("[data-save-rates]");
-      if (saveRates && !saveRates.disabled) {
-        showToast(saveRates.dataset.success);
-      }
     });
 
     document.addEventListener("submit", (event) => {
+      const packageEditorForm = event.target.closest(
+        "[data-package-editor-form]",
+      );
+      if (packageEditorForm) {
+        event.preventDefault();
+        savePackageEditor(packageEditorForm);
+        return;
+      }
       const packageCreateForm = event.target.closest(
         "[data-package-create-form]",
       );

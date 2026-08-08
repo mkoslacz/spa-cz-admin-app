@@ -70,6 +70,15 @@ const ROOM_TYPES = [
   },
 ];
 
+const PACKAGE_GALLERY_IMAGES = [
+  { id: 'hotel-exterior', name: { cs: 'Průčelí hotelu', en: 'Hotel exterior' } },
+  { id: 'spa-pool', name: { cs: 'Bazén a wellness', en: 'Pool and wellness' } },
+  { id: 'treatment-room', name: { cs: 'Léčebná místnost', en: 'Treatment room' } },
+  { id: 'guest-room', name: { cs: 'Pokoj pro hosty', en: 'Guest room' } },
+];
+
+const PACKAGE_SETTING_IDS = ['flexible-cancellation', 'late-arrival'];
+
 function pricesByDate(basePrice, adjustments) {
   return Object.fromEntries(
     AVAILABILITY_DATES.slice(0, 7).map((date, index) => [
@@ -158,6 +167,21 @@ const OFFERS = [
     title: { cs: 'Pobyt SPA HOTEL ČAJKOVSKIJ', en: 'SPA HOTEL ČAJKOVSKIJ stay' },
     duration: { cs: '3 dny / 2 noci', en: '3 days / 2 nights' },
     meal: { cs: 'Pobytový balíček se snídaní', en: 'Stay package with breakfast' },
+    description: {
+      cs: 'Odpočinkový pobyt s lázeňskou péčí v Karlových Varech.',
+      en: 'A relaxing stay with spa care in Karlovy Vary.',
+    },
+    galleryImageIds: ['hotel-exterior', 'spa-pool'],
+    inclusions: {
+      cs: ['Snídaně', 'Vstup do wellness'],
+      en: ['Breakfast', 'Wellness access'],
+    },
+    nights: 2,
+    procedures: {
+      cs: ['Vstupní konzultace', 'Klasická masáž'],
+      en: ['Initial consultation', 'Classic massage'],
+    },
+    settings: { 'flexible-cancellation': true, 'late-arrival': false },
     active: true,
     spa: true,
     roomPrices: [
@@ -172,6 +196,15 @@ const OFFERS = [
     title: { cs: 'Wellness víkend', en: 'Wellness weekend' },
     duration: { cs: '3 dny / 2 noci', en: '3 days / 2 nights' },
     meal: { cs: 'Snídaně', en: 'Breakfast' },
+    description: {
+      cs: 'Víkendový pobyt s wellness a snídaní.',
+      en: 'A weekend stay with wellness access and breakfast.',
+    },
+    galleryImageIds: ['spa-pool', 'guest-room'],
+    inclusions: { cs: ['Snídaně', 'Saunový svět'], en: ['Breakfast', 'Sauna world'] },
+    nights: 2,
+    procedures: { cs: ['Relaxační masáž'], en: ['Relaxing massage'] },
+    settings: { 'flexible-cancellation': true, 'late-arrival': true },
     active: true,
     spa: true,
     roomPrices: [
@@ -186,6 +219,21 @@ const OFFERS = [
     title: { cs: 'Lázeňský týden', en: 'Spa week' },
     duration: { cs: '8 dní / 7 nocí', en: '8 days / 7 nights' },
     meal: { cs: 'Polopenze', en: 'Half board' },
+    description: {
+      cs: 'Sedm nocí s polopenzí a programem lázeňských procedur.',
+      en: 'Seven nights with half board and a programme of spa procedures.',
+    },
+    galleryImageIds: ['hotel-exterior', 'treatment-room', 'guest-room'],
+    inclusions: {
+      cs: ['Polopenze', 'Denní vstup do wellness'],
+      en: ['Half board', 'Daily wellness access'],
+    },
+    nights: 7,
+    procedures: {
+      cs: ['Lékařská konzultace', 'Pět léčebných procedur'],
+      en: ['Medical consultation', 'Five spa procedures'],
+    },
+    settings: { 'flexible-cancellation': false, 'late-arrival': true },
     active: true,
     spa: false,
     roomPrices: [
@@ -202,6 +250,15 @@ const OFFERS = [
     title: { cs: 'Odpočinek pro dva', en: 'Break for two' },
     duration: { cs: '4 dny / 3 noci', en: '4 days / 3 nights' },
     meal: { cs: 'Snídaně', en: 'Breakfast' },
+    description: {
+      cs: 'Krátký pobyt pro dvě osoby se snídaní.',
+      en: 'A short stay for two with breakfast.',
+    },
+    galleryImageIds: ['hotel-exterior', 'guest-room'],
+    inclusions: { cs: ['Snídaně'], en: ['Breakfast'] },
+    nights: 3,
+    procedures: { cs: ['Privátní wellness'], en: ['Private wellness'] },
+    settings: { 'flexible-cancellation': false, 'late-arrival': false },
     active: false,
     spa: false,
     roomPrices: [
@@ -212,9 +269,15 @@ const OFFERS = [
 ];
 
 const PACKAGE_DRAFT_TEMPLATE = {
+  description: { cs: 'Nový pobytový balíček.', en: 'A new stay package.' },
+  galleryImageIds: ['hotel-exterior'],
+  inclusions: { cs: ['Ubytování'], en: ['Accommodation'] },
+  nights: 2,
   meal: { cs: 'Bez stravy', en: 'No meal' },
   active: false,
   spa: false,
+  procedures: { cs: ['Bez procedur'], en: ['No procedures'] },
+  settings: { 'flexible-cancellation': false, 'late-arrival': false },
   roomPrices: [roomPrice('double', null, [0, 0, 0, 0, 0, 0, 0])],
 };
 
@@ -251,11 +314,25 @@ function fixturePayload(fixtures, lang) {
       price: fixture.roomPrices ? packageStartingPrice(fixture) : fixture.price,
       hasRates: fixture.roomPrices ? packageHasRates(fixture) : fixture.hasRates,
       title: localized(fixture.title, lang),
+      description: localized(fixture.description, lang),
       duration: localized(fixture.duration, lang),
       meal: localized(fixture.meal, lang),
+      inclusions: localized(fixture.inclusions, lang),
+      procedures: localized(fixture.procedures, lang),
       status: localized(fixture.status, lang),
     }))
   ).replace(/</g, '\\u003c');
+}
+
+function packageEditorModelPayload(lang) {
+  return JSON.stringify([
+    {
+      galleryImages: PACKAGE_GALLERY_IMAGES.map(image => ({ id: image.id, name: localized(image.name, lang) })),
+      roomTypeIds: ROOM_TYPES.map(roomType => roomType.id),
+      rateDateIds: AVAILABILITY_DATES.slice(0, 7).map(date => date.id),
+      settingIds: PACKAGE_SETTING_IDS,
+    },
+  ]).replace(/</g, '\\u003c');
 }
 
 function packageDraftTemplatePayload(lang) {
@@ -541,17 +618,17 @@ function offerCard(lang, offer) {
   const startingPrice = packageStartingPrice(offer);
   const hasRates = packageHasRates(offer);
   return `<article class="offer-card ${offer.rank === 1 ? 'featured' : 'compact'}" data-inventory-rank="${offer.rank}" data-offer-id="${offer.id}" data-offer-active="${offer.active}" data-offer-spa="${offer.spa}" data-offer-has-rates="${hasRates}">
-    <div class="offer-visual"><div><small>${offer.rank === 1 ? 'SPA HOTEL ČAJKOVSKIJ' : tr(lang, 'POBYTOVÁ NABÍDKA', 'STAY OFFER')}</small><strong>${localized(offer.duration, lang)}</strong></div></div>
-    <div class="offer-copy"><div class="card-line"><h2>${localized(offer.title, lang)}</h2></div><p>${localized(offer.meal, lang)}</p><div class="offer-meta"><span class="status ${offer.active ? 'success' : 'warning'}">${offer.active ? tr(lang, 'Aktivní', 'Active') : tr(lang, 'Koncept', 'Draft')}</span>${offer.spa ? '<span class="status info">SPA.CZ</span>' : ''}</div></div>
-    <div class="offer-price"><div><small>${hasRates ? tr(lang, 'cena od', 'price from') : tr(lang, 'bez cen', 'missing rates')}</small><strong>${formatPrice(startingPrice)}</strong></div><a class="button primary" href="${route('rate-edit', lang, { offer: offer.id, section: 'rates' })}" data-carry-state>${tr(lang, 'Ceny', 'Rates')}</a></div>
+    <div class="offer-visual"><div><small>${offer.rank === 1 ? 'SPA HOTEL ČAJKOVSKIJ' : tr(lang, 'POBYTOVÁ NABÍDKA', 'STAY OFFER')}</small><strong data-offer-card-duration>${localized(offer.duration, lang)}</strong></div></div>
+    <div class="offer-copy"><div class="card-line"><h2 data-offer-card-title>${localized(offer.title, lang)}</h2></div><p data-offer-card-meal>${localized(offer.meal, lang)}</p><div class="offer-meta"><span class="status ${offer.active ? 'success' : 'warning'}" data-offer-card-publication>${offer.active ? tr(lang, 'Aktivní', 'Active') : tr(lang, 'Koncept', 'Draft')}</span>${offer.spa ? '<span class="status info">SPA.CZ</span>' : ''}</div></div>
+    <div class="offer-price"><div><small data-offer-card-price-label>${hasRates ? tr(lang, 'cena od', 'price from') : tr(lang, 'bez cen', 'missing rates')}</small><strong data-offer-card-price>${formatPrice(startingPrice)}</strong></div><div class="state-choices"><a class="button full" href="${route('rate-edit', lang, { offer: offer.id, section: 'package' })}" data-offer-card-edit data-carry-state data-outcome="route">${tr(lang, 'Upravit balíček', 'Edit package')}</a><a class="button primary full" href="${route('rate-edit', lang, { offer: offer.id, section: 'rates' })}" data-offer-card-rates data-carry-state data-outcome="route">${tr(lang, 'Ceny', 'Rates')}</a></div></div>
   </article>`;
 }
 
 function createdOfferTemplate(lang) {
   return `<template id="created-offer-template"><article class="offer-card compact" data-inventory-rank="0" data-offer-id="local-package-template" data-offer-active="false" data-offer-spa="false" data-offer-has-rates="false" data-created-package>
-    <div class="offer-visual"><div><small>${tr(lang, 'POBYTOVÁ NABÍDKA', 'STAY OFFER')}</small><strong data-created-offer-duration></strong></div></div>
-    <div class="offer-copy"><div class="card-line"><h2 data-created-offer-title></h2></div><p data-created-offer-meal></p><div class="offer-meta"><span class="status warning">${tr(lang, 'Koncept', 'Draft')}</span></div></div>
-    <div class="offer-price"><div><small>${tr(lang, 'bez cen', 'missing rates')}</small><strong>—</strong></div><div class="inline-actions"><a class="button" href="${file('rate-edit', lang)}" data-created-offer-edit data-carry-state data-outcome="route">${tr(lang, 'Upravit balíček', 'Edit package')}</a><a class="button primary" href="${file('rate-edit', lang)}" data-created-offer-rates data-carry-state data-outcome="route">${tr(lang, 'Ceny', 'Rates')}</a></div></div>
+    <div class="offer-visual"><div><small>${tr(lang, 'POBYTOVÁ NABÍDKA', 'STAY OFFER')}</small><strong data-created-offer-duration data-offer-card-duration></strong></div></div>
+    <div class="offer-copy"><div class="card-line"><h2 data-created-offer-title data-offer-card-title></h2></div><p data-created-offer-meal data-offer-card-meal></p><div class="offer-meta"><span class="status warning" data-offer-card-publication>${tr(lang, 'Koncept', 'Draft')}</span></div></div>
+    <div class="offer-price"><div><small data-offer-card-price-label>${tr(lang, 'bez cen', 'missing rates')}</small><strong data-offer-card-price>—</strong></div><div class="state-choices"><a class="button full" href="${file('rate-edit', lang)}" data-created-offer-edit data-offer-card-edit data-carry-state data-outcome="route">${tr(lang, 'Upravit balíček', 'Edit package')}</a><a class="button primary full" href="${file('rate-edit', lang)}" data-created-offer-rates data-offer-card-rates data-carry-state data-outcome="route">${tr(lang, 'Ceny', 'Rates')}</a></div></div>
   </article></template>`;
 }
 
@@ -565,13 +642,12 @@ function offer(lang) {
     </div>
     <div class="filter-empty" data-offer-empty hidden>${emptyState(lang, 'Žádné balíčky', 'No packages', 'Tomuto filtru neodpovídá žádný balíček.', 'No package matches this filter.')}</div>
     ${emptyState(lang, 'Žádné balíčky', 'No packages', 'V tomto stavu nejsou žádné nabídky.', 'There are no offers in this state.')}
-    ${createdOfferTemplate(lang)}
-    <script id="package-draft-fixture" type="application/json">${packageDraftTemplatePayload(lang)}</script>`;
+    ${createdOfferTemplate(lang)}`;
 }
 
 function rateMatrix(lang, offer) {
   const rateDates = AVAILABILITY_DATES.slice(0, 7);
-  const relationByRoomType = new Map(offer.roomPrices.map(row => [row.roomTypeId, row]));
+  const relationByRoomType = new Map((offer?.roomPrices || []).map(row => [row.roomTypeId, row]));
   const headers = rateDates
     .map(date => `<th class="${date.className}" data-date-id="${date.id}">${date.day}. 10.</th>`)
     .join('');
@@ -581,7 +657,7 @@ function rateMatrix(lang, offer) {
     const inputs = rateDates
       .map(date => {
         const value = eligible ? relation.prices[date.id] : null;
-        return `<td><input class="rate-input" type="number" value="${value ?? ''}" inputmode="numeric" aria-label="${localized(roomType.name, lang)} CZK" data-room-type-id="${roomType.id}" data-rate-date-id="${date.id}" data-write-action data-chm-write></td>`;
+        return `<td><input class="rate-input" type="number" value="${value ?? ''}" inputmode="numeric" aria-label="${localized(roomType.name, lang)} CZK" data-room-type-id="${roomType.id}" data-rate-date-id="${date.id}" readonly aria-readonly="true"></td>`;
       })
       .join('');
     return `<tr data-room-type-id="${roomType.id}"${eligible ? '' : ' hidden'}><td class="sticky-col"><strong>${localized(roomType.name, lang)}</strong><small>${roomType.capacity.adults}+${roomType.capacity.children}</small></td>${inputs}</tr>`;
@@ -589,35 +665,81 @@ function rateMatrix(lang, offer) {
   return `<div class="matrix-wrap"><table class="matrix rate-matrix"><thead><tr><th class="sticky-col">${tr(lang, 'Typ pokoje / příjezd', 'Room type / arrival')}</th>${headers}</tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
+function packageEditorForm(lang) {
+  const rateDates = AVAILABILITY_DATES.slice(0, 7);
+  const galleryChoices = PACKAGE_GALLERY_IMAGES.map(
+    image =>
+      `<label class="field"><span><input type="checkbox" data-package-gallery-id="${image.id}" data-write-action data-chm-write> ${localized(image.name, lang)}</span></label>`
+  ).join('');
+  const priceHeaders = rateDates.map(date => `<th>${date.day}. 10.</th>`).join('');
+  const priceRows = ROOM_TYPES.map(
+    roomType =>
+      `<tr data-package-room-row="${roomType.id}"><td class="sticky-col"><label><input type="checkbox" data-package-room-coverage="${roomType.id}" data-write-action data-chm-write> <strong>${localized(roomType.name, lang)}</strong></label></td>${rateDates
+        .map(
+          date =>
+            `<td><input class="rate-input" type="number" min="0" max="1000000" step="1" inputmode="numeric" data-package-room-price data-room-type-id="${roomType.id}" data-rate-date-id="${date.id}" aria-label="${localized(roomType.name, lang)}, ${date.id}, CZK" data-write-action data-chm-write></td>`
+        )
+        .join('')}</tr>`
+  ).join('');
+  const settings = [
+    ['flexible-cancellation', tr(lang, 'Flexibilní storno', 'Flexible cancellation')],
+    ['late-arrival', tr(lang, 'Pokyny pro pozdní příjezd', 'Late-arrival instructions')],
+  ]
+    .map(
+      ([id, label]) =>
+        `<label class="field"><span><input type="checkbox" data-package-setting-id="${id}" data-write-action data-chm-write> ${label}</span></label>`
+    )
+    .join('');
+  return `<form data-package-editor-form id="package-editor-form">
+    <section class="card"><div class="section-head"><h3>${tr(lang, 'Obsah balíčku', 'Package content')}</h3></div>
+      <label class="field"><span>${tr(lang, 'Název', 'Title')}</span><input data-package-field="title" maxlength="160" required data-write-action data-chm-write></label>
+      <label class="field"><span>${tr(lang, 'Popis', 'Description')}</span><textarea data-package-field="description" maxlength="1200" rows="4" required data-write-action data-chm-write></textarea></label>
+      <fieldset><legend>${tr(lang, 'Snímky z existující fotogalerie', 'Images from the existing gallery')}</legend><div class="form-two-col">${galleryChoices}</div></fieldset>
+      <label class="field"><span>${tr(lang, 'Obsah balíčku — jedna položka na řádek', 'Inclusions — one item per line')}</span><textarea data-package-field="inclusions" rows="4" required data-write-action data-chm-write></textarea></label>
+    </section>
+    <section class="card"><div class="section-head"><h3>${tr(lang, 'Pobyt a publikace', 'Stay and publication')}</h3></div><div class="form-two-col">
+      <label class="field"><span>${tr(lang, 'Počet nocí', 'Nights')}</span><input data-package-field="nights" type="number" min="1" max="365" step="1" required data-write-action data-chm-write></label>
+      <label class="field"><span>${tr(lang, 'Strava', 'Meal')}</span><input data-package-field="meal" maxlength="160" required data-write-action data-chm-write></label>
+      <label class="field"><span>${tr(lang, 'Publikace', 'Publication')}</span><select data-package-field="publication" data-write-action data-chm-write><option value="draft">${tr(lang, 'Koncept', 'Draft')}</option><option value="active">${tr(lang, 'Aktivní', 'Active')}</option></select></label>
+    </div></section>
+    <section class="card"><div class="section-head"><h3>${tr(lang, 'Pokryté typy pokojů a ceny', 'Covered room types and prices')}</h3></div><p class="subtle">${tr(lang, 'Vyberte alespoň jeden typ pokoje a zadejte cenu pro každý termín. Změna pokrytí nemění dostupnost pokojů.', 'Select at least one room type and enter its price for every date. Changing coverage does not change room availability.')}</p><div class="matrix-wrap"><table class="matrix"><thead><tr><th class="sticky-col">${tr(lang, 'Typ pokoje', 'Room type')}</th>${priceHeaders}</tr></thead><tbody>${priceRows}</tbody></table></div></section>
+    <section class="card"><div class="section-head"><h3>${tr(lang, 'Procedury a nastavení', 'Procedures and settings')}</h3></div>
+      <label class="field"><span>${tr(lang, 'Procedury — jedna položka na řádek', 'Procedures — one item per line')}</span><textarea data-package-field="procedures" rows="4" required data-write-action data-chm-write></textarea></label>
+      <fieldset><legend>${tr(lang, 'Použitelná nastavení', 'Applicable settings')}</legend><div class="form-two-col">${settings}</div></fieldset>
+    </section>
+    <p class="field-error" data-package-editor-error hidden></p>
+  </form>`;
+}
+
 function rateEdit(lang) {
   return `<a class="back-link" href="${file('offer', lang)}" data-carry-state>${icon('arrowLeft')} ${tr(lang, 'Nabídka', 'Offer')}</a>
     <div class="identity-found">
-    ${pageHead(lang, `<span data-offer-field="title">${localized(OFFERS[0].title, lang)}</span>`, `SPA HOTEL ČAJKOVSKIJ · <span data-offer-field="duration">${localized(OFFERS[0].duration, lang)}</span>`, false)}
+    ${pageHead(lang, '<span data-offer-field="title"></span>', `SPA HOTEL ČAJKOVSKIJ · <span data-offer-field="duration"></span>`, false)}
     ${stateAlerts(lang, true)}
     <div data-package-editor-surface hidden>
       <div class="section-head"><h2>${tr(lang, 'Upravit balíček', 'Edit package')}</h2></div>
       <section class="card">
-        <div class="card-line"><span><small>${tr(lang, 'ID balíčku', 'Package ID')}</small><br><strong data-offer-field="id">${OFFERS[0].id}</strong></span><span class="status success" data-offer-field="publication">${tr(lang, 'Aktivní', 'Active')}</span></div>
-        <div class="card-line secondary"><span data-offer-field="duration">${localized(OFFERS[0].duration, lang)}</span><span data-offer-field="meal">${localized(OFFERS[0].meal, lang)}</span></div>
+        <div class="card-line"><span><small>${tr(lang, 'ID balíčku', 'Package ID')}</small><br><strong data-offer-field="id"></strong></span><span class="status" data-offer-field="publication"></span></div>
+        <div class="card-line secondary"><span data-offer-field="duration"></span><span data-offer-field="meal"></span></div>
         <p class="subtle">${tr(lang, 'Tento editor patří vybranému balíčku. Dostupnost pokojů se zde nemění.', 'This editor belongs to the selected package. Room inventory is not changed here.')}</p>
-        <a class="button primary full" href="${route('rate-edit', lang, { offer: OFFERS[0].id, section: 'rates' })}" data-offer-route="rates" data-carry-state>${tr(lang, 'Otevřít ceny', 'Open rates')}</a>
+        <a class="button primary full" href="${route('rate-edit', lang, { section: 'rates' })}" data-offer-route="rates" data-carry-state>${tr(lang, 'Otevřít ceny', 'Open rates')}</a>
       </section>
+      ${packageEditorForm(lang)}
+      <section class="card"><div class="card-line"><span><small>${tr(lang, 'Vybraný balíček', 'Selected package')}</small><br><strong data-offer-field="id"></strong></span><button class="button primary" type="submit" form="package-editor-form" data-package-save data-write-action data-chm-write>${tr(lang, 'Uložit balíček', 'Save package')}</button></div></section>
     </div>
     <div data-package-rates-surface>
-    <div class="alert info" data-package-inventory-note><strong>${tr(lang, 'Dostupnost a obsah balíčku jsou oddělené.', 'Inventory and package content are separate.')}</strong>&nbsp;${tr(lang, 'Obsah balíčku nemění dostupnost pokojů. Dostupnost každého typu pokoje omezuje prodej propojených balíčků.', 'Package content does not change room inventory. Inventory for each room type limits sales of linked packages.')}</div>
-    <div class="tabs"><span class="active" aria-current="page">${tr(lang, 'Termíny a ceny', 'Dates & rates')}</span><button type="button" data-open-sheet="package-basics-sheet">${tr(lang, 'Základní údaje', 'Basics')}</button><button type="button" data-open-sheet="package-settings-sheet">${tr(lang, 'Nastavení', 'Settings')}</button></div>
+    <div class="alert info" data-package-inventory-note><strong>${tr(lang, 'Dostupnost a obsah balíčku jsou oddělené.', 'Inventory and package content are separate.')}</strong>&nbsp;${tr(lang, 'Obsah balíčku nemění dostupnost pokojů. Dostupnost každého typu pokoje omezuje prodej propojených balíčků. Ceny jsou zde pouze ke čtení; změny proveďte v editoru balíčku.', 'Package content does not change room inventory. Inventory for each room type limits sales of linked packages. Prices are read-only here; use Edit package to make changes.')}</div>
+    <div class="tabs"><span class="active" aria-current="page">${tr(lang, 'Termíny a ceny', 'Dates & rates')}</span><a href="${route('rate-edit', lang, { section: 'package' })}" data-offer-route="package" data-carry-state>${tr(lang, 'Upravit balíček', 'Edit package')}</a></div>
     <section class="card">
       <div class="form-two-col"><label class="field"><span class="meta">${tr(lang, 'Cenový model', 'Pricing model')}</span><select><option>${tr(lang, 'Osoba / pobyt', 'Person / stay')}</option><option>${tr(lang, 'Pokoj / pobyt', 'Room / stay')}</option></select></label><label class="field"><span class="meta">${tr(lang, 'Měna hotelu', 'Hotel currency')}</span><input value="CZK" readonly></label></div>
     </section>
     <div class="section-head"><h2>${tr(lang, 'Ceny balíčku podle typu pokoje', 'Package prices by room type')}</h2></div>
     <div class="matrix-toolbar"><button class="page-action-icon" type="button" data-grid-shift="-1" aria-label="${tr(lang, 'Předchozí dny', 'Previous days')}">${icon('arrowLeft')}</button><strong>${tr(lang, '12.–18. října 2026', '12–18 October 2026')}</strong><button class="page-action-icon" type="button" data-grid-shift="1" aria-label="${tr(lang, 'Další dny', 'Next days')}">${icon('arrowRight')}</button></div>
-    ${rateMatrix(lang, OFFERS[0])}
-    <div class="sticky-action-bar"><span><small>${tr(lang, 'Cena od', 'Price from')}</small><strong data-offer-field="price">3 577 Kč</strong></span><button class="button primary" type="button" data-save-rates data-success="${tr(lang, 'Ceny balíčku byly uloženy.', 'Package prices were saved.')}" data-write-action data-chm-write>${tr(lang, 'Uložit', 'Save')}</button></div>
+    ${rateMatrix(lang, null)}
+    <div class="sticky-action-bar"><span><small>${tr(lang, 'Cena od', 'Price from')}</small><strong data-offer-field="price">3 577 Kč</strong></span><a class="button primary" href="${route('rate-edit', lang, { section: 'package' })}" data-rate-edit-link data-offer-route="package" data-carry-state>${tr(lang, 'Upravit balíček', 'Edit package')}</a></div>
     </div>
     </div>
-    <section class="identity-missing card" hidden><h1>${tr(lang, 'Balíček nebyl nalezen', 'Package not found')}</h1><p>${tr(lang, 'Požadované ID balíčku není dostupné.', 'The requested package ID is unavailable.')}</p><a class="button primary" href="${file('offer', lang)}" data-carry-state>${tr(lang, 'Zpět na nabídku', 'Back to offer')}</a></section>
-    <script id="offer-fixtures" type="application/json">${fixturePayload(OFFERS, lang)}</script>
-    <script id="package-draft-fixture" type="application/json">${packageDraftTemplatePayload(lang)}</script>`;
+    <section class="identity-missing card" hidden><h1>${tr(lang, 'Balíček nebyl nalezen', 'Package not found')}</h1><p>${tr(lang, 'Požadované ID balíčku není dostupné.', 'The requested package ID is unavailable.')}</p><a class="button primary" href="${file('offer', lang)}" data-carry-state>${tr(lang, 'Zpět na nabídku', 'Back to offer')}</a></section>`;
 }
 
 function billingCard(lang, rank, id, term, statusKey, status, statusClass, price) {
@@ -700,7 +822,7 @@ function moreSheets(lang) {
       'gallery-sheet',
       lang,
       tr(lang, 'Fotogalerie', 'Photo gallery'),
-      `<p class="subtle">${tr(lang, '12 snímků · profilový snímek je nastaven.', '12 images · profile image is selected.')}</p><button class="button full" type="button" data-terminal="gallery-export" data-terminal-message="${tr(lang, 'Fotogalerie: seznam 12 snímků byl připraven.', 'Photo gallery: the list of 12 images is ready.')}">${tr(lang, 'Zobrazit seznam snímků', 'View image list')}</button>`
+      `<p class="subtle">${tr(lang, '4 snímky · profilový snímek je nastaven.', '4 images · profile image is selected.')}</p><button class="button full" type="button" data-terminal="gallery-export" data-terminal-message="${tr(lang, 'Fotogalerie: seznam 4 snímků byl připraven.', 'Photo gallery: the list of 4 images is ready.')}">${tr(lang, 'Zobrazit seznam snímků', 'View image list')}</button>`
     ),
     formSheet(
       'profile-sheet',
@@ -852,23 +974,6 @@ function sheets(page, lang) {
       `<div class="sheet-actions"><button class="button" type="button" data-close-sheet>${tr(lang, 'Zrušit', 'Cancel')}</button><button class="button primary" type="submit" form="new-package-sheet-form" data-write-action>${tr(lang, 'Vytvořit', 'Create')}</button></div>`
     );
   }
-  if (page === 'rate-edit') {
-    contextual =
-      formSheet(
-        'package-basics-sheet',
-        lang,
-        tr(lang, 'Základní údaje balíčku', 'Package basics'),
-        `<label class="field"><span>${tr(lang, 'Název', 'Name')}</span><input data-offer-input="title" value="${localized(OFFERS[0].title, lang)}" required></label><label class="field"><span>${tr(lang, 'Délka pobytu', 'Stay length')}</span><input data-offer-input="duration" value="${localized(OFFERS[0].duration, lang)}" required></label>`,
-        tr(lang, 'Základní údaje balíčku byly uloženy.', 'Package basics were saved.')
-      ) +
-      formSheet(
-        'package-settings-sheet',
-        lang,
-        tr(lang, 'Nastavení balíčku', 'Package settings'),
-        `<label class="field"><span>${tr(lang, 'Stav publikace', 'Publication status')}</span><select><option>${tr(lang, 'Aktivní', 'Active')}</option><option>${tr(lang, 'Koncept', 'Draft')}</option></select></label>`,
-        tr(lang, 'Nastavení balíčku bylo uloženo.', 'Package settings were saved.')
-      );
-  }
   if (page === 'billing') {
     contextual = sheetShell(
       'dispute-sheet',
@@ -943,6 +1048,9 @@ function renderPage(page, lang) {
   </div>
   ${walls(lang)}
   ${sheets(page, lang)}
+  <script id="offer-fixtures" type="application/json">${fixturePayload(OFFERS, lang)}</script>
+  <script id="package-editor-model" type="application/json">${packageEditorModelPayload(lang)}</script>
+  <script id="package-draft-fixture" type="application/json">${packageDraftTemplatePayload(lang)}</script>
   <div class="toast" role="status" aria-live="polite"></div>
   <div class="state-debug" data-state-output></div>
   <a class="screen-reader-only" href="${languageSibling}" data-carry-state>${lang === 'cs' ? 'English' : 'Čeština'}</a>
@@ -970,6 +1078,8 @@ module.exports = {
   AVAILABILITY_DATES,
   OFFERS,
   PACKAGE_DRAFT_TEMPLATE,
+  PACKAGE_GALLERY_IMAGES,
+  PACKAGE_SETTING_IDS,
   RESERVATIONS,
   ROOM_TYPES,
   outcomeAttributes,
