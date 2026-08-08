@@ -116,6 +116,183 @@ async function waitForCount(page, selector, count) {
   );
 }
 
+async function availabilitySnapshot(page, availabilityId) {
+  return page.$eval(`.availability-cell[data-availability-id="${availabilityId}"]`, cell => ({
+    text: cell.querySelector('[data-availability-control]').textContent.trim(),
+    stopped: cell.classList.contains('stop'),
+  }));
+}
+
+async function openAvailabilityEditor(page, availabilityId) {
+  await page.click(`.availability-cell[data-availability-id="${availabilityId}"] [data-availability-control]`);
+  await page.waitForSelector('#availability-cell-sheet.open');
+}
+
+async function setAvailabilityUnits(page, availabilityId, value) {
+  await openAvailabilityEditor(page, availabilityId);
+  await page.select('[data-availability-cell-action]', 'units');
+  await page.$eval(
+    '[data-availability-cell-units]',
+    (input, nextValue) => {
+      input.value = nextValue;
+      input.dispatchEvent(new globalThis.Event('input', { bubbles: true }));
+    },
+    String(value)
+  );
+  await page.click('[form="availability-cell-form"]');
+}
+
+async function assertRestrictedAvailability(page, origin, screen, overrides, label) {
+  const availabilityId = 'double:2026-10-13';
+  await open(page, origin, screen, overrides);
+  const bypass = await page.evaluate(key => {
+    const cell = document.querySelector(`.availability-cell[data-availability-id="${key}"]`);
+    const control = cell.querySelector('[data-availability-control]');
+    const disabled = control.disabled;
+    control.disabled = false;
+    control.click();
+    const form = document.querySelector('[data-availability-cell-form]');
+    form.dataset.availabilityId = key;
+    form.querySelector('[data-availability-cell-action]').value = 'units';
+    form.querySelector('[data-availability-cell-units]').value = '2';
+    form.dispatchEvent(new globalThis.Event('submit', { bubbles: true, cancelable: true }));
+    return {
+      disabled,
+      sheetOpen: document.querySelector('#availability-cell-sheet').classList.contains('open'),
+    };
+  }, availabilityId);
+  assert.strictEqual(bypass.disabled, true, `${label}: cell control disabled`);
+  assert.strictEqual(bypass.sheetOpen, false, `${label}: runtime handler refuses editor`);
+  await page.reload({ waitUntil: 'networkidle0' });
+  assert.deepStrictEqual(
+    await availabilitySnapshot(page, availabilityId),
+    { text: '4', stopped: false },
+    `${label}: forced runtime submit does not persist`
+  );
+}
+
+async function assertSingleAvailabilityFlow(page, origin, lang) {
+  const suffix = lang === 'en' ? '-en' : '';
+  const screen = `m-availability${suffix}.html`;
+  const availabilityId = 'double:2026-10-12';
+  const roomName = lang === 'en' ? 'Double' : 'Dvoulůžkový';
+  await open(page, origin, screen);
+  await page.evaluate(() => globalThis.localStorage.clear());
+  await open(page, origin, screen);
+  assert.deepStrictEqual(
+    await availabilitySnapshot(page, availabilityId),
+    { text: '4', stopped: false },
+    `${lang}: initial numeric state`
+  );
+
+  await openAvailabilityEditor(page, availabilityId);
+  const context = await page.evaluate(() => ({
+    title: document.querySelector('#availability-cell-sheet h2').textContent.trim(),
+    room: document.querySelector('[data-availability-cell-room]').textContent.trim(),
+    date: document.querySelector('[data-availability-cell-date]').textContent.trim(),
+    current: document.querySelector('[data-availability-cell-current]').textContent.trim(),
+  }));
+  assert.match(context.title, lang === 'en' ? /Set availability/ : /Nastavit dostupnost/);
+  assert.strictEqual(context.room, roomName, `${lang}: room context`);
+  assert.match(context.date, /12.*2026/, `${lang}: date context`);
+  assert.match(context.current, /^4\s/, `${lang}: current state context`);
+
+  await page.$eval('[data-availability-cell-units]', input => {
+    input.value = '256';
+  });
+  await page.click('[form="availability-cell-form"]');
+  assert.strictEqual(
+    await page.$eval('[data-availability-cell-error]', node => !node.hidden && node.textContent.trim().length > 0),
+    true,
+    `${lang}: visible 0–255 validation`
+  );
+  assert.deepStrictEqual(
+    await availabilitySnapshot(page, availabilityId),
+    { text: '4', stopped: false },
+    `${lang}: invalid value preserves state`
+  );
+
+  await page.$eval('[data-availability-cell-units]', input => {
+    input.value = '3';
+  });
+  await page.click('[form="availability-cell-form"]');
+  await page.waitForFunction(
+    () => document.querySelector('#availability-cell-sheet').getAttribute('aria-hidden') === 'true'
+  );
+  assert.deepStrictEqual(
+    await availabilitySnapshot(page, availabilityId),
+    { text: '3', stopped: false },
+    `${lang}: 4 → 3`
+  );
+  await page.reload({ waitUntil: 'networkidle0' });
+  assert.deepStrictEqual(
+    await availabilitySnapshot(page, availabilityId),
+    { text: '3', stopped: false },
+    `${lang}: numeric value survives reload`
+  );
+
+  await clickRoute(page, '.mobile-bottom-nav a[href*="m-dashboard"]');
+  await clickRoute(page, '.mobile-bottom-nav a[href*="m-availability"]');
+  assert.deepStrictEqual(
+    await availabilitySnapshot(page, availabilityId),
+    { text: '3', stopped: false },
+    `${lang}: numeric value survives navigation`
+  );
+
+  const otherLanguage = lang === 'en' ? 'cs' : 'en';
+  await clickRoute(page, `.langswitch a[data-lang="${otherLanguage}"]`);
+  assert.deepStrictEqual(
+    await availabilitySnapshot(page, availabilityId),
+    { text: '3', stopped: false },
+    `${lang}: numeric value survives language switch`
+  );
+  await clickRoute(page, `.langswitch a[data-lang="${lang}"]`);
+
+  await setAvailabilityUnits(page, availabilityId, 0);
+  await page.waitForFunction(
+    () => document.querySelector('#availability-cell-sheet').getAttribute('aria-hidden') === 'true'
+  );
+  assert.deepStrictEqual(
+    await availabilitySnapshot(page, availabilityId),
+    { text: '0', stopped: false },
+    `${lang}: numeric zero stays distinct`
+  );
+  await page.reload({ waitUntil: 'networkidle0' });
+  assert.deepStrictEqual(
+    await availabilitySnapshot(page, availabilityId),
+    { text: '0', stopped: false },
+    `${lang}: numeric zero survives reload`
+  );
+
+  await openAvailabilityEditor(page, availabilityId);
+  await page.select('[data-availability-cell-action]', 'stopSell');
+  assert.strictEqual(
+    await page.$eval('[data-availability-cell-units-field]', node => node.hidden),
+    true,
+    `${lang}: stop sell is a separate action`
+  );
+  await page.click('[form="availability-cell-form"]');
+  await page.waitForFunction(
+    () => document.querySelector('#availability-cell-sheet').getAttribute('aria-hidden') === 'true'
+  );
+  assert.deepStrictEqual(
+    await availabilitySnapshot(page, availabilityId),
+    { text: '×', stopped: true },
+    `${lang}: stop sell uses ×`
+  );
+  await page.reload({ waitUntil: 'networkidle0' });
+  assert.deepStrictEqual(
+    await availabilitySnapshot(page, availabilityId),
+    { text: '×', stopped: true },
+    `${lang}: stop sell survives reload`
+  );
+
+  await page.evaluate(() => globalThis.localStorage.clear());
+  await assertRestrictedAvailability(page, origin, screen, { access: 'read' }, `${lang} read-only`);
+  await page.evaluate(() => globalThis.localStorage.clear());
+  await assertRestrictedAvailability(page, origin, screen, { connection: 'chm' }, `${lang} Channel Manager`);
+}
+
 async function assertReviewPagesLayout(page, origin, viewport) {
   await page.setViewport({ ...viewport, deviceScaleFactor: 1 });
   await open(page, origin, 'm-dashboard.html');
@@ -209,7 +386,6 @@ async function main() {
   page.on('console', message => {
     if (message.type() === 'error') consoleErrors.push(message.text());
   });
-  await page.evaluateOnNewDocument(() => globalThis.localStorage.clear());
   await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 1 });
 
   try {
@@ -355,6 +531,7 @@ async function main() {
       assert.strictEqual(availabilityIdentity.count, 60, `${availability}: complete room/date coverage`);
       assert.strictEqual(new Set(availabilityIdentity.keys).size, 60, `${availability}: unique room/date ids`);
       assert(availabilityIdentity.complete, `${availability}: every cell carries room type and date ids`);
+      await assertSingleAvailabilityFlow(page, origin, lang ? 'en' : 'cs');
 
       const offers = `m-offer${lang}.html`;
       const offerCounts = { all: 4, active: 3, spa: 2, missing: 1 };

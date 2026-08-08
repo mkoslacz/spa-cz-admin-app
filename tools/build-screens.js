@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
-const ASSET_VERSION = '20260807g';
+const ASSET_VERSION = '20260808a';
 const SCREENS = [
   'dashboard',
   'reservations',
@@ -504,7 +504,11 @@ function availabilityMatrix(lang) {
           const stopped = value === 'X';
           const low = value === 0 || value === 1;
           const date = AVAILABILITY_DATES[index];
-          return `<td class="availability-cell ${date.className} ${stopped ? 'stop' : ''} ${low ? 'low' : ''}" data-room-type-id="${roomType.id}" data-date-id="${date.id}" data-availability-id="${roomType.id}:${date.id}" data-value="${stopped ? 0 : value}">${stopped ? '×' : value}</td>`;
+          const roomName = localized(roomType.name, lang);
+          const stateLabel = stopped
+            ? tr(lang, 'stop prodej', 'stop sell')
+            : tr(lang, `${value} volných jednotek`, `${value} available units`);
+          return `<td class="availability-cell ${date.className} ${stopped ? 'stop' : ''} ${low ? 'low' : ''}" data-room-type-id="${roomType.id}" data-date-id="${date.id}" data-availability-id="${roomType.id}:${date.id}" data-default-state="${stopped ? 'stopSell' : 'units'}" data-default-value="${stopped ? '' : value}"><button class="availability-control" type="button" data-availability-control data-open-sheet="availability-cell-sheet" data-outcome="sheet" data-write-action data-chm-write aria-label="${roomName}, ${date.id}: ${stateLabel}. ${tr(lang, 'Nastavit dostupnost', 'Set availability')}">${stopped ? '×' : value}</button></td>`;
         })
         .join('')}</tr>`
   ).join('');
@@ -769,13 +773,27 @@ function sheets(page, lang) {
     );
   }
   if (page === 'availability') {
-    contextual = sheetShell(
+    const actionOptions = `<option value="units">${tr(lang, 'Nastavit volné jednotky', 'Set available units')}</option><option value="stopSell">${tr(lang, 'Nastavit stop prodej', 'Stop sell')}</option>`;
+    const availabilityCellSheet = sheetShell(
+      'availability-cell-sheet',
+      lang,
+      tr(lang, 'Nastavit dostupnost', 'Set availability'),
+      `<form data-availability-cell-form id="availability-cell-form" novalidate>
+        <dl class="detail-list"><div class="detail-row"><dt>${tr(lang, 'Typ pokoje', 'Room type')}</dt><dd data-availability-cell-room></dd></div><div class="detail-row"><dt>${tr(lang, 'Datum', 'Date')}</dt><dd data-availability-cell-date></dd></div><div class="detail-row"><dt>${tr(lang, 'Aktuální stav', 'Current state')}</dt><dd data-availability-cell-current></dd></div></dl>
+        <label class="field"><span>${tr(lang, 'Akce', 'Action')}</span><select data-availability-cell-action>${actionOptions}</select></label>
+        <label class="field" data-availability-cell-units-field><span>${tr(lang, 'Volné jednotky (0–255)', 'Available units (0–255)')}</span><input type="number" inputmode="numeric" min="0" max="255" step="1" value="0" data-availability-cell-units required></label>
+        <p class="subtle" data-availability-cell-error role="alert" aria-live="polite" hidden></p>
+      </form>`,
+      `<div class="sheet-actions"><button class="button" type="button" data-close-sheet>${tr(lang, 'Zrušit', 'Cancel')}</button><button class="button primary" type="submit" form="availability-cell-form" data-write-action data-chm-write>${tr(lang, 'Uložit', 'Save')}</button></div>`
+    );
+    const availabilityBulkSheet = sheetShell(
       'availability-sheet',
       lang,
       tr(lang, 'Uzavřít termín', 'Close a date range'),
       `<form data-prototype-form data-success="${tr(lang, 'Stop prodej byl nastaven.', 'Stop sell set.')}" id="availability-form"><div class="form-two-col"><label class="field"><span>${tr(lang, 'Od', 'From')}</span><input type="date" value="2026-10-16"></label><label class="field"><span>${tr(lang, 'Do', 'To')}</span><input type="date" value="2026-10-17"></label></div><label class="field"><span>${tr(lang, 'Typ pokoje', 'Room type')}</span><select><option>${tr(lang, 'Všechny typy pokojů', 'All room types')}</option>${ROOM_TYPES.map(roomType => `<option value="${roomType.id}">${localized(roomType.name, lang)}</option>`).join('')}</select></label></form>`,
       `<div class="sheet-actions"><button class="button" type="button" data-close-sheet>${tr(lang, 'Zrušit', 'Cancel')}</button><button class="button primary" type="submit" form="availability-form">${tr(lang, 'Nastavit', 'Set')}</button></div>`
     );
+    contextual = availabilityCellSheet + availabilityBulkSheet;
   }
   if (page === 'reservation-detail') {
     contextual = sheetShell(

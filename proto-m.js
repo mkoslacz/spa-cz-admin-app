@@ -55,6 +55,7 @@
     from: "2026-09-12",
     to: "2026-10-12",
     section: "",
+    availabilityMutations: Object.freeze({}),
   });
   let state = readState();
   let toastTimer = 0;
@@ -87,7 +88,32 @@
     Object.keys(OPTIONS).forEach((key) => {
       if (!OPTIONS[key].includes(next[key])) next[key] = DEFAULTS[key];
     });
+    next.availabilityMutations = normalizeAvailabilityMutations(
+      next.availabilityMutations,
+    );
     return next;
+  }
+
+  function normalizeAvailabilityMutations(value) {
+    if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+    return Object.fromEntries(
+      Object.entries(value).flatMap(([key, mutation]) => {
+        if (!/^[a-z0-9-]+:\d{4}-\d{2}-\d{2}$/.test(key)) return [];
+        if (mutation && mutation.type === "stopSell") {
+          return [[key, { type: "stopSell" }]];
+        }
+        if (
+          mutation &&
+          mutation.type === "units" &&
+          Number.isInteger(mutation.value) &&
+          mutation.value >= 0 &&
+          mutation.value <= 255
+        ) {
+          return [[key, { type: "units", value: mutation.value }]];
+        }
+        return [];
+      }),
+    );
   }
 
   function persistState() {
@@ -146,6 +172,167 @@
     } catch (error) {
       return [];
     }
+  }
+
+  function canWriteAvailability() {
+    return state.access === "full" && state.connection === "manual";
+  }
+
+  function availabilityCellState(cell) {
+    const mutation = state.availabilityMutations[cell.dataset.availabilityId];
+    if (mutation) return mutation;
+    if (cell.dataset.defaultState === "stopSell") return { type: "stopSell" };
+    return { type: "units", value: Number(cell.dataset.defaultValue) };
+  }
+
+  function availabilityBaseState(cell) {
+    if (cell.dataset.defaultState === "stopSell") return { type: "stopSell" };
+    return { type: "units", value: Number(cell.dataset.defaultValue) };
+  }
+
+  function sameAvailabilityState(left, right) {
+    return (
+      left.type === right.type &&
+      (left.type === "stopSell" || left.value === right.value)
+    );
+  }
+
+  function availabilityDateLabel(dateId) {
+    return new Intl.DateTimeFormat(language() === "cs" ? "cs-CZ" : "en-GB", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      timeZone: "UTC",
+    }).format(new Date(dateId + "T00:00:00Z"));
+  }
+
+  function availabilityRoomLabel(cell) {
+    return (
+      cell
+        .closest("tr")
+        ?.querySelector(".sticky-col strong")
+        ?.textContent.trim() || cell.dataset.roomTypeId
+    );
+  }
+
+  function availabilityStateLabel(value) {
+    if (value.type === "stopSell")
+      return language() === "cs" ? "Stop prodej (×)" : "Stop sell (×)";
+    return language() === "cs"
+      ? `${value.value} volných jednotek`
+      : `${value.value} available units`;
+  }
+
+  function renderAvailability() {
+    document.querySelectorAll(".availability-cell").forEach((cell) => {
+      const value = availabilityCellState(cell);
+      const control = cell.querySelector("[data-availability-control]");
+      const stopped = value.type === "stopSell";
+      cell.classList.toggle("stop", stopped);
+      cell.classList.toggle("low", !stopped && value.value <= 1);
+      if (!control) return;
+      control.textContent = stopped ? "×" : String(value.value);
+      control.setAttribute(
+        "aria-label",
+        `${availabilityRoomLabel(cell)}, ${availabilityDateLabel(cell.dataset.dateId)}: ${availabilityStateLabel(value)}. ${language() === "cs" ? "Nastavit dostupnost" : "Set availability"}`,
+      );
+    });
+  }
+
+  function saveAvailabilityCell(cell, value) {
+    if (!canWriteAvailability() || !cell) return false;
+    const key = cell.dataset.availabilityId;
+    if (sameAvailabilityState(availabilityBaseState(cell), value)) {
+      delete state.availabilityMutations[key];
+    } else {
+      state.availabilityMutations[key] =
+        value.type === "stopSell"
+          ? { type: "stopSell" }
+          : { type: "units", value: value.value };
+    }
+    persistState();
+    renderAvailability();
+    return true;
+  }
+
+  function syncAvailabilityAction(form) {
+    if (!form) return;
+    const stopSell =
+      form.querySelector("[data-availability-cell-action]").value ===
+      "stopSell";
+    const field = form.querySelector("[data-availability-cell-units-field]");
+    const input = form.querySelector("[data-availability-cell-units]");
+    field.hidden = stopSell;
+    input.disabled = stopSell;
+    input.required = !stopSell;
+  }
+
+  function setAvailabilityError(form, message) {
+    const error = form.querySelector("[data-availability-cell-error]");
+    error.textContent = message || "";
+    error.hidden = !message;
+  }
+
+  function openAvailabilityEditor(control) {
+    if (!canWriteAvailability()) return;
+    const cell = control.closest(".availability-cell");
+    const form = document.querySelector("[data-availability-cell-form]");
+    if (!cell || !form) return;
+    const current = availabilityCellState(cell);
+    form.dataset.availabilityId = cell.dataset.availabilityId;
+    setText("[data-availability-cell-room]", availabilityRoomLabel(cell));
+    setText(
+      "[data-availability-cell-date]",
+      availabilityDateLabel(cell.dataset.dateId),
+    );
+    setText(
+      "[data-availability-cell-current]",
+      availabilityStateLabel(current),
+    );
+    form.querySelector("[data-availability-cell-action]").value = current.type;
+    form.querySelector("[data-availability-cell-units]").value =
+      current.type === "units" ? String(current.value) : "0";
+    setAvailabilityError(form, "");
+    syncAvailabilityAction(form);
+    openSheet("availability-cell-sheet", control);
+  }
+
+  function submitAvailabilityEditor(form) {
+    if (!canWriteAvailability()) return false;
+    const cell = document.querySelector(
+      `.availability-cell[data-availability-id="${CSS.escape(form.dataset.availabilityId || "")}"]`,
+    );
+    const action = form.querySelector("[data-availability-cell-action]").value;
+    let next = { type: "stopSell" };
+    if (action === "units") {
+      const raw = form
+        .querySelector("[data-availability-cell-units]")
+        .value.trim();
+      const value = Number(raw);
+      if (
+        !/^\d+$/.test(raw) ||
+        !Number.isInteger(value) ||
+        value < 0 ||
+        value > 255
+      ) {
+        setAvailabilityError(
+          form,
+          language() === "cs"
+            ? "Zadejte celé číslo od 0 do 255."
+            : "Enter a whole number from 0 to 255.",
+        );
+        return false;
+      }
+      next = { type: "units", value };
+    }
+    if (!saveAvailabilityCell(cell, next)) return false;
+    closeSheet(form.closest(".modal-backdrop"));
+    showToast(
+      language() === "cs"
+        ? "Dostupnost byla uložena."
+        : "Availability was saved.",
+    );
+    return true;
   }
 
   function formatCurrency(value) {
@@ -370,6 +557,7 @@
     });
     hydrateReservation();
     hydrateOffer();
+    renderAvailability();
     applyReservationFilter();
     applyOfferFilter();
     applyBillingFilter();
@@ -545,6 +733,15 @@
         return;
       }
 
+      const availabilityControl = event.target.closest(
+        "[data-availability-control]",
+      );
+      if (availabilityControl) {
+        event.preventDefault();
+        openAvailabilityEditor(availabilityControl);
+        return;
+      }
+
       const opener = event.target.closest("[data-open-sheet]");
       if (opener) {
         event.preventDefault();
@@ -596,28 +793,6 @@
         return;
       }
 
-      const availability = event.target.closest(".availability-cell");
-      if (
-        availability &&
-        state.access === "full" &&
-        state.connection === "manual"
-      ) {
-        availability.classList.toggle("stop");
-        availability.textContent = availability.classList.contains("stop")
-          ? "×"
-          : availability.dataset.value;
-        const room = availability
-          .closest("tr")
-          .querySelector(".sticky-col strong")
-          .textContent.trim();
-        showToast(
-          language() === "cs"
-            ? `Dostupnost pokoje ${room} byla změněna.`
-            : `${room} availability was changed.`,
-        );
-        return;
-      }
-
       const approval = event.target.closest("[data-approval]");
       if (approval && state.access === "full") {
         const card = approval.closest(".billing-card");
@@ -639,11 +814,27 @@
     });
 
     document.addEventListener("submit", (event) => {
+      const availabilityForm = event.target.closest(
+        "[data-availability-cell-form]",
+      );
+      if (availabilityForm) {
+        event.preventDefault();
+        submitAvailabilityEditor(availabilityForm);
+        return;
+      }
       const form = event.target.closest("[data-prototype-form]");
       if (!form) return;
       event.preventDefault();
       closeSheet(form.closest(".modal-backdrop"));
       showToast(form.dataset.success);
+    });
+
+    document.addEventListener("change", (event) => {
+      if (event.target.matches("[data-availability-cell-action]")) {
+        const form = event.target.closest("[data-availability-cell-form]");
+        setAvailabilityError(form, "");
+        syncAvailabilityAction(form);
+      }
     });
 
     document.addEventListener("keydown", (event) => {
