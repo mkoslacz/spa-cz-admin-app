@@ -83,7 +83,7 @@ A fully authorized hotel partner opens the dashboard, reviews the current worklo
 
 ### Screens and deep links
 
-- **mobile · 390×844** — [m-dashboard.html](../m-dashboard.html?auth=in&access=full&connection=manual&density=dense&inv=many&hotel=active)
+- **mobile · 390×844** — [m-dashboard.html](../m-dashboard.html?auth=in&access=full&connection=manual&density=dense&inv=many&hotel=active) · [capture](usecases/UC-01-m-dashboard.png)
 - **mobile · 390×844** — [m-reservations.html](../m-reservations.html?auth=in&access=full&connection=manual&density=dense&inv=many&hotel=active)
 
 ### Engineering rules
@@ -108,7 +108,7 @@ A partner switches to the compact presentation while working through a smaller s
 
 ### Screens and deep links
 
-- **mobile · 390×844** — [m-reservations.html](../m-reservations.html?auth=in&access=full&connection=manual&density=compact&inv=some&hotel=active)
+- **mobile · 390×844** — [m-reservations.html](../m-reservations.html?auth=in&access=full&connection=manual&density=compact&inv=some&hotel=active) · [capture](usecases/UC-02-m-reservations.png)
 - **mobile · 390×844** — [m-reservation-detail.html](../m-reservation-detail.html?auth=in&access=full&connection=manual&density=compact&inv=some&hotel=active)
 
 ### Engineering rules
@@ -133,7 +133,7 @@ A partner opens reservations for a period with no matching records and gets a pu
 
 ### Screens and deep links
 
-- **mobile · 390×844** — [m-reservations.html](../m-reservations.html?auth=in&access=full&connection=manual&density=dense&inv=none&hotel=active)
+- **mobile · 390×844** — [m-reservations.html](../m-reservations.html?auth=in&access=full&connection=manual&density=dense&inv=none&hotel=active) · [capture](usecases/UC-03-m-reservations.png)
 
 ### Engineering rules
 
@@ -157,7 +157,7 @@ A read-only user reviews reservations, rates and billing while every operation t
 
 ### Screens and deep links
 
-- **mobile · 390×844** — [m-reservation-detail.html](../m-reservation-detail.html?auth=in&access=read&connection=manual&density=compact&inv=many&hotel=active)
+- **mobile · 390×844** — [m-reservation-detail.html](../m-reservation-detail.html?auth=in&access=read&connection=manual&density=compact&inv=many&hotel=active) · [capture](usecases/UC-04-m-reservation-detail.png)
 - **mobile · 390×844** — [m-rate-edit.html](../m-rate-edit.html?auth=in&access=read&connection=manual&density=compact&inv=many&hotel=active)
 - **mobile · 390×844** — [m-billing.html](../m-billing.html?auth=in&access=read&connection=manual&density=compact&inv=many&hotel=active)
 
@@ -183,7 +183,7 @@ A signed-out visitor or an account without property access sees no protected hot
 
 ### Screens and deep links
 
-- **mobile · 390×844** — [m-more.html](../m-more.html?auth=out&access=none&connection=manual&density=compact&inv=some&hotel=test)
+- **mobile · 390×844** — [m-more.html](../m-more.html?auth=out&access=none&connection=manual&density=compact&inv=some&hotel=test) · [capture](usecases/UC-05-m-more.png)
 
 ### Engineering rules
 
@@ -207,7 +207,7 @@ A hotel connected to a channel manager reviews room availability while the partn
 
 ### Screens and deep links
 
-- **mobile · 390×844** — [m-availability.html](../m-availability.html?auth=in&access=full&connection=chm&density=dense&inv=many&hotel=active)
+- **mobile · 390×844** — [m-availability.html](../m-availability.html?auth=in&access=full&connection=chm&density=dense&inv=many&hotel=active) · [capture](usecases/UC-06-m-availability.png)
 
 ### Engineering rules
 
@@ -231,7 +231,7 @@ A partner reviews the package fixture, then moves to the related price configura
 
 ### Screens and deep links
 
-- **mobile · 390×844** — [m-offer.html](../m-offer.html?auth=in&access=full&connection=manual&density=dense&inv=some&hotel=active)
+- **mobile · 390×844** — [m-offer.html](../m-offer.html?auth=in&access=full&connection=manual&density=dense&inv=some&hotel=active) · [capture](usecases/UC-07-m-offer.png)
 - **mobile · 390×844** — [m-rate-edit.html](../m-rate-edit.html?auth=in&access=full&connection=manual&density=dense&inv=some&hotel=active)
 
 ### Engineering rules
@@ -256,7 +256,7 @@ An authorized account reviews a confirmed reservation and chooses either approva
 
 ### Screens and deep links
 
-- **mobile · 390×844** — [m-billing.html](../m-billing.html?auth=in&access=full&connection=manual&density=dense&inv=many&hotel=test)
+- **mobile · 390×844** — [m-billing.html](../m-billing.html?auth=in&access=full&connection=manual&density=dense&inv=many&hotel=test) · [capture](usecases/UC-08-m-billing.png)
 - **mobile · 390×844** — [m-reservation-detail.html](../m-reservation-detail.html?auth=in&access=full&connection=manual&density=dense&inv=many&hotel=test)
 
 ### Engineering rules

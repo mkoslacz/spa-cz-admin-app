@@ -1,9 +1,422 @@
 {
-  "generatedAt": "2026-08-07T19:51:20.372Z",
+  "generatedAt": "2026-08-08T12:11:41.105Z",
   "repository": "https://github.com/mkoslacz/spa-cz-admin-app",
   "limited": true,
   "limit": 50,
   "entries": [
+    {
+      "sha": "51fca2176b3cc75e22793035d56b4c02deeaafda",
+      "short": "51fca21",
+      "date": "2026-08-08",
+      "subject": "docs: close package availability review cycle",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/51fca2176b3cc75e22793035d56b4c02deeaafda"
+    },
+    {
+      "sha": "bbae428e11b0606b144ee996350f1ccffb143193",
+      "short": "bbae428",
+      "date": "2026-08-08",
+      "subject": "fix: isolate artifact receipt test index",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/bbae428e11b0606b144ee996350f1ccffb143193"
+    },
+    {
+      "sha": "ef1f26eb387ac2d79d51f424ea2a2cbc0e25b02c",
+      "short": "ef1f26e",
+      "date": "2026-08-08",
+      "subject": "fix: restrict receipt promotion to refresh",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/ef1f26eb387ac2d79d51f424ea2a2cbc0e25b02c"
+    },
+    {
+      "sha": "7298cff18c99792a3f84357250b0add5f9cc85c7",
+      "short": "7298cff",
+      "date": "2026-08-08",
+      "subject": "fix: bind artifact receipt to changelog history",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/7298cff18c99792a3f84357250b0add5f9cc85c7"
+    },
+    {
+      "sha": "f3d5cded1e9b7f1f89ee1c3ee73371a3d38a6b3f",
+      "short": "f3d5cde",
+      "date": "2026-08-08",
+      "subject": "feat: enforce generated artifact integrity",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/f3d5cded1e9b7f1f89ee1c3ee73371a3d38a6b3f"
+    },
+    {
+      "sha": "cc44e47f179b181911862f74c87ae8e077121f0b",
+      "short": "cc44e47",
+      "date": "2026-08-08",
+      "subject": "fix: validate bulk availability bounds",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/cc44e47f179b181911862f74c87ae8e077121f0b"
+    },
+    {
+      "sha": "5a2cf608034af305cebd329c2582e0506db9b67d",
+      "short": "5a2cf60",
+      "date": "2026-08-08",
+      "subject": "docs: plan verification repairs",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/5a2cf608034af305cebd329c2582e0506db9b67d"
+    },
+    {
+      "sha": "2cf40c9a2bb58fe3da75eda3757ac9880013989c",
+      "short": "2cf40c9",
+      "date": "2026-08-08",
+      "subject": "docs: measure availability package outcomes",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/2cf40c9a2bb58fe3da75eda3757ac9880013989c"
+    },
+    {
+      "sha": "182f9fe7e5d31d1334d7efa59a408323ae640a4f",
+      "short": "182f9fe",
+      "date": "2026-08-08",
+      "subject": "docs: verify availability package implementation",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/182f9fe7e5d31d1334d7efa59a408323ae640a4f"
+    },
+    {
+      "sha": "fb88086a8297cbbf7e78967a0955f3340001c889",
+      "short": "fb88086",
+      "date": "2026-08-08",
+      "subject": "docs: record availability package implementation",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/fb88086a8297cbbf7e78967a0955f3340001c889"
+    },
+    {
+      "sha": "7bdbd45b1dce97cc0671f11d937ee716cce2a60d",
+      "short": "7bdbd45",
+      "date": "2026-08-08",
+      "subject": "docs: record package persistence conventions",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/7bdbd45b1dce97cc0671f11d937ee716cce2a60d"
+    },
+    {
+      "sha": "9989d416478fa19c87b6526e1bcb2ebbc3778b6e",
+      "short": "9989d41",
+      "date": "2026-08-08",
+      "subject": "feat: persist package-specific editor state [IMPL-06]",
+      "body": "",
+      "screens": [
+        "m-availability-en.html",
+        "m-availability.html",
+        "m-billing-en.html",
+        "m-billing.html",
+        "m-dashboard-en.html",
+        "m-dashboard.html",
+        "m-more-en.html",
+        "m-more.html",
+        "m-offer-en.html",
+        "m-offer.html",
+        "m-rate-edit-en.html",
+        "m-rate-edit.html",
+        "m-reservation-detail-en.html",
+        "m-reservation-detail.html",
+        "m-reservations-en.html",
+        "m-reservations.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/9989d416478fa19c87b6526e1bcb2ebbc3778b6e"
+    },
+    {
+      "sha": "a62b63363037de737c558a71690b6a121c7bf213",
+      "short": "a62b633",
+      "date": "2026-08-08",
+      "subject": "feat: create persistent package drafts [IMPL-05]",
+      "body": "",
+      "screens": [
+        "m-dashboard-en.html",
+        "m-dashboard.html",
+        "m-offer-en.html",
+        "m-offer.html",
+        "m-rate-edit-en.html",
+        "m-rate-edit.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/a62b63363037de737c558a71690b6a121c7bf213"
+    },
+    {
+      "sha": "007d17b75fd724c6ecb2ee2ed5f9193bef4a42a5",
+      "short": "007d17b",
+      "date": "2026-08-08",
+      "subject": "feat: apply scoped availability bulk edits [IMPL-03]",
+      "body": "",
+      "screens": [
+        "m-availability-en.html",
+        "m-availability.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/007d17b75fd724c6ecb2ee2ed5f9193bef4a42a5"
+    },
+    {
+      "sha": "f76518bd96132ff0c535dfca13e9d033506ce446",
+      "short": "f76518b",
+      "date": "2026-08-08",
+      "subject": "feat: persist room-day availability [IMPL-02]",
+      "body": "",
+      "screens": [
+        "m-availability-en.html",
+        "m-availability.html",
+        "m-billing-en.html",
+        "m-billing.html",
+        "m-dashboard-en.html",
+        "m-dashboard.html",
+        "m-more-en.html",
+        "m-more.html",
+        "m-offer-en.html",
+        "m-offer.html",
+        "m-rate-edit-en.html",
+        "m-rate-edit.html",
+        "m-reservation-detail-en.html",
+        "m-reservation-detail.html",
+        "m-reservations-en.html",
+        "m-reservations.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/f76518bd96132ff0c535dfca13e9d033506ce446"
+    },
+    {
+      "sha": "af88a29b9d3c5bccba163d8ddce40b6a27c84bf9",
+      "short": "af88a29",
+      "date": "2026-08-08",
+      "subject": "feat: model room type package pricing [IMPL-01, IMPL-04]",
+      "body": "",
+      "screens": [
+        "index.html",
+        "m-availability-en.html",
+        "m-availability.html",
+        "m-billing-en.html",
+        "m-billing.html",
+        "m-dashboard-en.html",
+        "m-dashboard.html",
+        "m-more-en.html",
+        "m-more.html",
+        "m-offer-en.html",
+        "m-offer.html",
+        "m-rate-edit-en.html",
+        "m-rate-edit.html",
+        "m-reservation-detail-en.html",
+        "m-reservation-detail.html",
+        "m-reservations-en.html",
+        "m-reservations.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/af88a29b9d3c5bccba163d8ddce40b6a27c84bf9"
+    },
+    {
+      "sha": "1b916eba85423b068c27d62cdca9765ff56a595a",
+      "short": "1b916eb",
+      "date": "2026-08-08",
+      "subject": "docs: plan availability and package remediation",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/1b916eba85423b068c27d62cdca9765ff56a595a"
+    },
+    {
+      "sha": "e1823f73234c1684cfaa8fbb346b73f3dc994e18",
+      "short": "e1823f7",
+      "date": "2026-08-08",
+      "subject": "docs: add availability package review cycle",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/e1823f73234c1684cfaa8fbb346b73f3dc994e18"
+    },
+    {
+      "sha": "9306e4f9c81bb7ca2760422d63de146b6bc32a71",
+      "short": "9306e4f",
+      "date": "2026-08-08",
+      "subject": "docs: verify review scaffold release",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/9306e4f9c81bb7ca2760422d63de146b6bc32a71"
+    },
+    {
+      "sha": "6d9c6e625b11942c1de4bad6f359e25e2c144cc8",
+      "short": "6d9c6e6",
+      "date": "2026-08-08",
+      "subject": "docs: link implementation card results",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/6d9c6e625b11942c1de4bad6f359e25e2c144cc8"
+    },
+    {
+      "sha": "40cbc073ac0e04095b9dd432c513880b5d9b2b21",
+      "short": "40cbc07",
+      "date": "2026-08-08",
+      "subject": "docs: correct lifecycle handoff scope",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/40cbc073ac0e04095b9dd432c513880b5d9b2b21"
+    },
+    {
+      "sha": "66135c9be54136fb007c47539327c7a91a1c522a",
+      "short": "66135c9",
+      "date": "2026-08-08",
+      "subject": "test: assert review controls by behavior",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/66135c9be54136fb007c47539327c7a91a1c522a"
+    },
+    {
+      "sha": "ba840ebdd6ffe9a1f4cad14ec4f9d3bdf8eb7e6d",
+      "short": "ba840eb",
+      "date": "2026-08-07",
+      "subject": "docs: record review scaffold correction",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/ba840ebdd6ffe9a1f4cad14ec4f9d3bdf8eb7e6d"
+    },
+    {
+      "sha": "f80932282231158220416e4cd3988a7518dbfbeb",
+      "short": "f809322",
+      "date": "2026-08-07",
+      "subject": "fix: stabilize review controls and comment packaging",
+      "body": "",
+      "screens": [
+        "index.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/f80932282231158220416e4cd3988a7518dbfbeb"
+    },
+    {
+      "sha": "7a941c608abdaca67dbfcc3e61808fef945e0cc6",
+      "short": "7a941c6",
+      "date": "2026-08-07",
+      "subject": "docs: plan review scaffold corrections",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/7a941c608abdaca67dbfcc3e61808fef945e0cc6"
+    },
+    {
+      "sha": "290832985507f48de67677a0a4b36e123750a7b3",
+      "short": "2908329",
+      "date": "2026-08-07",
+      "subject": "docs: verify Firebase activation round",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/290832985507f48de67677a0a4b36e123750a7b3"
+    },
+    {
+      "sha": "f846a6b5c6b6c503af928391d2ee5c5365a8fe8e",
+      "short": "f846a6b",
+      "date": "2026-08-07",
+      "subject": "docs: record Firebase activation implementation",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/f846a6b5c6b6c503af928391d2ee5c5365a8fe8e"
+    },
+    {
+      "sha": "c2d70a6f340804728c10a623eb8971be801701e2",
+      "short": "c2d70a6",
+      "date": "2026-08-07",
+      "subject": "feat: activate secure Firebase comments",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/c2d70a6f340804728c10a623eb8971be801701e2"
+    },
+    {
+      "sha": "6b2d27f137151205d0dfab3260c788e3fdce8f46",
+      "short": "6b2d27f",
+      "date": "2026-08-07",
+      "subject": "docs: plan Firebase activation correction",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/6b2d27f137151205d0dfab3260c788e3fdce8f46"
+    },
+    {
+      "sha": "b781dccd646b916eee67403f3fde0d64b687980f",
+      "short": "b781dcc",
+      "date": "2026-08-07",
+      "subject": "docs: capture Firebase activation failures",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/b781dccd646b916eee67403f3fde0d64b687980f"
+    },
+    {
+      "sha": "a1322516e71734334e0a4d9907c45fd05f619ed2",
+      "short": "a132251",
+      "date": "2026-08-07",
+      "subject": "docs: verify SPA.CZ interaction implementation",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/a1322516e71734334e0a4d9907c45fd05f619ed2"
+    },
+    {
+      "sha": "9541f81e3802e9e2c0b7cf05cdc26137f0a19063",
+      "short": "9541f81",
+      "date": "2026-08-07",
+      "subject": "docs: record SPA.CZ interaction implementation",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/9541f81e3802e9e2c0b7cf05cdc26137f0a19063"
+    },
+    {
+      "sha": "b1742fe4a60d30fbb227876dbaf0f5ee316c0143",
+      "short": "b1742fe",
+      "date": "2026-08-07",
+      "subject": "feat: make SPA.CZ prototype fully interactive",
+      "body": "",
+      "screens": [
+        "index.html",
+        "m-availability-en.html",
+        "m-availability.html",
+        "m-billing-en.html",
+        "m-billing.html",
+        "m-dashboard-en.html",
+        "m-dashboard.html",
+        "m-more-en.html",
+        "m-more.html",
+        "m-offer-en.html",
+        "m-offer.html",
+        "m-rate-edit-en.html",
+        "m-rate-edit.html",
+        "m-reservation-detail-en.html",
+        "m-reservation-detail.html",
+        "m-reservations-en.html",
+        "m-reservations.html",
+        "usecases.html"
+      ],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/b1742fe4a60d30fbb227876dbaf0f5ee316c0143"
+    },
     {
       "sha": "e140167dfb091b4bedc681abb3c014128ea7dd31",
       "short": "e140167",
