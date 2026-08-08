@@ -16,7 +16,7 @@
     },
     "access": {
       "label": "Access",
-      "doc": "Pins the permission level used to demonstrate available, read-only and inaccessible partner operations.",
+      "doc": "Pins the permission level used to show available, read-only and inaccessible partner operations.",
       "options": {
         "full": {
           "label": "Full access",
@@ -61,7 +61,7 @@
       }
     },
     "inv": {
-      "label": "Demo inventory",
+      "label": "Record volume",
       "doc": "Pins the amount of fixture inventory available in lists and summaries.",
       "options": {
         "many": {
@@ -80,11 +80,11 @@
     },
     "hotel": {
       "label": "Property mode",
-      "doc": "Selects an active property or a test property used for demonstration and training.",
+      "doc": "Selects an active property or a test property used for review and training.",
       "options": {
         "active": {
           "label": "Active property",
-          "doc": "Uses the SPA HOTEL ČAJKOVSKIJ demo package fixture."
+          "doc": "Uses the SPA HOTEL ČAJKOVSKIJ package fixture."
         },
         "test": {
           "label": "Test property",
@@ -99,7 +99,7 @@
       "name": "Start the operational day",
       "story": "A fully authorized hotel partner opens the dashboard, reviews the current workload and moves into reservations or inventory management.",
       "rules": [
-        "Dashboard links preserve the selected demo state when they open operational screens.",
+        "Dashboard links preserve the selected fixture state when they open operational screens.",
         "The populated fixture is deterministic across Czech and English app screens."
       ],
       "screens": ["m-dashboard.html", "m-reservations.html"],
@@ -215,9 +215,9 @@
     {
       "id": "UC-07",
       "name": "Maintain an offer and its rate",
-      "story": "A partner reviews the demo package fixture, then moves to the related price configuration without losing context.",
+      "story": "A partner reviews the package fixture, then moves to the related price configuration without losing context.",
       "rules": [
-        "The demo fixture stays consistent within the prototype: SPA HOTEL ČAJKOVSKIJ, three days, two nights, from 3,577 CZK, check-in 14:00 and check-out 10:00.",
+        "The fixture stays consistent within the prototype: SPA HOTEL ČAJKOVSKIJ, three days, two nights, from 3,577 CZK, check-in 14:00 and check-out 10:00.",
         "Offer and rate actions respect the selected access level."
       ],
       "screens": ["m-offer.html", "m-rate-edit.html"],
@@ -237,7 +237,7 @@
       "story": "An authorized account reviews a confirmed reservation and chooses either approval or a dispute supported by a reason and a corrected positive amount.",
       "rules": [
         "Approval and dispute require an authorized account.",
-        "A dispute requires a reason and a positive price; the prototype demonstrates validation without making a backend write."
+        "A dispute requires a reason and a positive price; the prototype shows validation without making a backend write."
       ],
       "screens": ["m-billing.html", "m-reservation-detail.html"],
       "viewport": { "name": "mobile", "width": 390, "height": 844 },

@@ -4,7 +4,7 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
-const { outcomeAttributes } = require('./build-screens.js');
+const { AVAILABILITY_DATES, OFFERS, RESERVATIONS, ROOM_TYPES, outcomeAttributes } = require('./build-screens.js');
 
 const root = path.resolve(__dirname, '..');
 const screens = fs
@@ -44,19 +44,60 @@ assert.throws(() => outcomeAttributes({ route: 'm-offer.html', sheet: 'offer-she
 assert.match(outcomeAttributes({ route: 'm-offer.html' }), /data-outcome="route"/);
 assert.match(outcomeAttributes({ sheet: 'offer-sheet' }), /data-outcome="sheet"/);
 assert.match(
-  outcomeAttributes({ terminal: { id: 'download', message: 'Demo document is ready.' } }),
+  outcomeAttributes({ terminal: { id: 'download', message: 'Document is ready.' } }),
   /data-outcome="terminal"/
 );
+
+const forbiddenProductMarker = /demo|ukáz|DEMO-/i;
+const roomTypeIds = ROOM_TYPES.map(roomType => roomType.id);
+const dateIds = AVAILABILITY_DATES.map(date => date.id);
+const rateDateIds = dateIds.slice(0, 7);
+assert.strictEqual(new Set(roomTypeIds).size, ROOM_TYPES.length, 'room type ids are unique');
+assert.strictEqual(new Set(dateIds).size, AVAILABILITY_DATES.length, 'availability date ids are unique');
+ROOM_TYPES.forEach(roomType => {
+  assert.match(roomType.id, /^[a-z0-9-]+$/, `${roomType.id}: stable room type id`);
+  assert(roomType.name.cs && roomType.name.en, `${roomType.id}: localized names`);
+  assert(Number.isInteger(roomType.capacity.adults), `${roomType.id}: adult capacity`);
+  assert(Number.isInteger(roomType.capacity.children), `${roomType.id}: child capacity`);
+  assert.strictEqual(roomType.availability.length, dateIds.length, `${roomType.id}: complete availability`);
+});
+
+const coveredRoomTypeIds = new Set();
+OFFERS.forEach(offer => {
+  assert(offer.roomPrices.length > 0, `${offer.id}: explicit room-price eligibility`);
+  assert.strictEqual(
+    new Set(offer.roomPrices.map(relation => relation.roomTypeId)).size,
+    offer.roomPrices.length,
+    `${offer.id}: unique room-price references`
+  );
+  offer.roomPrices.forEach(relation => {
+    assert(roomTypeIds.includes(relation.roomTypeId), `${offer.id}: known ${relation.roomTypeId} reference`);
+    assert.strictEqual(relation.eligible, true, `${offer.id}/${relation.roomTypeId}: explicit eligibility`);
+    assert.deepStrictEqual(
+      Object.keys(relation.prices),
+      rateDateIds,
+      `${offer.id}/${relation.roomTypeId}: date price coverage`
+    );
+    Object.values(relation.prices).forEach(value => {
+      assert(value == null || Number.isInteger(value), `${offer.id}/${relation.roomTypeId}: numeric or missing price`);
+    });
+    coveredRoomTypeIds.add(relation.roomTypeId);
+  });
+});
+assert.deepStrictEqual([...coveredRoomTypeIds].sort(), [...roomTypeIds].sort(), 'package coverage spans room types');
+assert.strictEqual(new Set(RESERVATIONS.map(reservation => reservation.id)).size, RESERVATIONS.length);
+RESERVATIONS.forEach(reservation => assert.match(reservation.id, /^RSV-[0-9]+$/, 'neutral reservation id'));
 
 for (const screen of screens) {
   const html = read(screen);
   assert.doesNotMatch(html, /href\s*=\s*["']#["']/i, `${screen}: exact href=# is forbidden`);
   assert.doesNotMatch(html, /data-toast/i, `${screen}: generic toast hooks are forbidden`);
   assert.doesNotMatch(html, /\bIn prototype\b|\bV prototypu\b/i, `${screen}: placeholder prototype copy is forbidden`);
+  assert.doesNotMatch(html, forbiddenProductMarker, `${screen}: no prototype-framing markers`);
   assert.doesNotMatch(
     html,
     /Public offer fact|Public fact|publicly verified|Verified pricing|Public baseline|Veřejná nabídka|Veřejný fakt|veřejně ověř|Ověřený cen|Veřejný základ/i,
-    `${screen}: demo data must not be described as public or verified`
+    `${screen}: fixture data must not be described as public or verified`
   );
 
   const tags = [...html.matchAll(/<[A-Za-z][^<>]*>/g)].map(match => match[0]);
@@ -108,9 +149,22 @@ for (const lang of ['', '-en']) {
   });
 
   const reservations = read(`m-reservations${lang}.html`);
-  assert.strictEqual((reservations.match(/reservation=DEMO-/g) || []).length, 5, 'five exact reservation routes');
+  assert.strictEqual((reservations.match(/reservation=RSV-/g) || []).length, 5, 'five exact reservation routes');
+  for (const reservation of RESERVATIONS) {
+    assert.match(reservations, new RegExp(`reservation=${reservation.id}`), `${reservation.id}: exact route`);
+  }
   const offers = read(`m-offer${lang}.html`);
   assert.strictEqual((offers.match(/offer=[a-z0-9-]+/g) || []).length, 4, 'four exact offer routes');
+
+  const availability = read(`m-availability${lang}.html`);
+  assert.strictEqual(
+    (availability.match(/data-availability-id="[^"]+"/g) || []).length,
+    ROOM_TYPES.length * AVAILABILITY_DATES.length,
+    `m-availability${lang}.html: stable room/date cells`
+  );
+  const rates = read(`m-rate-edit${lang}.html`);
+  assert.match(rates, /Package prices by room type|Ceny balíčku podle typu pokoje/);
+  roomTypeIds.forEach(id => assert.match(rates, new RegExp(`data-room-type-id="${id}"`), `${id}: rate row`));
 }
 
 ['tools/build-screens.js', 'proto-m.js'].forEach(relative => {
@@ -118,6 +172,24 @@ for (const lang of ['', '-en']) {
   assert.doesNotMatch(source, /data-toast|\bIn prototype\b|\bV prototypu\b/i, `${relative}: no placeholder outcomes`);
 });
 
+['index.html', 'usecases.json', 'usecases.built.json', 'docs/usecases.md'].forEach(relative => {
+  assert.doesNotMatch(read(relative), forbiddenProductMarker, `${relative}: no published prototype-framing markers`);
+});
+
+const generatorSource = read('tools/build-screens.js');
+const availabilitySource = generatorSource.slice(
+  generatorSource.indexOf('function availabilityMatrix'),
+  generatorSource.indexOf('function availability(lang)')
+);
+const rateSource = generatorSource.slice(
+  generatorSource.indexOf('function rateMatrix'),
+  generatorSource.indexOf('function rateEdit')
+);
+assert.match(availabilitySource, /ROOM_TYPES/);
+assert.match(rateSource, /ROOM_TYPES/);
+assert.doesNotMatch(availabilitySource, /const\s+(?:rows|days)\s*=/, 'no parallel availability rows');
+assert.doesNotMatch(rateSource, /const\s+rows\s*=\s*\[/, 'no parallel rate rows');
+
 process.stdout.write(
-  `product-contract-qa: ${screens.length} screens, dashboard, identities, filters and 14 More outcomes — OK\n`
+  `product-contract-qa: ${screens.length} screens, vocabulary, room types, identities, filters and 14 More outcomes — OK\n`
 );

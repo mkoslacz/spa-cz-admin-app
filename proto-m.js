@@ -46,7 +46,7 @@
     density: "dense",
     inv: "many",
     hotel: "active",
-    reservation: "DEMO-10482",
+    reservation: "RSV-10482",
     offer: "cajkovskij-stay",
     queue: "all",
     reservationFilter: "all",
@@ -218,16 +218,32 @@
       .forEach((input) => {
         input.value = offer.duration;
       });
-    document.querySelectorAll("[data-rate-delta]").forEach((input) => {
-      input.value =
-        offer.price == null
-          ? ""
-          : String(offer.price + Number(input.dataset.rateDelta));
-      input.setAttribute(
-        "aria-label",
-        `${offer.title}: ${input.value || (language() === "cs" ? "bez ceny" : "missing rate")} CZK`,
-      );
-    });
+    const relationByRoomType = new Map(
+      (offer.roomPrices || []).map((relation) => [
+        relation.roomTypeId,
+        relation,
+      ]),
+    );
+    document
+      .querySelectorAll(".rate-matrix tbody tr[data-room-type-id]")
+      .forEach((row) => {
+        const relation = relationByRoomType.get(row.dataset.roomTypeId);
+        const eligible = Boolean(relation && relation.eligible);
+        row.hidden = !eligible;
+        const roomName = row
+          .querySelector(".sticky-col strong")
+          .textContent.trim();
+        row.querySelectorAll("[data-rate-date-id]").forEach((input) => {
+          const value = eligible
+            ? relation.prices[input.dataset.rateDateId]
+            : null;
+          input.value = value == null ? "" : String(value);
+          input.setAttribute(
+            "aria-label",
+            `${offer.title}, ${roomName}: ${input.value || (language() === "cs" ? "bez ceny" : "missing price")} CZK`,
+          );
+        });
+      });
   }
 
   function inventoryAllows(node) {
@@ -423,7 +439,7 @@
         },
         {
           key: "inv",
-          label: "Demo inventory",
+          label: "Record volume",
           persist: true,
           default: DEFAULTS.inv,
           options: [
@@ -596,8 +612,8 @@
           .textContent.trim();
         showToast(
           language() === "cs"
-            ? `Dostupnost pokoje ${room} byla změněna v ukázkovém kalendáři.`
-            : `${room} availability was changed in the demo calendar.`,
+            ? `Dostupnost pokoje ${room} byla změněna.`
+            : `${room} availability was changed.`,
         );
         return;
       }

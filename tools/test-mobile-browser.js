@@ -34,7 +34,7 @@ const defaults = {
   density: 'dense',
   inv: 'many',
   hotel: 'active',
-  reservation: 'DEMO-10482',
+  reservation: 'RSV-10482',
   offer: 'cajkovskij-stay',
   queue: 'all',
   reservationFilter: 'all',
@@ -237,6 +237,7 @@ async function main() {
           notificationRight: Math.round(notification.right),
           hasPanel: Boolean(document.querySelector('.proto-tools')),
           panelText: document.querySelector('.proto-tools')?.textContent || '',
+          productCopy: document.documentElement.outerHTML,
         };
       });
       assert.strictEqual(result.viewport, 'mobile', `${screen}: viewport contract`);
@@ -250,6 +251,7 @@ async function main() {
       assert.match(result.panelText, /Use cases/);
       assert.match(result.panelText, /Comments/);
       assert.match(result.panelText, /Changelog/);
+      assert.doesNotMatch(result.productCopy, /demo|ukáz|DEMO-/i, `${screen}: no prototype-framing markers`);
 
       await page.click('[data-open-sheet="notification-sheet"]');
       await page.waitForSelector('#notification-sheet.open');
@@ -321,17 +323,17 @@ async function main() {
 
       const reservations = `m-reservations${lang}.html`;
       await open(page, origin, reservations);
-      await clickRoute(page, 'a[href*="reservation=DEMO-10477"]');
+      await clickRoute(page, 'a[href*="reservation=RSV-10477"]');
       assert.deepStrictEqual(
         await page.evaluate(() => ({
           id: document.querySelector('[data-reservation-field="id"]').textContent.trim(),
           guest: document.querySelector('[data-reservation-field="guest"]').textContent.trim(),
           missing: document.body.dataset.identityStatus,
         })),
-        { id: 'DEMO-10477', guest: 'Petr Dvořák', missing: 'found' },
+        { id: 'RSV-10477', guest: 'Petr Dvořák', missing: 'found' },
         `${lang || 'cs'} reservation identity`
       );
-      await open(page, origin, `m-reservation-detail${lang}.html`, { reservation: 'DEMO-DOES-NOT-EXIST' });
+      await open(page, origin, `m-reservation-detail${lang}.html`, { reservation: 'RSV-DOES-NOT-EXIST' });
       assert.strictEqual(
         await page.$eval('.identity-missing', node => node.hidden),
         false,
@@ -342,6 +344,17 @@ async function main() {
       await waitForCount(page, '[data-reservation-count]', 4);
       await open(page, origin, reservations, { queue: 'departures' });
       await waitForCount(page, '[data-reservation-count]', 3);
+
+      const availability = `m-availability${lang}.html`;
+      await open(page, origin, availability);
+      const availabilityIdentity = await page.$$eval('.availability-cell', cells => ({
+        count: cells.length,
+        keys: cells.map(cell => cell.dataset.availabilityId),
+        complete: cells.every(cell => cell.dataset.roomTypeId && cell.dataset.dateId),
+      }));
+      assert.strictEqual(availabilityIdentity.count, 60, `${availability}: complete room/date coverage`);
+      assert.strictEqual(new Set(availabilityIdentity.keys).size, 60, `${availability}: unique room/date ids`);
+      assert(availabilityIdentity.complete, `${availability}: every cell carries room type and date ids`);
 
       const offers = `m-offer${lang}.html`;
       const offerCounts = { all: 4, active: 3, spa: 2, missing: 1 };
@@ -362,6 +375,33 @@ async function main() {
           expectedTitle
         );
       }
+      await open(page, origin, `m-rate-edit${lang}.html`, { offer: 'spa-week' });
+      assert.strictEqual(
+        await page.$eval('.section-head h2', nodes => nodes.textContent.trim()),
+        lang ? 'Package prices by room type' : 'Ceny balíčku podle typu pokoje',
+        `${lang || 'cs'}: package price heading`
+      );
+      const rateRelation = await page.$$eval('.rate-matrix tbody tr', rows => ({
+        visibleRoomTypeIds: rows.filter(row => !row.hidden).map(row => row.dataset.roomTypeId),
+        firstValues: rows.filter(row => !row.hidden).map(row => row.querySelector('input').value),
+      }));
+      assert.deepStrictEqual(
+        rateRelation.visibleRoomTypeIds,
+        ['double', 'deluxe-double', 'suite', 'single', 'family'],
+        `${lang || 'cs'}: selected package room-type eligibility`
+      );
+      assert.deepStrictEqual(
+        rateRelation.firstValues,
+        ['14200', '14900', '16100', '13600', '17400'],
+        `${lang || 'cs'}: selected package prices by room type`
+      );
+      assert.match(
+        await page.$eval('[data-package-inventory-note]', node => node.textContent),
+        lang
+          ? /Package content does not change room inventory.*limits sales/s
+          : /Obsah balíčku nemění dostupnost pokojů.*omezuje prodej/s,
+        `${lang || 'cs'}: inventory-sale relationship`
+      );
       await open(page, origin, `m-rate-edit${lang}.html`, { offer: 'unknown-offer' });
       assert.strictEqual(
         await page.$eval('.identity-missing', node => node.hidden),
