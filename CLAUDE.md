@@ -4,7 +4,7 @@
 
 - This repository is a mobile-app prototype, not a responsive desktop redesign. Product frames are 390 × 844 and use the five-item bottom navigation.
 - Product functions and business rules come from `../szallas-apps-master/spa/spacz_web`; the supplied design-system export supplies structure, while SPA.CZ colors and logo supply branding.
-- Product data is deterministic demo data. Never imply that a fixture is a live reservation, quotation, account balance, or partner-product “fact”. Keep provenance in `research/`, not in product labels.
+- Product data is deterministic fixture data. Never imply that a fixture is a live reservation, quotation, account balance, or partner-product “fact”. Keep provenance in `research/`, not in product labels.
 - Do not import or reproduce production database rows for prototype content.
 
 ## Sources and generated files
@@ -13,6 +13,8 @@
 - `usecases.json` is the canonical published scenario matrix. `tools/build-usecases.js` generates `usecases.built.json`, `docs/usecases.md`, and captures under `docs/usecases/`.
 - `tokens-m.css` and `app-m.css` are the mobile visual source of truth. `proto-m.js`, `proto-tools.*`, `proto-comments.*`, and `proto-discussion.*` are review scaffolding, not production application code.
 - `prototype.json` controls previews, DOM dumps, and the editable Figma export. Keep every product/export frame mobile-only and 390 × 844.
+- Room types, availability and package prices share one canonical fixture model. Persist only normalized overlays keyed by stable room/date or package IDs; never use list position or a first fixture as identity.
+- Package editing is distinct from the read-only rates view. Use existing gallery fixture IDs only, and make package writes atomic: if durable local state cannot be stored, retain the form, explain the failure, and do not claim success.
 
 ## Interaction contract
 
