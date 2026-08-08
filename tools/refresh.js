@@ -47,20 +47,21 @@ const {
   executionOptInGranted,
   resolveContainedPath,
 } = require('./converter-policy.js');
+const { prepareReceipt, writeAtomically } = require('./artifact-integrity.js');
 
 class RefreshError extends Error {}
 
 const ROOT = path.resolve(__dirname, '..');
 const DEFAULT_TIMEOUT_MS = 5 * 60 * 1000;
-const ARTIFACTS = ['changelog', 'usecases', 'previews', 'fig'];
+const ARTIFACTS = ['screens', 'changelog', 'usecases', 'previews', 'fig', 'integrity'];
 
-const HELP = `Usage: node tools/refresh.js [--fast] [${EXECUTION_OPT_IN.flag}] [--only changelog|usecases|previews|fig]
+const HELP = `Usage: node tools/refresh.js [--fast] [${EXECUTION_OPT_IN.flag}] [--only screens|changelog|usecases|previews|fig|integrity]
 
 Regenerates derived prototype artifacts in dependency order:
-  changelog -> usecases -> hub previews -> Figma export
+  mobile screens -> changelog -> use cases/captures -> hub previews -> DOM dumps/Figma -> integrity receipt
 
 Options:
-  --fast        Skip every browser-dependent step (use-case captures, hub previews, Figma export).
+  --fast        Skip every browser-dependent step (use-case captures, hub previews, Figma export and receipt).
   --only <name> Refresh exactly one logical artifact; it does not run the other steps.
   ${EXECUTION_OPT_IN.flag}
                 Allow a preview command read out of the prototype root to run. A
@@ -181,6 +182,15 @@ function fingerprintPreviews() {
     .sort()
     .map(name => name + ':' + hashFile(path.join(ROOT, name)));
   return crypto.createHash('sha256').update(previews.join('\n')).digest('hex');
+}
+
+function fingerprintScreens() {
+  const screens = fs
+    .readdirSync(ROOT)
+    .filter(name => /^m-.*\.html$/i.test(name))
+    .sort()
+    .map(name => `${name}:${hashFile(path.join(ROOT, name))}`);
+  return crypto.createHash('sha256').update(screens.join('\n')).digest('hex');
 }
 
 function stateChanged(before, after) {
@@ -352,6 +362,18 @@ async function refreshChangelog(options, summary) {
   summary.changelog = { status: stateChanged(before, fingerprint(output)) };
 }
 
+async function refreshScreens(options, summary) {
+  if (!shouldRun(options, 'screens')) return skip(summary, 'screens', 'not selected by --only');
+  const before = fingerprintScreens();
+  await spawnStep(
+    'mobile screen generator',
+    process.execPath,
+    [scriptPath('build-screens.js')],
+    positiveTimeout(process.env.REFRESH_SCREENS_TIMEOUT_MS, 'REFRESH_SCREENS_TIMEOUT_MS')
+  );
+  summary.screens = { status: stateChanged(before, fingerprintScreens()) };
+}
+
 async function refreshUsecases(options, summary) {
   if (!shouldRun(options, 'usecases')) return skip(summary, 'usecases', 'not selected by --only');
   if (!fs.existsSync(path.join(ROOT, 'usecases.json')))
@@ -425,6 +447,31 @@ async function refreshFig(options, summary, manifest) {
   summary.fig = { status: stateChanged(before, fingerprint(output)) };
 }
 
+function writeReceiptAfterCompleteRefresh(root = ROOT) {
+  const result = prepareReceipt(root);
+  writeAtomically(path.join(root, result.inventory.receipt), `${JSON.stringify(result.receipt, null, 2)}\n`);
+  return result;
+}
+
+async function refreshIntegrity(options, summary) {
+  if (!shouldRun(options, 'integrity')) return skip(summary, 'integrity', 'not selected by --only');
+  if (options.fast || options.only) {
+    return skip(summary, 'integrity', 'the receipt is written only by a complete non-fast refresh');
+  }
+  for (const artifact of ['screens', 'changelog', 'usecases', 'previews', 'fig']) {
+    if (!summary[artifact] || !['changed', 'unchanged'].includes(summary[artifact].status)) {
+      throw new RefreshError(`integrity receipt requires completed ${artifact} refresh`);
+    }
+  }
+  const result = writeReceiptAfterCompleteRefresh(ROOT);
+  summary.integrity = {
+    status: 'changed',
+    detail:
+      `${result.inventory.screenPaths.length} screens, ${result.inventory.dumpPaths.length} dumps, ` +
+      `${result.inventory.previewPaths.length} previews and ${result.inventory.captures.length} use-case captures`,
+  };
+}
+
 function printSummary(summary) {
   console.log('\nRefresh summary:');
   for (const artifact of ARTIFACTS) {
@@ -444,10 +491,12 @@ async function main() {
       return;
     }
     const manifest = loadManifest();
+    await refreshScreens(options, summary);
     await refreshChangelog(options, summary);
     await refreshUsecases(options, summary);
     await refreshPreviews(options, summary, manifest);
     await refreshFig(options, summary, manifest);
+    await refreshIntegrity(options, summary);
     printSummary(summary);
   } catch (error) {
     const target = options && options.only;
@@ -471,6 +520,9 @@ module.exports = {
   describeCommand,
   fingerprint,
   fingerprintPreviews,
+  fingerprintScreens,
   packagePreviewCommand,
+  refreshIntegrity,
   refreshPreviews,
+  refreshScreens,
 };

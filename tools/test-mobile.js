@@ -5,6 +5,8 @@ const assert = require('assert');
 const childProcess = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const { validateReceipt } = require('./artifact-integrity.js');
+const { renderPage } = require('./build-screens.js');
 const { captureJobs } = require('./capture-previews.js');
 const { normaliseUsecase } = require('./build-usecases.js');
 const { normalizedViewportHeight, normalizedViewportWidth } = require('./dump-dom.js');
@@ -46,6 +48,14 @@ assert.strictEqual(
 
 for (const screen of actualScreens) {
   const html = read(screen);
+  const screenName = screen.slice(2, -'.html'.length);
+  const english = screenName.endsWith('-en');
+  const page = english ? screenName.slice(0, -'-en'.length) : screenName;
+  assert.strictEqual(
+    html,
+    renderPage(page, english ? 'en' : 'cs'),
+    `${screen} must be generated from build-screens.js`
+  );
   assert.match(html, /<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">/);
   assert.match(html, /data-viewport="mobile"/);
   assert.match(html, /class="mobile-bottom-nav"/);
@@ -123,6 +133,22 @@ assert.deepStrictEqual(
   usecaseCaptures,
   expectedUsecaseCaptures,
   'the published package must keep exactly one representative capture per use case'
+);
+const artifactIntegrity = validateReceipt(root);
+assert.deepStrictEqual(
+  artifactIntegrity.inventory.screenPaths,
+  actualScreens,
+  'the integrity receipt must inventory every generated mobile screen'
+);
+assert.deepStrictEqual(
+  artifactIntegrity.inventory.previewPaths,
+  previewJobs.map(job => job.output).sort(),
+  'the integrity receipt must inventory every manifest-declared preview'
+);
+assert.deepStrictEqual(
+  artifactIntegrity.inventory.captures,
+  expectedUsecaseCaptures.map(name => `docs/usecases/${name}`).sort(),
+  'the integrity receipt must inventory every published use-case capture'
 );
 
 assert(exists('comments.config.example.json'));

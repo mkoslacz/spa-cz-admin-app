@@ -9,6 +9,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const { execFileSync } = require('child_process');
 
 class ToolError extends Error {}
@@ -148,7 +149,11 @@ function generatedArtifactOnly(files) {
         name === 'docs/usecases.md' ||
         name.endsWith('/docs/usecases.md') ||
         /(^|\/)docs\/usecases(?:\/|$)/.test(name) ||
+        /(^|\/)m-[^/]+\.html$/i.test(name) ||
         /(^|\/)preview-[^/]+\.png$/i.test(name) ||
+        /(^|\/)tools\/dumps(?:\/|$)/.test(name) ||
+        name === 'tools/artifact-integrity.json' ||
+        name.endsWith('/tools/artifact-integrity.json') ||
         /\.fig$/i.test(name)
       );
     })
@@ -347,6 +352,25 @@ function writeAtomic(file, contents) {
   }
 }
 
+function changelogSource(root, options = {}, dependencies = {}) {
+  const gitRunner = dependencies.gitRunner || createGitRunner(dependencies);
+  const limit = options.limit == null ? 50 : options.limit;
+  const repository = normaliseGitHubRemote(gitRunner.tryRun(['remote', 'get-url', 'origin'], root));
+  return {
+    repository,
+    limited: true,
+    limit,
+    entries: loadEntries(root, repository, limit, gitRunner, dependencies.historyBatchSize ?? HISTORY_BATCH_SIZE),
+  };
+}
+
+function changelogSourceDigest(root, options = {}, dependencies = {}) {
+  return crypto
+    .createHash('sha256')
+    .update(JSON.stringify(changelogSource(root, options, dependencies)))
+    .digest('hex');
+}
+
 function build(options, cwd = process.cwd(), dependencies = {}) {
   const gitRunner = dependencies.gitRunner || createGitRunner(dependencies);
   const now = dependencies.now || (() => new Date());
@@ -354,21 +378,11 @@ function build(options, cwd = process.cwd(), dependencies = {}) {
   if (gitRunner.run(['rev-parse', '--is-shallow-repository'], root, 'could not inspect Git history') === 'true') {
     throw new ToolError('Git history is shallow; fetch full history before generating the changelog');
   }
-  const repository = normaliseGitHubRemote(gitRunner.tryRun(['remote', 'get-url', 'origin'], root));
   const output = path.resolve(cwd, options.out);
-  const entries = loadEntries(
-    root,
-    repository,
-    options.limit,
-    gitRunner,
-    dependencies.historyBatchSize ?? HISTORY_BATCH_SIZE
-  );
+  const source = changelogSource(root, options, { ...dependencies, gitRunner });
   const document = {
     generatedAt: now().toISOString(),
-    repository,
-    limited: true,
-    limit: options.limit,
-    entries,
+    ...source,
   };
   writeAtomic(output, JSON.stringify(document, null, 2) + '\n');
   return { output, document };
@@ -400,6 +414,8 @@ module.exports = {
   parseRoundTags,
   parseRevisionGraph,
   generatedArtifactOnly,
+  changelogSource,
+  changelogSourceDigest,
   loadEntries,
   mapRounds,
   build,

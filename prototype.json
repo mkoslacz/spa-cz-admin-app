@@ -8,6 +8,19 @@
   "pagesDir": ".",
   "assets": "assets",
   "dumpDir": "tools/dumps",
+  "artifacts": {
+    "previewFrameIds": [
+      "m-dashboard",
+      "m-reservations",
+      "m-reservation-detail",
+      "m-availability",
+      "m-offer",
+      "m-rate-edit",
+      "m-billing",
+      "m-more"
+    ],
+    "integrityReceipt": "tools/artifact-integrity.json"
+  },
   "schemaFrom": "tools/.schema/canvas.fig",
   "width": 390,
   "height": 844,

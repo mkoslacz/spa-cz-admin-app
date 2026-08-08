@@ -2,7 +2,6 @@
 comments.config.json
 comments/
 tools/node_modules/
-tools/dumps/
 tools/.cache/
 firebase-debug.log
 firestore-debug.log

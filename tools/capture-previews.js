@@ -5,20 +5,11 @@ const fs = require('fs');
 const path = require('path');
 const { pathToFileURL } = require('url');
 const puppeteer = require('puppeteer-core');
+const { previewFrameIds } = require('./artifact-integrity.js');
 
 const root = path.resolve(__dirname, '..');
 const chromePath = process.env.CHROME_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const manifestPath = path.join(root, 'prototype.json');
-const screenNames = [
-  'dashboard',
-  'reservations',
-  'reservation-detail',
-  'availability',
-  'offer',
-  'rate-edit',
-  'billing',
-  'more',
-];
 
 function assertFile(file) {
   if (!fs.existsSync(file) || !fs.statSync(file).isFile()) {
@@ -34,11 +25,17 @@ function positiveInteger(value, label) {
 
 function captureJobs(manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'))) {
   const frames = (manifest.rows || []).flatMap(row => row.frames || []);
-  return screenNames.map(name => ({
-    page: 'm-' + name + '.html',
-    output: 'preview-m-' + name + '.png',
-    ...dimensionsForPage('m-' + name + '.html', frames, manifest),
-  }));
+  const byId = new Map(frames.map(frame => [frame.id, frame]));
+  return previewFrameIds(manifest).map(id => {
+    const frame = byId.get(id);
+    if (!frame) throw new Error('Missing declared preview frame: ' + id);
+    const page = String(frame.page || '').split('?')[0];
+    return {
+      page,
+      output: 'preview-' + id + '.png',
+      ...dimensionsForPage(page, frames, manifest),
+    };
+  });
 }
 
 function dimensionsForPage(page, frames, manifest) {
