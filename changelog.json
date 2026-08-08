@@ -1,9 +1,19 @@
 {
-  "generatedAt": "2026-08-08T12:11:41.105Z",
+  "generatedAt": "2026-08-08T13:00:55.838Z",
   "repository": "https://github.com/mkoslacz/spa-cz-admin-app",
   "limited": true,
   "limit": 50,
   "entries": [
+    {
+      "sha": "45238af33c7d02de501636e85703bbc086671d15",
+      "short": "45238af",
+      "date": "2026-08-08",
+      "subject": "chore: preserve release workflow handoff",
+      "body": "",
+      "screens": [],
+      "round": "unreleased",
+      "url": "https://github.com/mkoslacz/spa-cz-admin-app/commit/45238af33c7d02de501636e85703bbc086671d15"
+    },
     {
       "sha": "51fca2176b3cc75e22793035d56b4c02deeaafda",
       "short": "51fca21",

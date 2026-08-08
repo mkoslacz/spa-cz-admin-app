@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "changelogSourceDigest": "f5dda0ccab689d02e4f2e57914a7c18251764db2167d1ec3aa612f05a9c005be",
+  "changelogSourceDigest": "f46766e5d7f769fdcd9c41a769c829907bd564ee7238f2b5a8a40b71179c7225",
   "inputs": {
     "app-m.css": "d4f8258a773544ce58a73b08bd3f5c56e4b2df99d4803ffd61b63a81e0a96c87",
     "assets/fonts/LICENSE-DM-Sans.txt": "6fbd040a29c2037a765dfb9f2561e9965b5c95c6dcb5dce516089d63d5f17af7",
@@ -57,10 +57,10 @@
     "usecases.json": "6742c4b210823a13321a66d7391a8703dbb4c5d06bb16bd6e0dd7eb98c312497"
   },
   "outputs": {
-    "changelog.json": "f88bd143f2ab1817438823e3c1eee9efe638bcbcbd54e56bb2d800583fb709cf",
+    "changelog.json": "bf30faf05b789d774daa5d1c97f0fe6b9a887ecfef05b615cdfc53811b7981fc",
     "docs/usecases.md": "ff43c1c94362f100b15104855ed3d132ceb915038496a792c372c580a6641a9d",
     "docs/usecases/UC-01-m-dashboard.png": "2fcd001e7befb7b1caad47c618a7dc80659632c8a434e388ef8e380463b6672a",
-    "docs/usecases/UC-02-m-reservations.png": "d84623952a403e6736ddb873b6c688662732af1da44545233695832256f04ec1",
+    "docs/usecases/UC-02-m-reservations.png": "a78f77e902d2bcdb625d7ed35e025a5756acf20236fe0e6df60933dc58727949",
     "docs/usecases/UC-03-m-reservations.png": "2814f20f27fbdc5a9f8a2c3453df272748403b31034f556eac50a99c1369938b",
     "docs/usecases/UC-04-m-reservation-detail.png": "03107967f9e5631ccf500d14cf9687eb929a272842e08abfb923951d9654014b",
     "docs/usecases/UC-05-m-more.png": "e9ba048cbbadaabbb482292831a8222ab043e588641b81a54aa7e040aada9d46",
@@ -91,7 +91,7 @@
     "preview-m-rate-edit.png": "d3b2be9976310835117a9c1d5ec7a9d7b24dfdf3393380d840b5a1c47b7b2d69",
     "preview-m-reservation-detail.png": "57cff0272cef56e674ee3b5cda0c9e164a185dc5d28a2d98c34e827866b0e37b",
     "preview-m-reservations.png": "6f86f62ff9e4cb9452368aecdfd92dc07f9ad4ddd0cbd0dee06d61dbedfe4566",
-    "spa-cz-partner-mobile.fig": "f01672c794581728c59f500c9a4b6210af7d651601e9ede0eb85ceaf4fdf5fb5",
+    "spa-cz-partner-mobile.fig": "63d4ed68f3fd895f1d6ec8b84cfd828879e65e933b737fd04908a4b06322b6d1",
     "tools/dumps/dump-m-availability-chm.json": "b9b108c15cbf692a22e2cb8bf291fdfa8bc41dc10d7d6dbe94a7e923765aa0b5",
     "tools/dumps/dump-m-availability-en.json": "c1d281e7dbd958c5af054e43f38840ba91d2e98430f9fb0b651e1411b273abf6",
     "tools/dumps/dump-m-availability.json": "70cee6975bf029943096b0fc468d90f63480a58a8369f83fe866d548055454ec",
@@ -116,6 +116,6 @@
     "tools/dumps/dump-m-reservations-en.json": "0e4febaf092c5a86a1f467220eddc0ace1608ee166dcff660f88c4decaf2d55e",
     "tools/dumps/dump-m-reservations-some.json": "11fd51d45fee7411568ebf3d943ebfcc676fee8c8a956a6a347598d19cecbfee",
     "tools/dumps/dump-m-reservations.json": "229e119d6d8d30588470b93cc68fe3073f16442aa51d14351a11ac57b4abea61",
-    "usecases.built.json": "c135432090cdc7eb7388be46008c3b2c973915a4316289ee54ec68170aeea28d"
+    "usecases.built.json": "58bb37cf79e66f9d73f95ef18120db77b841f46e00be5b873d1656128c6879e5"
   }
 }
