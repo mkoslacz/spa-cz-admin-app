@@ -522,7 +522,6 @@ module.exports = {
   fingerprintPreviews,
   fingerprintScreens,
   packagePreviewCommand,
-  refreshIntegrity,
   refreshPreviews,
   refreshScreens,
 };

@@ -7,6 +7,8 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const artifactIntegrity = require('./artifact-integrity.js');
+const { ToolError, changelogSource } = require('./build-changelog.js');
+const refresh = require('./refresh.js');
 const { ArtifactIntegrityError, artifactInventory, prepareReceipt, validateReceipt, writeAtomically } =
   artifactIntegrity;
 
@@ -82,6 +84,25 @@ withTemporaryRepository(repository => {
     artifactIntegrity.writeReceipt,
     undefined,
     'artifact contract must not expose a direct receipt-promotion API'
+  );
+  assert.strictEqual(
+    refresh.refreshIntegrity,
+    undefined,
+    'refresh must not expose receipt promotion without its completed orchestration path'
+  );
+  assert.throws(
+    () =>
+      changelogSource(
+        root,
+        {},
+        {
+          gitRunner: {
+            run: () => 'true',
+          },
+        }
+      ),
+    error => error instanceof ToolError && /Git history is shallow/.test(error.message),
+    'receipt provenance must reject a shallow history exactly as the changelog generator does'
   );
   validateReceipt(repository);
   const inventory = artifactInventory(repository);

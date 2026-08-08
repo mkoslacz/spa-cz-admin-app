@@ -354,6 +354,9 @@ function writeAtomic(file, contents) {
 
 function changelogSource(root, options = {}, dependencies = {}) {
   const gitRunner = dependencies.gitRunner || createGitRunner(dependencies);
+  if (gitRunner.run(['rev-parse', '--is-shallow-repository'], root, 'could not inspect Git history') === 'true') {
+    throw new ToolError('Git history is shallow; fetch full history before generating the changelog');
+  }
   const limit = options.limit == null ? 50 : options.limit;
   const repository = normaliseGitHubRemote(gitRunner.tryRun(['remote', 'get-url', 'origin'], root));
   return {
@@ -375,9 +378,6 @@ function build(options, cwd = process.cwd(), dependencies = {}) {
   const gitRunner = dependencies.gitRunner || createGitRunner(dependencies);
   const now = dependencies.now || (() => new Date());
   const root = repositoryRoot(cwd, gitRunner);
-  if (gitRunner.run(['rev-parse', '--is-shallow-repository'], root, 'could not inspect Git history') === 'true') {
-    throw new ToolError('Git history is shallow; fetch full history before generating the changelog');
-  }
   const output = path.resolve(cwd, options.out);
   const source = changelogSource(root, options, { ...dependencies, gitRunner });
   const document = {
