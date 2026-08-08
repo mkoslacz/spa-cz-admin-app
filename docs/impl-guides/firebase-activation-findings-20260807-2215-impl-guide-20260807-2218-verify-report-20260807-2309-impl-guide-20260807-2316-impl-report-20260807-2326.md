@@ -16,8 +16,8 @@
 
 | Card | Outcome | Evidence |
 |---|---|---|
-| `IMPL-01` | implemented | Shared `.pt-pages` styling now renders Changelog, Use cases and Comments as three full-width rows with 44 px minimum height and an explicit keyboard focus treatment. The browser gate measures 1280 × 844 and 390 × 844, including strict vertical order, dimensions, focus, panel/document overflow and the unchanged horizontal ordinary switch. |
-| `IMPL-02` | implemented | Hub copy describes configured and unconfigured modes without claiming the current deployment state. The Pages workflow checks exact source/package `comments.config.json` parity after assembly and before upload in both directions without printing contents. Static QA locks copy, include-list, command ordering, both parity branches and the sole permitted secret-to-file write. |
+| `docs/impl-guides/firebase-activation-findings-20260807-2215-impl-guide-20260807-2218-verify-report-20260807-2309-impl-guide-20260807-2316.md#IMPL-01` | implemented | Shared `.pt-pages` styling now renders Changelog, Use cases and Comments as three full-width rows with 44 px minimum height and an explicit keyboard focus treatment. The browser gate measures 1280 × 844 and 390 × 844, including strict vertical order, dimensions, focus, panel/document overflow and the unchanged horizontal ordinary switch. |
+| `docs/impl-guides/firebase-activation-findings-20260807-2215-impl-guide-20260807-2218-verify-report-20260807-2309-impl-guide-20260807-2316.md#IMPL-02` | implemented | Hub copy describes configured and unconfigured modes without claiming the current deployment state. The Pages workflow checks exact source/package `comments.config.json` parity after assembly and before upload in both directions without printing contents. Static QA locks copy, include-list, command ordering, both parity branches and the sole permitted secret-to-file write. |
 
 Fix level: shared mechanism. The correction applies once in the shared review panel and once in the common Pages packaging path rather than patching generated screens or one deployment.
 
