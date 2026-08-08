@@ -56,7 +56,7 @@ Run `/impl-verify` against the source guide after the pushed workflow is green, 
 ## Handoff
 
 - Source: `docs/impl-guides/firebase-activation-findings-20260807-2215-impl-guide-20260807-2218-verify-report-20260807-2309-impl-guide-20260807-2316.md`
-- Scope: `#{IMPL-01,IMPL-02}`
+- Scope: `docs/impl-guides/firebase-activation-findings-20260807-2215-impl-guide-20260807-2218-verify-report-20260807-2309-impl-guide-20260807-2316.md#{IMPL-01,IMPL-02}`
 - State: `implemented`
 - Evidence: `f80932282231158220416e4cd3988a7518dbfbeb`; static, lint, format and diff gates passed; browser/emulator evidence pending CI
 - Next: `/impl-verify docs/impl-guides/firebase-activation-findings-20260807-2215-impl-guide-20260807-2218-verify-report-20260807-2309-impl-guide-20260807-2316.md`
