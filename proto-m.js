@@ -197,6 +197,20 @@
     );
   }
 
+  function parseAvailabilityUnits(raw) {
+    const normalized = String(raw).trim();
+    const value = Number(normalized);
+    if (
+      !/^\d+$/.test(normalized) ||
+      !Number.isInteger(value) ||
+      value < 0 ||
+      value > 255
+    ) {
+      return null;
+    }
+    return value;
+  }
+
   function availabilityDateLabel(dateId) {
     return new Intl.DateTimeFormat(language() === "cs" ? "cs-CZ" : "en-GB", {
       day: "numeric",
@@ -239,8 +253,7 @@
     });
   }
 
-  function saveAvailabilityCell(cell, value) {
-    if (!canWriteAvailability() || !cell) return false;
+  function setAvailabilityMutation(cell, value) {
     const key = cell.dataset.availabilityId;
     if (sameAvailabilityState(availabilityBaseState(cell), value)) {
       delete state.availabilityMutations[key];
@@ -250,9 +263,18 @@
           ? { type: "stopSell" }
           : { type: "units", value: value.value };
     }
+  }
+
+  function saveAvailabilityCells(cells, value) {
+    if (!canWriteAvailability() || !cells.length) return false;
+    cells.forEach((cell) => setAvailabilityMutation(cell, value));
     persistState();
     renderAvailability();
     return true;
+  }
+
+  function saveAvailabilityCell(cell, value) {
+    return saveAvailabilityCells(cell ? [cell] : [], value);
   }
 
   function syncAvailabilityAction(form) {
@@ -271,6 +293,85 @@
     const error = form.querySelector("[data-availability-cell-error]");
     error.textContent = message || "";
     error.hidden = !message;
+  }
+
+  function syncAvailabilityBulkAction(form) {
+    if (!form) return;
+    const stopSell =
+      form.querySelector("[data-availability-bulk-action]").value ===
+      "stopSell";
+    const field = form.querySelector("[data-availability-bulk-units-field]");
+    const input = form.querySelector("[data-availability-bulk-units]");
+    field.hidden = stopSell;
+    input.disabled = stopSell;
+    input.required = !stopSell;
+  }
+
+  function setAvailabilityBulkError(form, message) {
+    const error = form.querySelector("[data-availability-bulk-error]");
+    error.textContent = message || "";
+    error.hidden = !message;
+  }
+
+  function availabilityBulkSelection(form) {
+    const from = form.querySelector("[data-availability-bulk-from]").value;
+    const to = form.querySelector("[data-availability-bulk-to]").value;
+    const roomTypeId = form.querySelector(
+      "[data-availability-bulk-room]",
+    ).value;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(from) || !/^\d{4}-\d{2}-\d{2}$/.test(to)) {
+      return {
+        cells: [],
+        error:
+          language() === "cs"
+            ? "Vyberte platné datum od a do."
+            : "Select valid from and to dates.",
+      };
+    }
+    if (from > to) {
+      return {
+        cells: [],
+        error:
+          language() === "cs"
+            ? "Datum od nesmí být po datu do."
+            : "The from date cannot be after the to date.",
+      };
+    }
+    const cells = [...document.querySelectorAll(".availability-cell")].filter(
+      (cell) =>
+        cell.dataset.dateId >= from &&
+        cell.dataset.dateId <= to &&
+        (roomTypeId === "all" || cell.dataset.roomTypeId === roomTypeId),
+    );
+    if (!cells.length) {
+      return {
+        cells,
+        error:
+          language() === "cs"
+            ? "Vybraný rozsah neobsahuje žádné buňky."
+            : "The selected range contains no cells.",
+      };
+    }
+    return { cells, error: "" };
+  }
+
+  function updateAvailabilityBulkPreview(form) {
+    if (!form) return { cells: [], error: "" };
+    const selection = availabilityBulkSelection(form);
+    form.querySelector("[data-availability-bulk-count]").textContent = String(
+      selection.cells.length,
+    );
+    setAvailabilityBulkError(form, selection.error);
+    return selection;
+  }
+
+  function openAvailabilityBulkEditor(control) {
+    if (!canWriteAvailability()) return;
+    const form = document.querySelector("[data-availability-bulk-form]");
+    if (!form) return;
+    syncAvailabilityBulkAction(form);
+    updateAvailabilityBulkPreview(form);
+    openSheet("availability-sheet", control);
   }
 
   function openAvailabilityEditor(control) {
@@ -308,13 +409,8 @@
       const raw = form
         .querySelector("[data-availability-cell-units]")
         .value.trim();
-      const value = Number(raw);
-      if (
-        !/^\d+$/.test(raw) ||
-        !Number.isInteger(value) ||
-        value < 0 ||
-        value > 255
-      ) {
+      const value = parseAvailabilityUnits(raw);
+      if (value === null) {
         setAvailabilityError(
           form,
           language() === "cs"
@@ -331,6 +427,39 @@
       language() === "cs"
         ? "Dostupnost byla uložena."
         : "Availability was saved.",
+    );
+    return true;
+  }
+
+  function submitAvailabilityBulk(form) {
+    if (!canWriteAvailability()) return false;
+    const selection = updateAvailabilityBulkPreview(form);
+    if (selection.error) return false;
+    const action = form.querySelector("[data-availability-bulk-action]").value;
+    let next = { type: "stopSell" };
+    if (action === "units") {
+      const value = parseAvailabilityUnits(
+        form.querySelector("[data-availability-bulk-units]").value,
+      );
+      if (value === null) {
+        setAvailabilityBulkError(
+          form,
+          language() === "cs"
+            ? "Zadejte celé číslo od 0 do 255."
+            : "Enter a whole number from 0 to 255.",
+        );
+        return false;
+      }
+      next = { type: "units", value };
+    } else if (action !== "stopSell") {
+      return false;
+    }
+    if (!saveAvailabilityCells(selection.cells, next)) return false;
+    closeSheet(form.closest(".modal-backdrop"));
+    showToast(
+      language() === "cs"
+        ? `Dostupnost byla změněna v ${selection.cells.length} buňkách.`
+        : `Availability was changed in ${selection.cells.length} cells.`,
     );
     return true;
   }
@@ -742,6 +871,15 @@
         return;
       }
 
+      const availabilityBulkControl = event.target.closest(
+        "[data-availability-bulk-open]",
+      );
+      if (availabilityBulkControl) {
+        event.preventDefault();
+        openAvailabilityBulkEditor(availabilityBulkControl);
+        return;
+      }
+
       const opener = event.target.closest("[data-open-sheet]");
       if (opener) {
         event.preventDefault();
@@ -822,6 +960,14 @@
         submitAvailabilityEditor(availabilityForm);
         return;
       }
+      const availabilityBulkForm = event.target.closest(
+        "[data-availability-bulk-form]",
+      );
+      if (availabilityBulkForm) {
+        event.preventDefault();
+        submitAvailabilityBulk(availabilityBulkForm);
+        return;
+      }
       const form = event.target.closest("[data-prototype-form]");
       if (!form) return;
       event.preventDefault();
@@ -834,6 +980,20 @@
         const form = event.target.closest("[data-availability-cell-form]");
         setAvailabilityError(form, "");
         syncAvailabilityAction(form);
+      }
+      if (event.target.matches("[data-availability-bulk-action]")) {
+        const form = event.target.closest("[data-availability-bulk-form]");
+        syncAvailabilityBulkAction(form);
+        updateAvailabilityBulkPreview(form);
+      }
+      if (
+        event.target.matches(
+          "[data-availability-bulk-from], [data-availability-bulk-to], [data-availability-bulk-room]",
+        )
+      ) {
+        updateAvailabilityBulkPreview(
+          event.target.closest("[data-availability-bulk-form]"),
+        );
       }
     });
 

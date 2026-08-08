@@ -523,7 +523,7 @@ function availability(lang) {
     ${availabilityMatrix(lang)}
     ${emptyState(lang, 'Žádné pokoje', 'No rooms', 'V tomto stavu není co zobrazit.', 'There is nothing to show in this state.')}
     <div class="section-head"><h2>${tr(lang, 'Hromadná změna', 'Bulk action')}</h2></div>
-    <section class="card"><p class="subtle">${tr(lang, 'Nastavte stop prodej pro vybraný termín bez úpravy každé buňky.', 'Set stop sell for a date range without editing each cell.')}</p><button class="button full" type="button" data-open-sheet="availability-sheet" data-write-action data-chm-write>${tr(lang, 'Uzavřít termín', 'Close a date range')}</button></section>`;
+    <section class="card"><p class="subtle">${tr(lang, 'Nastavte počet volných jednotek nebo stop prodej pro přesně vybrané pokoje a termín.', 'Set available units or stop sell for the exact rooms and date range selected.')}</p><button class="button full" type="button" data-availability-bulk-open data-open-sheet="availability-sheet" data-outcome="sheet" data-write-action data-chm-write>${tr(lang, 'Hromadně změnit dostupnost', 'Edit availability in bulk')}</button></section>`;
 }
 
 function offerCard(lang, offer) {
@@ -789,9 +789,16 @@ function sheets(page, lang) {
     const availabilityBulkSheet = sheetShell(
       'availability-sheet',
       lang,
-      tr(lang, 'Uzavřít termín', 'Close a date range'),
-      `<form data-prototype-form data-success="${tr(lang, 'Stop prodej byl nastaven.', 'Stop sell set.')}" id="availability-form"><div class="form-two-col"><label class="field"><span>${tr(lang, 'Od', 'From')}</span><input type="date" value="2026-10-16"></label><label class="field"><span>${tr(lang, 'Do', 'To')}</span><input type="date" value="2026-10-17"></label></div><label class="field"><span>${tr(lang, 'Typ pokoje', 'Room type')}</span><select><option>${tr(lang, 'Všechny typy pokojů', 'All room types')}</option>${ROOM_TYPES.map(roomType => `<option value="${roomType.id}">${localized(roomType.name, lang)}</option>`).join('')}</select></label></form>`,
-      `<div class="sheet-actions"><button class="button" type="button" data-close-sheet>${tr(lang, 'Zrušit', 'Cancel')}</button><button class="button primary" type="submit" form="availability-form">${tr(lang, 'Nastavit', 'Set')}</button></div>`
+      tr(lang, 'Hromadná změna dostupnosti', 'Bulk availability'),
+      `<form data-availability-bulk-form id="availability-form" novalidate>
+        <label class="field"><span>${tr(lang, 'Akce', 'Action')}</span><select data-availability-bulk-action>${actionOptions}</select></label>
+        <div class="form-two-col"><label class="field"><span>${tr(lang, 'Od', 'From')}</span><input type="date" min="${AVAILABILITY_DATES[0].id}" max="${AVAILABILITY_DATES.at(-1).id}" value="2026-10-16" data-availability-bulk-from required></label><label class="field"><span>${tr(lang, 'Do včetně', 'To inclusive')}</span><input type="date" min="${AVAILABILITY_DATES[0].id}" max="${AVAILABILITY_DATES.at(-1).id}" value="2026-10-17" data-availability-bulk-to required></label></div>
+        <label class="field"><span>${tr(lang, 'Typ pokoje', 'Room type')}</span><select data-availability-bulk-room><option value="all">${tr(lang, 'Všechny typy pokojů', 'All room types')}</option>${ROOM_TYPES.map(roomType => `<option value="${roomType.id}"${roomType.id === 'double' ? ' selected' : ''}>${localized(roomType.name, lang)}</option>`).join('')}</select></label>
+        <label class="field" data-availability-bulk-units-field><span>${tr(lang, 'Volné jednotky (0–255)', 'Available units (0–255)')}</span><input type="number" inputmode="numeric" min="0" max="255" step="1" value="3" data-availability-bulk-units required></label>
+        <p class="subtle" aria-live="polite">${tr(lang, 'Počet dotčených buněk:', 'Affected cells:')} <strong data-availability-bulk-count>2</strong></p>
+        <p class="subtle" data-availability-bulk-error role="alert" aria-live="assertive" hidden></p>
+      </form>`,
+      `<div class="sheet-actions"><button class="button" type="button" data-close-sheet>${tr(lang, 'Zrušit', 'Cancel')}</button><button class="button primary" type="submit" form="availability-form" data-write-action data-chm-write>${tr(lang, 'Použít změnu', 'Apply change')}</button></div>`
     );
     contextual = availabilityCellSheet + availabilityBulkSheet;
   }

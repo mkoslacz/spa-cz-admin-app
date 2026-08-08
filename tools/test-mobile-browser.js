@@ -142,6 +142,73 @@ async function setAvailabilityUnits(page, availabilityId, value) {
   await page.click('[form="availability-cell-form"]');
 }
 
+async function availabilityMutationState(page) {
+  return page.evaluate(() => {
+    const stored = JSON.parse(globalThis.localStorage.getItem('spa-cz-admin-prototype') || '{}');
+    return stored.availabilityMutations || {};
+  });
+}
+
+async function availabilitySnapshots(page, availabilityIds) {
+  return Object.fromEntries(
+    await Promise.all(
+      availabilityIds.map(async availabilityId => [availabilityId, await availabilitySnapshot(page, availabilityId)])
+    )
+  );
+}
+
+async function setBulkDate(page, selector, value) {
+  await page.$eval(
+    selector,
+    (input, nextValue) => {
+      input.value = nextValue;
+      input.dispatchEvent(new globalThis.Event('change', { bubbles: true }));
+    },
+    value
+  );
+}
+
+async function openAvailabilityBulkEditor(page) {
+  const before = await page.$eval('[data-availability-bulk-open]', control => ({
+    disabled: control.disabled,
+    access: document.body.dataset.access,
+    connection: document.body.dataset.connection,
+  }));
+  assert.deepStrictEqual(before, { disabled: false, access: 'full', connection: 'manual' });
+  const box = await page.$eval('[data-availability-bulk-open]', control => {
+    control.scrollIntoView({ block: 'center' });
+    const rect = control.getBoundingClientRect();
+    return {
+      x: rect.x,
+      y: rect.y,
+      width: rect.width,
+      height: rect.height,
+      panels: [...document.querySelectorAll('.proto-tools, aside.proto-comments-tools')].map(panel => {
+        const panelRect = panel.getBoundingClientRect();
+        return { left: panelRect.left, right: panelRect.right, top: panelRect.top, bottom: panelRect.bottom };
+      }),
+    };
+  });
+  const clickPoint = { x: box.x + 24, y: box.y + box.height / 2 };
+  assert(clickPoint.x >= box.x && clickPoint.x <= box.x + box.width, 'bulk click x is inside the control');
+  assert(clickPoint.y >= box.y && clickPoint.y <= box.y + box.height, 'bulk click y is inside the control');
+  box.panels.forEach(panel => {
+    assert(
+      !(
+        clickPoint.x >= panel.left &&
+        clickPoint.x <= panel.right &&
+        clickPoint.y >= panel.top &&
+        clickPoint.y <= panel.bottom
+      ),
+      'bulk click point remains visible outside review and comments panels'
+    );
+  });
+  await page.mouse.click(clickPoint.x, clickPoint.y);
+  await page.waitForFunction(() => document.querySelector('#availability-sheet').classList.contains('open'), {
+    timeout: 5000,
+  });
+}
+
 async function assertRestrictedAvailability(page, origin, screen, overrides, label) {
   const availabilityId = 'double:2026-10-13';
   await open(page, origin, screen, overrides);
@@ -156,19 +223,224 @@ async function assertRestrictedAvailability(page, origin, screen, overrides, lab
     form.querySelector('[data-availability-cell-action]').value = 'units';
     form.querySelector('[data-availability-cell-units]').value = '2';
     form.dispatchEvent(new globalThis.Event('submit', { bubbles: true, cancelable: true }));
+    const bulkControl = document.querySelector('[data-availability-bulk-open]');
+    const bulkDisabled = bulkControl.disabled;
+    bulkControl.disabled = false;
+    bulkControl.click();
+    const bulkForm = document.querySelector('[data-availability-bulk-form]');
+    bulkForm.querySelector('[data-availability-bulk-action]').value = 'units';
+    bulkForm.querySelector('[data-availability-bulk-room]').value = 'double';
+    bulkForm.querySelector('[data-availability-bulk-from]').value = '2026-10-16';
+    bulkForm.querySelector('[data-availability-bulk-to]').value = '2026-10-17';
+    bulkForm.querySelector('[data-availability-bulk-units]').value = '3';
+    bulkForm.dispatchEvent(new globalThis.Event('submit', { bubbles: true, cancelable: true }));
     return {
       disabled,
       sheetOpen: document.querySelector('#availability-cell-sheet').classList.contains('open'),
+      bulkDisabled,
+      bulkSheetOpen: document.querySelector('#availability-sheet').classList.contains('open'),
     };
   }, availabilityId);
   assert.strictEqual(bypass.disabled, true, `${label}: cell control disabled`);
   assert.strictEqual(bypass.sheetOpen, false, `${label}: runtime handler refuses editor`);
+  assert.strictEqual(bypass.bulkDisabled, true, `${label}: bulk control disabled`);
+  assert.strictEqual(bypass.bulkSheetOpen, false, `${label}: runtime handler refuses bulk editor`);
   await page.reload({ waitUntil: 'networkidle0' });
   assert.deepStrictEqual(
     await availabilitySnapshot(page, availabilityId),
     { text: '4', stopped: false },
     `${label}: forced runtime submit does not persist`
   );
+  assert.deepStrictEqual(await availabilityMutationState(page), {}, `${label}: no forced bulk mutation persists`);
+}
+
+async function assertBulkAvailabilityFlow(page, origin, lang) {
+  const suffix = lang === 'en' ? '-en' : '';
+  const screen = `m-availability${suffix}.html`;
+  const numericIds = ['double:2026-10-16', 'double:2026-10-17'];
+  const numericUnselectedIds = ['double:2026-10-15', 'double:2026-10-18', 'suite:2026-10-16'];
+  await open(page, origin, screen);
+  await page.evaluate(() => globalThis.localStorage.clear());
+  await open(page, origin, screen);
+  const numericUnselectedBefore = await availabilitySnapshots(page, numericUnselectedIds);
+
+  await openAvailabilityBulkEditor(page);
+  const labels = await page.evaluate(() => ({
+    title: document.querySelector('#availability-sheet h2').textContent.trim(),
+    actions: [...document.querySelector('[data-availability-bulk-action]').options].map(option =>
+      option.textContent.trim()
+    ),
+    rooms: [...document.querySelector('[data-availability-bulk-room]').options].map(option =>
+      option.textContent.trim()
+    ),
+    count: document.querySelector('[data-availability-bulk-count]').textContent.trim(),
+    unitsHidden: document.querySelector('[data-availability-bulk-units-field]').hidden,
+  }));
+  assert.match(labels.title, lang === 'en' ? /Bulk availability/ : /Hromadná změna dostupnosti/);
+  assert.deepStrictEqual(
+    labels.actions,
+    lang === 'en' ? ['Set available units', 'Stop sell'] : ['Nastavit volné jednotky', 'Nastavit stop prodej'],
+    `${lang}: localized bulk actions`
+  );
+  assert(labels.rooms.includes(lang === 'en' ? 'All room types' : 'Všechny typy pokojů'));
+  assert(labels.rooms.includes(lang === 'en' ? 'Double' : 'Dvoulůžkový'));
+  assert.strictEqual(labels.count, '2', `${lang}: default Double inclusive count`);
+  assert.strictEqual(labels.unitsHidden, false, `${lang}: numeric action shows numeric input`);
+
+  await setBulkDate(page, '[data-availability-bulk-from]', '2026-10-18');
+  await setBulkDate(page, '[data-availability-bulk-to]', '2026-10-17');
+  assert.strictEqual(
+    await page.$eval('[data-availability-bulk-count]', node => node.textContent.trim()),
+    '0',
+    `${lang}: reversed range affects zero cells`
+  );
+  assert.strictEqual(
+    await page.$eval('[data-availability-bulk-error]', node => !node.hidden && node.textContent.trim().length > 0),
+    true,
+    `${lang}: reversed range shows an error`
+  );
+  await page.click('[form="availability-form"]');
+  assert.deepStrictEqual(await availabilityMutationState(page), {}, `${lang}: reversed range cannot mutate state`);
+
+  await setBulkDate(page, '[data-availability-bulk-from]', '2026-10-16');
+  await setBulkDate(page, '[data-availability-bulk-to]', '2026-10-17');
+  await page.$eval('[data-availability-bulk-units]', input => {
+    input.value = '256';
+  });
+  await page.click('[form="availability-form"]');
+  assert.strictEqual(
+    await page.$eval('[data-availability-bulk-error]', node => !node.hidden && node.textContent.trim().length > 0),
+    true,
+    `${lang}: bulk units enforce 0–255`
+  );
+  assert.deepStrictEqual(await availabilityMutationState(page), {}, `${lang}: invalid units preserve state`);
+
+  await page.$eval('[data-availability-bulk-units]', input => {
+    input.value = '3';
+  });
+  assert.strictEqual(
+    await page.$eval('[data-availability-bulk-count]', node => node.textContent.trim()),
+    '2',
+    `${lang}: Double 16–17 preview count`
+  );
+  await page.click('[form="availability-form"]');
+  await page.waitForFunction(
+    () => document.querySelector('#availability-sheet').getAttribute('aria-hidden') === 'true'
+  );
+  for (const availabilityId of numericIds) {
+    assert.deepStrictEqual(
+      await availabilitySnapshot(page, availabilityId),
+      { text: '3', stopped: false },
+      `${lang}: numeric bulk changes ${availabilityId}`
+    );
+  }
+  assert.deepStrictEqual(
+    await availabilitySnapshots(page, numericUnselectedIds),
+    numericUnselectedBefore,
+    `${lang}: numeric bulk leaves neighboring and unselected cells unchanged`
+  );
+  assert.deepStrictEqual(
+    Object.keys(await availabilityMutationState(page)).sort(),
+    numericIds.slice().sort(),
+    `${lang}: numeric bulk writes exactly two keys`
+  );
+  await page.reload({ waitUntil: 'networkidle0' });
+  assert.deepStrictEqual(
+    await availabilitySnapshots(page, numericUnselectedIds),
+    numericUnselectedBefore,
+    `${lang}: numeric unselected cells stay unchanged after reload`
+  );
+  for (const availabilityId of numericIds) {
+    assert.deepStrictEqual(
+      await availabilitySnapshot(page, availabilityId),
+      { text: '3', stopped: false },
+      `${lang}: numeric bulk survives reload for ${availabilityId}`
+    );
+  }
+
+  await page.evaluate(() => globalThis.localStorage.clear());
+  await page.reload({ waitUntil: 'networkidle0' });
+  const allRoomIds = await page.$$eval('.availability-cell', cells =>
+    cells
+      .filter(cell => ['2026-10-17', '2026-10-18'].includes(cell.dataset.dateId))
+      .map(cell => cell.dataset.availabilityId)
+  );
+  const stopSellUnselectedIds = ['double:2026-10-16', 'double:2026-10-19', 'family:2026-10-16'];
+  const stopSellUnselectedBefore = await availabilitySnapshots(page, stopSellUnselectedIds);
+  await openAvailabilityBulkEditor(page);
+  await page.select('[data-availability-bulk-action]', 'stopSell');
+  await page.select('[data-availability-bulk-room]', 'all');
+  await setBulkDate(page, '[data-availability-bulk-from]', '2026-10-17');
+  await setBulkDate(page, '[data-availability-bulk-to]', '2026-10-18');
+  assert.strictEqual(
+    await page.$eval('[data-availability-bulk-units-field]', node => node.hidden),
+    true,
+    `${lang}: stop sell hides numeric input`
+  );
+  assert.strictEqual(
+    await page.$eval('[data-availability-bulk-count]', node => node.textContent.trim()),
+    '10',
+    `${lang}: all rooms over two dates previews ten cells`
+  );
+  await page.click('[form="availability-form"]');
+  await page.waitForFunction(
+    () => document.querySelector('#availability-sheet').getAttribute('aria-hidden') === 'true'
+  );
+  assert.strictEqual(allRoomIds.length, 10, `${lang}: five rooms over two dates`);
+  for (const availabilityId of allRoomIds) {
+    assert.deepStrictEqual(
+      await availabilitySnapshot(page, availabilityId),
+      { text: '×', stopped: true },
+      `${lang}: all-room stop sell changes ${availabilityId}`
+    );
+  }
+  assert.deepStrictEqual(
+    Object.keys(await availabilityMutationState(page)).sort(),
+    allRoomIds.slice().sort(),
+    `${lang}: all-room stop sell writes exactly ten selected keys`
+  );
+  assert.deepStrictEqual(
+    await availabilitySnapshots(page, stopSellUnselectedIds),
+    stopSellUnselectedBefore,
+    `${lang}: all-room stop sell leaves dates outside the range unchanged`
+  );
+  await page.reload({ waitUntil: 'networkidle0' });
+  for (const availabilityId of allRoomIds) {
+    assert.deepStrictEqual(
+      await availabilitySnapshot(page, availabilityId),
+      { text: '×', stopped: true },
+      `${lang}: all-room stop sell survives reload for ${availabilityId}`
+    );
+  }
+  assert.deepStrictEqual(
+    await availabilitySnapshots(page, stopSellUnselectedIds),
+    stopSellUnselectedBefore,
+    `${lang}: unselected dates stay unchanged after stop-sell reload`
+  );
+
+  await page.evaluate(() => globalThis.localStorage.clear());
+  await page.reload({ waitUntil: 'networkidle0' });
+  await openAvailabilityBulkEditor(page);
+  await page.$eval('[data-availability-bulk-units]', input => {
+    input.value = '0';
+  });
+  await page.click('[form="availability-form"]');
+  await page.reload({ waitUntil: 'networkidle0' });
+  for (const availabilityId of numericIds) {
+    assert.deepStrictEqual(
+      await availabilitySnapshot(page, availabilityId),
+      { text: '0', stopped: false },
+      `${lang}: bulk numeric zero remains distinct from stop sell after reload`
+    );
+  }
+  const zeroMutations = await availabilityMutationState(page);
+  numericIds.forEach(availabilityId => {
+    assert.deepStrictEqual(
+      zeroMutations[availabilityId],
+      { type: 'units', value: 0 },
+      `${lang}: bulk zero uses numeric mutation semantics for ${availabilityId}`
+    );
+  });
 }
 
 async function assertSingleAvailabilityFlow(page, origin, lang) {
@@ -532,6 +804,7 @@ async function main() {
       assert.strictEqual(new Set(availabilityIdentity.keys).size, 60, `${availability}: unique room/date ids`);
       assert(availabilityIdentity.complete, `${availability}: every cell carries room type and date ids`);
       await assertSingleAvailabilityFlow(page, origin, lang ? 'en' : 'cs');
+      await assertBulkAvailabilityFlow(page, origin, lang ? 'en' : 'cs');
 
       const offers = `m-offer${lang}.html`;
       const offerCounts = { all: 4, active: 3, spa: 2, missing: 1 };
